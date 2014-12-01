@@ -1,6 +1,9 @@
 package fr.tvbarthel.simplesoundcloud.library;
 
+import com.google.gson.JsonObject;
+
 import retrofit.RestAdapter;
+import rx.Observable;
 
 /**
  * Encapsulate network and player features to work with sound cloud.
@@ -33,10 +36,10 @@ public final class SimpleSoundCloud {
     private SimpleSoundCloud(String clientId) {
         mSimpleSoundCloudRequestSignator = new SimpleSoundCloudRequestSignator(clientId);
 
-        RestAdapter restAdapter =
-                new RestAdapter.Builder().setEndpoint(SOUND_CLOUD_API)
-                        .setRequestInterceptor(mSimpleSoundCloudRequestSignator)
-                        .build();
+        RestAdapter restAdapter
+                = new RestAdapter.Builder().setEndpoint(SOUND_CLOUD_API)
+                .setRequestInterceptor(mSimpleSoundCloudRequestSignator)
+                .build();
 
         mSimpleSoundCloudService = restAdapter.create(SimpleSoundCloudService.class);
     }
@@ -57,5 +60,15 @@ public final class SimpleSoundCloud {
             sInstance.mSimpleSoundCloudRequestSignator.setClientId(clientId);
         }
         return sInstance;
+    }
+
+    /**
+     * Retrieve SoundCloud user profile.
+     *
+     * @param userId user id.
+     * @return {@link rx.Observable}
+     */
+    public Observable<JsonObject> getUser(int userId) {
+        return mSimpleSoundCloudService.getUser(userId);
     }
 }

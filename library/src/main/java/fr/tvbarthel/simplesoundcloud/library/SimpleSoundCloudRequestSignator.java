@@ -3,7 +3,7 @@ package fr.tvbarthel.simplesoundcloud.library;
 import retrofit.RequestInterceptor;
 
 /**
- * {@link retrofit.RequestInterceptor} used to sign each call for the sound cloud api.
+ * {@link retrofit.RequestInterceptor} used to sign each call for the SoundCloud api.
  */
 public class SimpleSoundCloudRequestSignator implements RequestInterceptor {
 
@@ -18,7 +18,7 @@ public class SimpleSoundCloudRequestSignator implements RequestInterceptor {
     private String mClientId;
 
     /**
-     * {@link retrofit.RequestInterceptor} used to sign each request for sound cloud http api.
+     * {@link retrofit.RequestInterceptor} used to sign each request for SoundCloud http api.
      *
      * @param clientId client id.
      */
@@ -34,7 +34,7 @@ public class SimpleSoundCloudRequestSignator implements RequestInterceptor {
     /**
      * Set the client id used to sign each request.
      *
-     * @param clientId sound cloud client id.
+     * @param clientId SoundCloud client id.
      */
     public void setClientId(String clientId) {
         if (clientId == null) {
