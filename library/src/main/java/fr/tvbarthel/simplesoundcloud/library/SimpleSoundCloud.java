@@ -5,7 +5,6 @@ import android.content.Context;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
 import retrofit.RestAdapter;
-import retrofit.client.Response;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -36,17 +35,6 @@ public final class SimpleSoundCloud {
     private SimpleSoundCloudRequestSignator mSimpleSoundCloudRequestSignator;
 
     /**
-     * Offliner used to store and access {@link retrofit.client.Response} body
-     * when no network connection is available.
-     */
-    private SimpleSoundCloudOffliner mSimpleSoundCloudOffliner;
-
-    /**
-     * Transformer used to store or retrieve response from offliner when no network access.
-     */
-    private Observable.Transformer<Response, String> mPrepareForOffline;
-
-    /**
      * Singleton pattern.
      *
      * @param context  context used to initiate
@@ -64,15 +52,7 @@ public final class SimpleSoundCloud {
 
         mSimpleSoundCloudService = restAdapter.create(SimpleSoundCloudService.class);
 
-        mSimpleSoundCloudOffliner = SimpleSoundCloudOffliner.initInstance(context, false);
-
-        mPrepareForOffline = new Observable.Transformer<Response, String>() {
-            @Override
-            public Observable<? extends String> call(Observable<? extends Response> observable) {
-                return observable.map(mSimpleSoundCloudOffliner.save)
-                        .onErrorReturn(mSimpleSoundCloudOffliner.retrieve);
-            }
-        };
+        SimpleSoundCloudOffliner.initInstance(context, false);
     }
 
     /**
@@ -104,7 +84,7 @@ public final class SimpleSoundCloud {
         return mSimpleSoundCloudService.getUser(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(mPrepareForOffline)
+                .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
                 .map(SimpleSoundCloudRxParser.PARSE_USER);
     }
 

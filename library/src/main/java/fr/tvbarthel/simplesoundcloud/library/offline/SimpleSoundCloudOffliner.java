@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import rx.Observable;
 import rx.functions.Func1;
 
 /**
@@ -19,6 +20,23 @@ import rx.functions.Func1;
  * Saved response body could then be retrieved for offline usage.
  */
 public final class SimpleSoundCloudOffliner {
+
+    /**
+     * Prepare an {@link rx.Observable} of {@link retrofit.client.Response} for offline usage.
+     * <p/>
+     * This will save JSON body or retrieved it for offline usage.
+     * <p/>
+     * {@link fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner#initInstance(android.content.Context, boolean)}
+     * must have been called before.
+     */
+    public static final Observable.Transformer<Response, String> PREPARE_FOR_OFFLINE
+            = new Observable.Transformer<Response, String>() {
+        @Override
+        public Observable<? extends String> call(Observable<? extends Response> observable) {
+            return observable.map(getInstance().save)
+                    .onErrorReturn(getInstance().retrieve);
+        }
+    };
 
     /**
      * Tag for log cat.
@@ -34,7 +52,7 @@ public final class SimpleSoundCloudOffliner {
      * Allow an {@link rx.Observable<retrofit.client.Response>} to save the Response body
      * for offline usage.
      */
-    public Func1<Response, String> save = new Func1<Response, String>() {
+    private Func1<Response, String> save = new Func1<Response, String>() {
         @Override
         public String call(Response response) {
 
@@ -80,7 +98,7 @@ public final class SimpleSoundCloudOffliner {
      * Allow an {@link rx.Observable<retrofit.client.Response>} to retrieveFromCache the Response body from
      * offline saver when an {@link rx.Observable#onErrorReturn(rx.functions.Func1)} is called.
      */
-    public Func1<Throwable, String> retrieve = new Func1<Throwable, String>() {
+    private Func1<Throwable, String> retrieve = new Func1<Throwable, String>() {
         @Override
         public String call(Throwable throwable) {
             String url = ((RetrofitError) throwable).getUrl();
