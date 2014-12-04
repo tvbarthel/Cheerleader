@@ -43,7 +43,7 @@ public class SoundCloudUser implements Parcelable {
     private int mPlaylistCount;
     private int mFollowersCount;
     private int mFollowingsCount;
-    private int mPublicFavoritCount;
+    private int mPublicFavoritedCount;
 
     /**
      * Default constructor.
@@ -78,7 +78,7 @@ public class SoundCloudUser implements Parcelable {
         this.mPlaylistCount = in.readInt();
         this.mFollowersCount = in.readInt();
         this.mFollowingsCount = in.readInt();
-        this.mPublicFavoritCount = in.readInt();
+        this.mPublicFavoritedCount = in.readInt();
     }
 
     @Override
@@ -109,7 +109,35 @@ public class SoundCloudUser implements Parcelable {
         dest.writeInt(this.mPlaylistCount);
         dest.writeInt(this.mFollowersCount);
         dest.writeInt(this.mFollowingsCount);
-        dest.writeInt(this.mPublicFavoritCount);
+        dest.writeInt(this.mPublicFavoritedCount);
+    }
+
+    @Override
+    public String toString() {
+        return "SoundCloudUser{"
+                + "mId=" + mId
+                + ", mPermaLink='" + mPermaLink + '\''
+                + ", mUserName='" + mUserName + '\''
+                + ", mUri='" + mUri + '\''
+                + ", mPermaLinkUrl='" + mPermaLinkUrl + '\''
+                + ", mAvatarUrl='" + mAvatarUrl + '\''
+                + ", mCountry='" + mCountry + '\''
+                + ", mFullName='" + mFullName + '\''
+                + ", mFirstName='" + mFirstName + '\''
+                + ", mLastName='" + mLastName + '\''
+                + ", mCity='" + mCity + '\''
+                + ", mDescription='" + mDescription + '\''
+                + ", mDiscogsName='" + mDiscogsName + '\''
+                + ", mMyspaceName='" + mMyspaceName + '\''
+                + ", mWebsite='" + mWebsite + '\''
+                + ", mWebsiteTitle='" + mWebsiteTitle + '\''
+                + ", mOnline=" + mOnline
+                + ", mTrackCount=" + mTrackCount
+                + ", mPlaylistCount=" + mPlaylistCount
+                + ", mFollowersCount=" + mFollowersCount
+                + ", mFollowingsCount=" + mFollowingsCount
+                + ", mPublicFavoritedCount=" + mPublicFavoritedCount
+                + '}';
     }
 
     /**
@@ -169,7 +197,7 @@ public class SoundCloudUser implements Parcelable {
     /**
      * API resource.
      * <p/>
-     * Example : URL	http://api.soundcloud.com/comments/32562
+     * Example : URL http://api.soundcloud.com/comments/32562
      *
      * @return API resource.
      */
@@ -180,7 +208,7 @@ public class SoundCloudUser implements Parcelable {
     /**
      * API resource.
      * <p/>
-     * Example : URL	http://api.soundcloud.com/comments/32562
+     * Example : URL http://api.soundcloud.com/comments/32562
      *
      * @param uri API resource.
      */
@@ -526,7 +554,7 @@ public class SoundCloudUser implements Parcelable {
      * @return number of favorited public tracks
      */
     public int getPublicFavoritedCount() {
-        return mPublicFavoritCount;
+        return mPublicFavoritedCount;
     }
 
     /**
@@ -535,7 +563,7 @@ public class SoundCloudUser implements Parcelable {
      * @param publicFavoritedCount number of favorited public tracks
      */
     public void setPublicFavoritedCount(int publicFavoritedCount) {
-        this.mPublicFavoritCount = publicFavoritedCount;
+        this.mPublicFavoritedCount = publicFavoritedCount;
     }
 
 }

@@ -5,7 +5,7 @@ import retrofit.RequestInterceptor;
 /**
  * {@link retrofit.RequestInterceptor} used to sign each call for the SoundCloud api.
  */
-public class SimpleSoundCloudRequestSignator implements RequestInterceptor {
+class SimpleSoundCloudRequestSignator implements RequestInterceptor {
 
     /**
      * Query param used to sign each request.

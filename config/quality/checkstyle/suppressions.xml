@@ -9,4 +9,5 @@
     <suppress files="BuildConfig.java" checks="[a-zA-Z0-9]*" />
     <suppress files="FastBlurHelper"
         checks="InnerAssignmentCheck|MultipleVariableDeclarationsCheck|MethodLengthCheck" />
+    <suppress files="SimpleSoundCloudOffliner" checks="VisibilityModifierCheck"/>
 </suppressions>

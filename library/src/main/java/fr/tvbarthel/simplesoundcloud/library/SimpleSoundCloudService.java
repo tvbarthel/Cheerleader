@@ -1,8 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.library;
 
 
-import com.google.gson.JsonObject;
-
+import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import rx.Observable;
@@ -19,5 +18,5 @@ interface SimpleSoundCloudService {
      * @return {@link rx.Observable} on {@link com.google.gson.JsonObject}
      */
     @GET("/users/{userId}.json")
-    public Observable<JsonObject> getUser(@Path("userId") int userId);
+    public Observable<Response> getUser(@Path("userId") int userId);
 }
