@@ -1,5 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.library;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,7 +47,7 @@ final class SimpleSoundCloudRxParser {
                 simpleSoundCloudUser.setFollowersCount(jsonObject.optInt(FOLLOWERS_COUNT));
                 simpleSoundCloudUser.setFollowingsCount(jsonObject.optInt(FOLLOWINGS_COUNT));
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(TAG, "FAILED TO PARSE_USER : " + json);
             }
 
             return simpleSoundCloudUser;
