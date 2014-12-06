@@ -49,23 +49,27 @@ public final class SimpleSoundCloudOffliner {
     private static SimpleSoundCloudOffliner sInstance;
 
     /**
+     * Used to encapsulate offline access and storage through {@link android.content.ContentResolver}.
+     */
+    private OfflinerQueryHandler mOfflinerQueryHandler;
+
+
+    /**
      * Allow an {@link rx.Observable<retrofit.client.Response>} to save the Response body
      * for offline usage.
      */
     private Func1<Response, String> save = new Func1<Response, String>() {
         @Override
         public String call(Response response) {
-
             String jsonBody;
 
-            log("----- SAVE FOR OFFLINE : saving starts");
-            log("---------- for request : " + response.getUrl());
-
+            long start = System.currentTimeMillis();
+            log("---> SAVE FOR OFFLINE");
+            log("Request : " + response.getUrl());
 
             //Try to get response body
             BufferedReader reader;
             StringBuilder sb = new StringBuilder();
-            log("---------- trying to parse response body");
             try {
                 reader = new BufferedReader(new InputStreamReader(response.getBody().in(),
                         Charset.forName("UTF-8")));
@@ -81,15 +85,12 @@ public final class SimpleSoundCloudOffliner {
                 Log.e(TAG, "IOException : " + e.getMessage());
             }
 
-
             jsonBody = sb.toString();
             String key = response.getUrl();
-            log("---------- trying to save response body for offline");
-            OfflinerHelper.put(getContext(), key, jsonBody);
-            log("---------- url : " + key);
-            log("---------- body : " + jsonBody);
+            mOfflinerQueryHandler.put(key, jsonBody);
+            log("Json body saved : " + jsonBody);
 
-            log("----- SAVE FOR OFFLINE : saving ends");
+            log("<--- SAVE FOR OFFLINE REQUESTED (" + (System.currentTimeMillis() - start) + "ms)");
             return jsonBody;
         }
     };
@@ -116,10 +117,13 @@ public final class SimpleSoundCloudOffliner {
     /**
      * Private constructor to avoid concurrent access.
      *
-     * @param debug true to enable debug log.
+     * @param applicationContext context used to retrieve  {@link android.content.ContentResolver}
+     * @param debug              true to enable setLog log.
      */
-    private SimpleSoundCloudOffliner(boolean debug) {
-        mDebug = debug;
+    private SimpleSoundCloudOffliner(Context applicationContext, boolean debug) {
+        this.mDebug = debug;
+        this.mOfflinerQueryHandler = new OfflinerQueryHandler(applicationContext.getContentResolver());
+        this.mContext = new WeakReference<>(applicationContext);
     }
 
     /**
@@ -141,16 +145,29 @@ public final class SimpleSoundCloudOffliner {
      * Initialize the static instance.
      *
      * @param context context store in a {@link java.lang.ref.WeakReference} to avoid memory leak.
-     * @param debug   true if debug mode is enable.
+     * @param debug   true if setLog mode is enable.
      * @return {@link SimpleSoundCloudOffliner} instance.
      */
     public static SimpleSoundCloudOffliner initInstance(Context context, boolean debug) {
         if (sInstance == null) {
-            sInstance = new SimpleSoundCloudOffliner(debug);
+            sInstance = new SimpleSoundCloudOffliner(context, debug);
+        } else {
+            sInstance.mContext = new WeakReference<>(context);
         }
-        sInstance.mContext = new WeakReference<>(context);
 
         return sInstance;
+    }
+
+    /**
+     * Enable or disable log for the current instance.
+     *
+     * @param enable true to enable log.
+     */
+    public static void debug(boolean enable) {
+        if (sInstance != null) {
+            sInstance.mDebug = enable;
+            sInstance.mOfflinerQueryHandler.debug(enable);
+        }
     }
 
     /**
@@ -160,16 +177,18 @@ public final class SimpleSoundCloudOffliner {
      * @return response body as string.
      */
     private String retrieveFromCache(String url) {
+        long start = System.currentTimeMillis();
         String savedJson;
-
-        savedJson = OfflinerHelper.get(getContext(), url);
-        log("---------- body found in offline saver : " + savedJson);
-        log("----- NO NETWORK : retrieving ends");
+        log("---> RETRIEVE FROM OFFLINE STORAGE ");
+        log("Request : " + url);
+        savedJson = mOfflinerQueryHandler.get(getContext(), url);
+        log("Retrieved body json : " + savedJson);
+        log("<--- RETRIEVE FROM OFFLINE STORAGE (" + (System.currentTimeMillis() - start) + "ms)");
         return savedJson;
     }
 
     /**
-     * Log in LogCat when debug mode is enable.
+     * Log in LogCat when setLog mode is enable.
      *
      * @param message text to be logged.
      */
