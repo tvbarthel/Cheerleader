@@ -3,6 +3,7 @@ package fr.tvbarthel.simplesoundcloud.library.player;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -27,9 +28,9 @@ public class SimpleSoundCloudPlayer extends Service {
     private static final String THREAD_NAME = TAG + "player_thread";
 
     /**
-     * Action used to identify start request.
+     * Action used to add a sound cloud track to the queue.
      */
-    private static final String ACTION_START = "sound_cloud_player_action_start";
+    private static final String ACTION_ADD_TRACK = "sound_cloud_player_action_add_track";
 
     /**
      * Bundle key used to pass client id.
@@ -37,27 +38,35 @@ public class SimpleSoundCloudPlayer extends Service {
     private static final String BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID = "sound_cloud_player_bundle_key_client_id";
 
     /**
+     * Bundle key used to pass track id.
+     */
+    private static final String BUNDLE_KEY_SOUND_CLOUD_TRACK_ID = "sound_cloud_player_bundle_key_track_id";
+
+    /**
+     * what id used to identify add track message.
+     */
+    private static final int WHAT_ADD_TRACK = 0;
+
+    /**
      * Handler used to execute works on an {@link android.os.HandlerThread}
      */
     private Handler mPlayerHandler;
 
     /**
-     * SoundCloud client id deliver to access the SoundCloud API.
-     */
-    private String mSoundCloudClientId;
-
-    /**
-     * Start the player service.
+     * Add a track to the player queue.
      *
-     * @param context context from which the service will be started.
+     * @param context  context from which the service will be started.
+     * @param clientId soundCloud client id to communicate with the api.
+     * @param trackId  sound cloud track id to be played.
      */
-    public static void start(Context context, String clientId) {
+    public static void addTrack(Context context, String clientId, int trackId) {
         if (clientId == null) {
             throw new IllegalArgumentException("clientId can't be null.");
         }
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
-        intent.setAction(ACTION_START);
+        intent.setAction(ACTION_ADD_TRACK);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK_ID, trackId);
         context.startService(intent);
     }
 
@@ -79,24 +88,28 @@ public class SimpleSoundCloudPlayer extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
+            Message message = mPlayerHandler.obtainMessage();
+            message.setData(intent.getExtras());
             switch (intent.getAction()) {
-                case ACTION_START:
-                    mSoundCloudClientId = intent.getStringExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID);
-                    Log.d(TAG, "---> Start");
-                    Log.d(TAG, "Client id : " + mSoundCloudClientId);
-                    Log.d(TAG, "<--- Start");
+                case ACTION_ADD_TRACK:
+                    message.what = WHAT_ADD_TRACK;
                     break;
                 default:
                     break;
             }
+            mPlayerHandler.sendMessage(message);
         }
         return START_STICKY;
+    }
+
+    private void enqueueTrack(String clientId, int trackId) {
+        Log.d("DEBUG==", "add track : " + clientId + " : " + trackId);
     }
 
     /**
      * Looper used process player request.
      */
-    private static class PlayerHandler extends Handler {
+    private final class PlayerHandler extends Handler {
 
         /**
          * Handler used to process player request.
@@ -110,6 +123,15 @@ public class SimpleSoundCloudPlayer extends Service {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            Bundle data = msg.getData();
+            switch (msg.what) {
+                case WHAT_ADD_TRACK:
+                    enqueueTrack(
+                            data.getString(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID),
+                            data.getInt(BUNDLE_KEY_SOUND_CLOUD_TRACK_ID)
+                    );
+                    break;
+            }
         }
     }
 }
