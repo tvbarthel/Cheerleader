@@ -2,8 +2,11 @@ package fr.tvbarthel.simplesoundcloud.library;
 
 import android.content.Context;
 
+import java.lang.ref.WeakReference;
+
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
+import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import retrofit.RestAdapter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -63,6 +66,16 @@ public final class SimpleSoundCloud {
     private SimpleSoundCloudRequestSignator mSimpleSoundCloudRequestSignator;
 
     /**
+     * WeakReference on the application context.
+     */
+    private WeakReference<Context> mApplicationContext;
+
+    /**
+     * Sound cloud client id used to have access to the API.
+     */
+    private String mClientKey;
+
+    /**
      * Singleton pattern.
      *
      * @param applicationContext context used to initiate
@@ -70,16 +83,27 @@ public final class SimpleSoundCloud {
      * @param clientId           SoundCloud api client key.
      */
     private SimpleSoundCloud(Context applicationContext, String clientId) {
-        mSimpleSoundCloudRequestSignator = new SimpleSoundCloudRequestSignator(clientId);
 
+        mClientKey = clientId;
+
+        mSimpleSoundCloudRequestSignator = new SimpleSoundCloudRequestSignator(mClientKey);
+
+        mApplicationContext = new WeakReference<>(applicationContext);
+
+        /**
+         * Initialize the Retrofit adapter for network communication.
+         */
         mRestAdapter = new RestAdapter.Builder()
                 .setEndpoint(SOUND_CLOUD_API)
                 .setRequestInterceptor(mSimpleSoundCloudRequestSignator)
                 .build();
-
         mSimpleSoundCloudService = mRestAdapter.create(SimpleSoundCloudService.class);
 
-        SimpleSoundCloudOffliner.initInstance(applicationContext, false);
+        /**
+         * Initialize the Offliner component for offline storage.
+         */
+        SimpleSoundCloudOffliner.initInstance(getContext(), false);
+
     }
 
     /**
@@ -116,6 +140,75 @@ public final class SimpleSoundCloud {
     }
 
     /**
+     * Start the playback. First track of the queue will be played.
+     * <p/>
+     * If the SoundCloud player is currently paused, the current track will be restart at the stopped position.
+     */
+    public void play() {
+        SimpleSoundCloudPlayer.play(getContext());
+    }
+
+    /**
+     * Pause the playback.
+     */
+    public void pause() {
+        SimpleSoundCloudPlayer.pause(getContext());
+    }
+
+    /**
+     * Stop the current played track and load the next one if the playlist isn't empty.
+     * <p/>
+     * If the current played track is the last one, the first track will be loaded.
+     */
+    public void next() {
+        SimpleSoundCloudPlayer.next(getContext());
+    }
+
+    /**
+     * Stop the current played track and load the previous one.
+     * <p/>
+     * If the current played track is the first one, the last track will be loaded.
+     */
+    public void previous() {
+        SimpleSoundCloudPlayer.previous(getContext());
+    }
+
+    /**
+     * Seek to the precise track position.
+     * <p/>
+     * The current playing state of the SoundCloud player will be kept.
+     * <p/>
+     * If playing it remains playing, if paused it remains paused.
+     *
+     * @param milli time in milli of the position.
+     */
+    public void seekTo(int milli) {
+        SimpleSoundCloudPlayer.seekTo(getContext(), milli);
+    }
+
+    /**
+     * Add a track to the current SoundCloud player playlist.
+     *
+     * @param trackId track identifier.
+     * @param playNow true if the track should be played immediately,
+     *                false to simple add the track to the queue.
+     */
+    public void addTrack(int trackId, boolean playNow) {
+        SimpleSoundCloudPlayer.addTrack(getContext(), mClientKey, trackId, playNow);
+    }
+
+    /**
+     * Remove a track from the SoundCloud player playlist.
+     * <p/>
+     * If the track is currently played, it will be stopped before being removed.
+     *
+     * @param trackId track id.
+     */
+    public void removeTrack(int trackId) {
+        SimpleSoundCloudPlayer.removeTrack(getContext(), trackId);
+    }
+
+    /**
      * Define the log policy.
      * <p/>
      * Note : some log configuration can increase memory foot print and/or reduce the performance.
@@ -141,6 +234,18 @@ public final class SimpleSoundCloud {
         }
         SimpleSoundCloudOffliner.debug((logLevel & LOG_OFFLINER) != 0);
 
+    }
+
+    /**
+     * Retrieve the context used at the creation.
+     *
+     * @return context.
+     */
+    private Context getContext() {
+        if (mApplicationContext.get() == null) {
+            throw new IllegalStateException("WeakReference on application context null");
+        }
+        return mApplicationContext.get();
     }
 
 }
