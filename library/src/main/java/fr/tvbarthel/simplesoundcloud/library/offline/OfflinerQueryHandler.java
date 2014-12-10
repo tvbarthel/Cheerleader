@@ -170,15 +170,17 @@ final class OfflinerQueryHandler extends AsyncQueryHandler {
         final Cursor cursor = context.getContentResolver().query(getUri(OfflinerDBHelper.TABLE_CACHE),
                 OfflinerDBHelper.PARAMS_CACHE, OfflinerDBHelper.REQUEST_URL
                         + " = '" + url + "'", null, null);
+        String result = null;
 
-        if (cursor != null && cursor.getCount() != 0) {
-            cursor.moveToFirst();
-            String result = cursor.getString(cursor.getColumnIndex(OfflinerDBHelper.REQUEST_RESULT));
+        if (cursor != null) {
+            if (cursor.getCount() != 0) {
+                cursor.moveToFirst();
+                result = cursor.getString(cursor.getColumnIndex(OfflinerDBHelper.REQUEST_RESULT));
+            }
             cursor.close();
-            return result;
-        } else {
-            return null;
         }
+
+        return result;
     }
 
     /**
