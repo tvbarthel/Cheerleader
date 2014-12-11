@@ -33,8 +33,7 @@ public class SoundCloudTrack implements Parcelable {
     private int mLabelId;
     private int mBmp;
     private long mDurationInMilli;
-    private Date mCreatationDate;
-    private Date mReleaseDate;
+    private Date mCreationDate;
     private boolean mPublicSharing;
     private boolean mStreamable;
     private boolean mDownloadable;
@@ -54,6 +53,7 @@ public class SoundCloudTrack implements Parcelable {
     private String mTrackType;
     private String mLicense;
     private String mOriginalFormat;
+    private String mWaveFormUrl;
 
     /**
      * Default constructor.
@@ -73,9 +73,7 @@ public class SoundCloudTrack implements Parcelable {
         this.mBmp = in.readInt();
         this.mDurationInMilli = in.readLong();
         long tmpMCreatationDate = in.readLong();
-        this.mCreatationDate = tmpMCreatationDate == -1 ? null : new Date(tmpMCreatationDate);
-        long tmpMReleaseDate = in.readLong();
-        this.mReleaseDate = tmpMReleaseDate == -1 ? null : new Date(tmpMReleaseDate);
+        this.mCreationDate = tmpMCreatationDate == -1 ? null : new Date(tmpMCreatationDate);
         this.mPublicSharing = in.readByte() != 0;
         this.mStreamable = in.readByte() != 0;
         this.mDownloadable = in.readByte() != 0;
@@ -95,6 +93,7 @@ public class SoundCloudTrack implements Parcelable {
         this.mTrackType = in.readString();
         this.mLicense = in.readString();
         this.mOriginalFormat = in.readString();
+        this.mWaveFormUrl = in.readString();
     }
 
     @Override
@@ -114,8 +113,7 @@ public class SoundCloudTrack implements Parcelable {
         dest.writeInt(this.mLabelId);
         dest.writeInt(this.mBmp);
         dest.writeLong(this.mDurationInMilli);
-        dest.writeLong(mCreatationDate != null ? mCreatationDate.getTime() : -1);
-        dest.writeLong(mReleaseDate != null ? mReleaseDate.getTime() : -1);
+        dest.writeLong(mCreationDate != null ? mCreationDate.getTime() : -1);
         dest.writeByte(mPublicSharing ? (byte) 1 : (byte) 0);
         dest.writeByte(mStreamable ? (byte) 1 : (byte) 0);
         dest.writeByte(mDownloadable ? (byte) 1 : (byte) 0);
@@ -135,6 +133,7 @@ public class SoundCloudTrack implements Parcelable {
         dest.writeString(this.mTrackType);
         dest.writeString(this.mLicense);
         dest.writeString(this.mOriginalFormat);
+        dest.writeString(this.mWaveFormUrl);
     }
 
     @Override
@@ -150,8 +149,7 @@ public class SoundCloudTrack implements Parcelable {
                 + ", mLabelId=" + mLabelId
                 + ", mBmp=" + mBmp
                 + ", mDurationInMilli=" + mDurationInMilli
-                + ", mCreatationDate=" + mCreatationDate
-                + ", mReleaseDate=" + mReleaseDate
+                + ", mCreationDate=" + mCreationDate
                 + ", mPublicSharing=" + mPublicSharing
                 + ", mStreamable=" + mStreamable
                 + ", mDownloadable=" + mDownloadable
@@ -171,6 +169,7 @@ public class SoundCloudTrack implements Parcelable {
                 + ", mTrackType='" + mTrackType + '\''
                 + ", mLicense='" + mLicense + '\''
                 + ", mOriginalFormat='" + mOriginalFormat + '\''
+                + ", mWaveUrl='" + mWaveFormUrl + '\''
                 + '}';
     }
 
@@ -359,35 +358,17 @@ public class SoundCloudTrack implements Parcelable {
      *
      * @return Date of creation
      */
-    public Date getCreatationDate() {
-        return mCreatationDate;
+    public Date getCreationDate() {
+        return mCreationDate;
     }
 
     /**
      * Date of creation
      *
-     * @param creatationDate Date of creation
+     * @param creationDate Date of creation
      */
-    public void setCreatationDate(Date creatationDate) {
-        this.mCreatationDate = creatationDate;
-    }
-
-    /**
-     * Date of the release.
-     *
-     * @return Date of the release.
-     */
-    public Date getReleaseDate() {
-        return mReleaseDate;
-    }
-
-    /**
-     * Date of the release.
-     *
-     * @param releaseDate Date of the release.
-     */
-    public void setReleaseDate(Date releaseDate) {
-        this.mReleaseDate = releaseDate;
+    public void setCreationDate(Date creationDate) {
+        this.mCreationDate = creationDate;
     }
 
     /**
@@ -742,5 +723,21 @@ public class SoundCloudTrack implements Parcelable {
      */
     public void setOriginalFormat(String originalFormat) {
         this.mOriginalFormat = originalFormat;
+    }
+
+    /**
+     * URL to PNG waveform image
+     * @return URL to PNG waveform image
+     */
+    public String getWaveFormUrl() {
+        return mWaveFormUrl;
+    }
+
+    /**
+     * URL to PNG waveform image
+     * @param waveFormUrl URL to PNG waveform image
+     */
+    public void setWaveFormUrl(String waveFormUrl) {
+        this.mWaveFormUrl = waveFormUrl;
     }
 }

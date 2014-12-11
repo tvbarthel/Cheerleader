@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.lang.ref.WeakReference;
 
+import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
@@ -129,7 +130,7 @@ public final class SimpleSoundCloud {
      * Retrieve SoundCloud user profile.
      *
      * @param userId user id.
-     * @return {@link rx.Observable}
+     * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser}
      */
     public Observable<SoundCloudUser> getUser(int userId) {
         return mSimpleSoundCloudService.getUser(userId)
@@ -137,6 +138,20 @@ public final class SimpleSoundCloud {
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
                 .map(SimpleSoundCloudRxParser.PARSE_USER);
+    }
+
+    /**
+     * Retrieve a SoundCloud track according to its id.
+     *
+     * @param trackId SoundCloud track id.
+     * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
+     */
+    public Observable<SoundCloudTrack> getTrack(int trackId) {
+        return mSimpleSoundCloudService.getTrack(trackId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
+                .map(SimpleSoundCloudRxParser.PARSE_TRACK);
     }
 
     /**
