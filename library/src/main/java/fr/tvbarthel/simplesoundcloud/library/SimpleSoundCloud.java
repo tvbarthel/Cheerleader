@@ -204,12 +204,12 @@ public final class SimpleSoundCloud {
     /**
      * Add a track to the current SoundCloud player playlist.
      *
-     * @param trackId track identifier.
-     * @param playNow true if the track should be played immediately,
-     *                false to simple add the track to the queue.
+     * @param trackUrl track identifier.
+     * @param playNow  true if the track should be played immediately,
+     *                 false to simple add the track to the queue.
      */
-    public void addTrack(int trackId, boolean playNow) {
-        SimpleSoundCloudPlayer.addTrack(getContext(), mClientKey, trackId, playNow);
+    public void addTrack(String trackUrl, boolean playNow) {
+        SimpleSoundCloudPlayer.addTrack(getContext(), trackUrl + "?client_id=" + mClientKey, playNow);
     }
 
     /**
@@ -217,10 +217,10 @@ public final class SimpleSoundCloud {
      * <p/>
      * If the track is currently played, it will be stopped before being removed.
      *
-     * @param trackId track id.
+     * @param trackUrl track stream url.
      */
-    public void removeTrack(int trackId) {
-        SimpleSoundCloudPlayer.removeTrack(getContext(), trackId);
+    public void removeTrack(String trackUrl) {
+        SimpleSoundCloudPlayer.removeTrack(getContext(), trackUrl + "?client_id=" + mClientKey);
     }
 
     /**
