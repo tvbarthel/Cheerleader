@@ -350,8 +350,20 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mMediaPlayer.seekTo(milli);
     }
 
-    private void enqueueTrack(String trackUrl) {
-        mPlaylist.add(trackUrl);
+    /**
+     * Add a track to the playlist.
+     *
+     * @param trackUrl track url.
+     * @param playNow  if true, track will be added to the current position and the song will start to
+     *                 play immediately.
+     */
+    private void enqueueTrack(String trackUrl, boolean playNow) {
+        if (playNow) {
+            mPlaylist.add(++mCurrentTrackIndex, trackUrl);
+            playTrack(mPlaylist.get(mCurrentTrackIndex));
+        } else {
+            mPlaylist.add(trackUrl);
+        }
     }
 
     private void removeTrack(String trackUrl) {
@@ -449,12 +461,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     seekToPosition(data.getInt(BUNDLE_KEY_SOUND_CLOUD_TRACK_POSITION));
                     break;
                 case WHAT_ADD_TRACK:
-                    enqueueTrack(data.getString(BUNDLE_KEY_SOUND_CLOUD_TRACK));
-                    if (data.getBoolean(BUNDLE_KEY_SOUND_CLOUD_PLAY_NOW)) {
-                        // play the last added song
-                        mCurrentTrackIndex = mPlaylist.size() - 1;
-                        playTrack(mPlaylist.get(mCurrentTrackIndex));
-                    }
+                    enqueueTrack(
+                            data.getString(BUNDLE_KEY_SOUND_CLOUD_TRACK),
+                            data.getBoolean(BUNDLE_KEY_SOUND_CLOUD_PLAY_NOW)
+                    );
                     break;
                 case WHAT_REMOVE_TRACK:
                     removeTrack(data.getString(BUNDLE_KEY_SOUND_CLOUD_TRACK));
