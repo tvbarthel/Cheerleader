@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -27,6 +28,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Log cat and thread name prefix.
      */
     private static final String TAG = SimpleSoundCloudPlayer.class.getSimpleName();
+
+    /**
+     * Tag used in debugging message for wifi lock.
+     */
+    private static final String WIFI_LOCK_TAG = TAG + "wifi_lock";
 
     /**
      * Name for the internal handler thread.
@@ -149,6 +155,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private boolean mIsPaused;
 
     /**
+     * Lock used to keep wifi while playing.
+     */
+    private WifiManager.WifiLock mWifiLock;
+
+    /**
      * Start the playback. First track of the queue will be played.
      * <p/>
      * If the SoundCloud player is currently paused, the current track will be restart at the stopped position.
@@ -257,6 +268,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
         initializeMediaPlayer();
 
+        mWifiLock = ((WifiManager) getBaseContext().getSystemService(Context.WIFI_SERVICE))
+                .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
+
     }
 
     @Override
@@ -315,6 +329,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        // release lock on wifi.
+        mWifiLock.release();
+
         nextTrack();
     }
 
@@ -410,6 +427,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      */
     private void playTrack(String track) {
         try {
+            // acquire lock on wifi.
+            mWifiLock.acquire();
+
             // set media player to stop state in order to be able to call prepare.
             mMediaPlayer.reset();
 
