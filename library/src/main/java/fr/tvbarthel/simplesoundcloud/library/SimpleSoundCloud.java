@@ -40,7 +40,6 @@ public final class SimpleSoundCloud {
      */
     public static final int LOG_OFFLINER = 0x00000010;
 
-
     /**
      * Sound cloud api url.
      */
@@ -160,14 +159,14 @@ public final class SimpleSoundCloud {
      * If the SoundCloud player is currently paused, the current track will be restart at the stopped position.
      */
     public void play() {
-        SimpleSoundCloudPlayer.play(getContext());
+        SimpleSoundCloudPlayer.play(getContext(), mClientKey);
     }
 
     /**
      * Pause the playback.
      */
     public void pause() {
-        SimpleSoundCloudPlayer.pause(getContext());
+        SimpleSoundCloudPlayer.pause(getContext(), mClientKey);
     }
 
     /**
@@ -176,7 +175,7 @@ public final class SimpleSoundCloud {
      * If the current played track is the last one, the first track will be loaded.
      */
     public void next() {
-        SimpleSoundCloudPlayer.next(getContext());
+        SimpleSoundCloudPlayer.next(getContext(), mClientKey);
     }
 
     /**
@@ -185,7 +184,7 @@ public final class SimpleSoundCloud {
      * If the current played track is the first one, the last track will be loaded.
      */
     public void previous() {
-        SimpleSoundCloudPlayer.previous(getContext());
+        SimpleSoundCloudPlayer.previous(getContext(), mClientKey);
     }
 
     /**
@@ -198,18 +197,19 @@ public final class SimpleSoundCloud {
      * @param milli time in milli of the position.
      */
     public void seekTo(int milli) {
-        SimpleSoundCloudPlayer.seekTo(getContext(), milli);
+        SimpleSoundCloudPlayer.seekTo(getContext(), mClientKey, milli);
     }
 
     /**
      * Add a track to the current SoundCloud player playlist.
      *
-     * @param trackUrl track identifier.
-     * @param playNow  true if the track should be played immediately,
-     *                 false to simple add the track to the queue.
+     * @param track   {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack} to be
+     *                added to the player.
+     * @param playNow true if the track should be played immediately,
+     *                false to simple add the track to the queue.
      */
-    public void addTrack(String trackUrl, boolean playNow) {
-        SimpleSoundCloudPlayer.addTrack(getContext(), trackUrl + "?client_id=" + mClientKey, playNow);
+    public void addTrack(SoundCloudTrack track, boolean playNow) {
+        SimpleSoundCloudPlayer.addTrack(getContext(), mClientKey, track, playNow);
     }
 
     /**
@@ -220,7 +220,7 @@ public final class SimpleSoundCloud {
      * @param trackUrl track stream url.
      */
     public void removeTrack(String trackUrl) {
-        SimpleSoundCloudPlayer.removeTrack(getContext(), trackUrl + "?client_id=" + mClientKey);
+        SimpleSoundCloudPlayer.removeTrack(getContext(), mClientKey, trackUrl + "?client_id=" + mClientKey);
     }
 
     /**

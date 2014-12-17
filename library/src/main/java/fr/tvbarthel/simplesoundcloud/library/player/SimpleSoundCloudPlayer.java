@@ -19,15 +19,23 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+
 /**
  * Service used as SoundCloudPlayer.
  */
-public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
+public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErrorListener,
+        MediaPlayer.OnCompletionListener {
 
     /**
      * Log cat and thread name prefix.
      */
     private static final String TAG = SimpleSoundCloudPlayer.class.getSimpleName();
+
+    /**
+     * Path param used to access streaming url.
+     */
+    private static final String SOUND_CLOUD_CLIENT_ID_PARAM = "?client_id=";
 
     /**
      * Tag used in debugging message for wifi lock.
@@ -142,7 +150,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     /**
      * List of all track.
      */
-    private ArrayList<String> mPlaylist;
+    private ArrayList<SoundCloudTrack> mPlaylist;
 
     /**
      * Index of the current track.
@@ -160,26 +168,35 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private WifiManager.WifiLock mWifiLock;
 
     /**
+     * SoundCloudClientId.
+     */
+    private String mSoundCloundClientId;
+
+    /**
      * Start the playback. First track of the queue will be played.
      * <p/>
      * If the SoundCloud player is currently paused, the current track will be restart at the stopped position.
      *
-     * @param context context from which the service will be started.
+     * @param context  context from which the service will be started.
+     * @param clientId SoundCloud api client id.
      */
-    public static void play(Context context) {
+    public static void play(Context context, String clientId) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
         intent.setAction(ACTION_START_PLAYER);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         context.startService(intent);
     }
 
     /**
      * Pause the SoundCloud payer.
      *
-     * @param context context from which the service will be started.
+     * @param context  context from which the service will be started.
+     * @param clientId SoundCloud api client id.
      */
-    public static void pause(Context context) {
+    public static void pause(Context context, String clientId) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
         intent.setAction(ACTION_PAUSE_PLAYER);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         context.startService(intent);
     }
 
@@ -188,11 +205,13 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * <p/>
      * If the current played track is the last one, the first track will be loaded.
      *
-     * @param context context from which the service will be started.
+     * @param context  context from which the service will be started.
+     * @param clientId SoundCloud api client id.
      */
-    public static void next(Context context) {
+    public static void next(Context context, String clientId) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
         intent.setAction(ACTION_NEXT_TRACK);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         context.startService(intent);
     }
 
@@ -201,11 +220,13 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * <p/>
      * If the current played track is the first one, the last track will be loaded.
      *
-     * @param context context from which the service will be started.
+     * @param context  context from which the service will be started.
+     * @param clientId SoundCloud api client id.
      */
-    public static void previous(Context context) {
+    public static void previous(Context context, String clientId) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
         intent.setAction(ACTION_PREVIOUS_TRACK);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         context.startService(intent);
     }
 
@@ -216,12 +237,14 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * <p/>
      * If playing it remains playing, if paused it remains paused.
      *
-     * @param context context from which the service will be started.
-     * @param milli   time in milli of the position.
+     * @param context  context from which the service will be started.
+     * @param clientId SoundCloud api client id.
+     * @param milli    time in milli of the position.
      */
-    public static void seekTo(Context context, int milli) {
+    public static void seekTo(Context context, String clientId, int milli) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
         intent.setAction(ACTION_SEEK_TO);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK_POSITION, milli);
         context.startService(intent);
     }
@@ -230,13 +253,15 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Add a track to the player queue.
      *
      * @param context  context from which the service will be started.
-     * @param trackUrl sound cloud track stream url to be played.
+     * @param clientId SoundCloud api client id.
+     * @param track    sound cloud track stream url to be played.
      * @param playNow  true to play the track immediately.
      */
-    public static void addTrack(Context context, String trackUrl, boolean playNow) {
+    public static void addTrack(Context context, String clientId, SoundCloudTrack track, boolean playNow) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
         intent.setAction(ACTION_ADD_TRACK);
-        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK, trackUrl);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK, track);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_PLAY_NOW, playNow);
         context.startService(intent);
     }
@@ -245,11 +270,13 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Remove track from the player playlist.
      *
      * @param context  context from which the service will be started.
+     * @param clientId SoundCloud api client id.
      * @param trackUrl track id to remove.
      */
-    public static void removeTrack(Context context, String trackUrl) {
+    public static void removeTrack(Context context, String clientId, String trackUrl) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
         intent.setAction(ACTION_REMOVE_TRACK);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK, trackUrl);
         context.startService(intent);
     }
@@ -289,7 +316,15 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             Message message = mPlayerHandler.obtainMessage();
-            message.setData(intent.getExtras());
+            Bundle extra = intent.getExtras();
+
+            // client id should be passed for each command as service could have been restarted
+            // by the system.
+            mSoundCloundClientId = extra.getString(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID);
+
+            // transfer args to the handler.
+            message.setData(extra);
+
             switch (intent.getAction()) {
                 case ACTION_START_PLAYER:
                     message.what = WHAT_START_PLAYER;
@@ -370,16 +405,16 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     /**
      * Add a track to the playlist.
      *
-     * @param trackUrl track url.
-     * @param playNow  if true, track will be added to the current position and the song will start to
-     *                 play immediately.
+     * @param track   track url.
+     * @param playNow if true, track will be added to the current position and the song will start to
+     *                play immediately.
      */
-    private void enqueueTrack(String trackUrl, boolean playNow) {
+    private void enqueueTrack(SoundCloudTrack track, boolean playNow) {
         if (playNow) {
-            mPlaylist.add(++mCurrentTrackIndex, trackUrl);
+            mPlaylist.add(++mCurrentTrackIndex, track);
             playTrack(mPlaylist.get(mCurrentTrackIndex));
         } else {
-            mPlaylist.add(trackUrl);
+            mPlaylist.add(track);
         }
     }
 
@@ -425,7 +460,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      *
      * @param track track url.
      */
-    private void playTrack(String track) {
+    private void playTrack(SoundCloudTrack track) {
         try {
             // acquire lock on wifi.
             mWifiLock.acquire();
@@ -434,7 +469,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             mMediaPlayer.reset();
 
             // set new data source
-            mMediaPlayer.setDataSource(track);
+            mMediaPlayer.setDataSource(track.getStreamUrl() + SOUND_CLOUD_CLIENT_ID_PARAM + mSoundCloundClientId);
 
             // prepare synchronously as the service run on it's own handler thread.
             mMediaPlayer.prepare();
@@ -482,7 +517,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     break;
                 case WHAT_ADD_TRACK:
                     enqueueTrack(
-                            data.getString(BUNDLE_KEY_SOUND_CLOUD_TRACK),
+                            ((SoundCloudTrack) data.getParcelable(BUNDLE_KEY_SOUND_CLOUD_TRACK)),
                             data.getBoolean(BUNDLE_KEY_SOUND_CLOUD_PLAY_NOW)
                     );
                     break;
