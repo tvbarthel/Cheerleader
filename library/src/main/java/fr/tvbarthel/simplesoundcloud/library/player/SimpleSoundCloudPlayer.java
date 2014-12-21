@@ -440,10 +440,15 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             if (mPlaylist.size() == 0) {
                 // last song has been removed
                 mCurrentTrackIndex = 0;
-
             } else if (mCurrentTrackIndex == trackIndex) {
-                // still at list one track in the playlist,
-                // set current index to the previous one.
+                // update current index and start the nex track if player wasn't paused.
+                mCurrentTrackIndex = (mCurrentTrackIndex - 1) % mPlaylist.size();
+                if (!mIsPaused) {
+                    playTrack(mPlaylist.get(mCurrentTrackIndex));
+                }
+            } else if (mCurrentTrackIndex > trackIndex) {
+                // update current track index if the removed one was before
+                // in the playlist
                 mCurrentTrackIndex = (mCurrentTrackIndex - 1) % mPlaylist.size();
             }
         }
