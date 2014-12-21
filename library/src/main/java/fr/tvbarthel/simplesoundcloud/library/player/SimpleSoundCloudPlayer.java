@@ -98,6 +98,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private static final String BUNDLE_KEY_SOUND_CLOUD_TRACK = "sound_cloud_player_bundle_key_track_url";
 
     /**
+     * Bundle key used to pass a track index.
+     */
+    private static final String BUNDLE_KEY_SOUND_CLOUD_TRACK_INDEX = "sound_cloud_player_bundle_key_track_index";
+
+    /**
      * Bundle key used to seek to a given position.
      */
     private static final String BUNDLE_KEY_SOUND_CLOUD_TRACK_POSITION = "sound_cloud_player_bundle_key_seek_to";
@@ -269,15 +274,15 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     /**
      * Remove track from the player playlist.
      *
-     * @param context  context from which the service will be started.
-     * @param clientId SoundCloud api client id.
-     * @param trackUrl track id to remove.
+     * @param context    context from which the service will be started.
+     * @param clientId   SoundCloud api client id.
+     * @param trackIndex track index in the playlist to remove.
      */
-    public static void removeTrack(Context context, String clientId, String trackUrl) {
+    public static void removeTrack(Context context, String clientId, int trackIndex) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
         intent.setAction(ACTION_REMOVE_TRACK);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
-        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK, trackUrl);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK_INDEX, trackIndex);
         context.startService(intent);
     }
 
@@ -418,11 +423,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         }
     }
 
-    private void removeTrack(String trackUrl) {
-        int trackIndex = mPlaylist.indexOf(trackUrl);
+    private void removeTrack(int trackIndex) {
 
         // check if track is in the playlist
-        if (trackIndex != -1) {
+        if (trackIndex >= 0 && trackIndex < mPlaylist.size()) {
 
             // stop the player when the removed track is also the current one.
             if (mCurrentTrackIndex == trackIndex) {
@@ -430,7 +434,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             }
 
             // remove the track from the playlist
-            mPlaylist.remove(trackUrl);
+            mPlaylist.remove(trackIndex);
 
             // update the current index
             if (mPlaylist.size() == 0) {
@@ -522,7 +526,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     );
                     break;
                 case WHAT_REMOVE_TRACK:
-                    removeTrack(data.getString(BUNDLE_KEY_SOUND_CLOUD_TRACK));
+                    removeTrack(data.getInt(BUNDLE_KEY_SOUND_CLOUD_TRACK_INDEX));
                     break;
                 default:
                     break;

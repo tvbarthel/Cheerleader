@@ -217,10 +217,10 @@ public final class SimpleSoundCloud {
      * <p/>
      * If the track is currently played, it will be stopped before being removed.
      *
-     * @param trackUrl track stream url.
+     * @param playlistIndex index of the track to be removed.
      */
-    public void removeTrack(String trackUrl) {
-        SimpleSoundCloudPlayer.removeTrack(getContext(), mClientKey, trackUrl + "?client_id=" + mClientKey);
+    public void removeTrack(int playlistIndex) {
+        SimpleSoundCloudPlayer.removeTrack(getContext(), mClientKey, playlistIndex);
     }
 
     /**
