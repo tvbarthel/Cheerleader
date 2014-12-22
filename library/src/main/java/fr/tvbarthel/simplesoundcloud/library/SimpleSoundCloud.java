@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
+import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudListener;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import retrofit.RestAdapter;
 import rx.Observable;
@@ -221,6 +222,24 @@ public final class SimpleSoundCloud {
      */
     public void removeTrack(int playlistIndex) {
         SimpleSoundCloudPlayer.removeTrack(getContext(), mClientKey, playlistIndex);
+    }
+
+    /**
+     * Register a listener to catch player events.
+     *
+     * @param listener listener to register.
+     */
+    public void registerPlayerListener(SimpleSoundCloudListener listener) {
+        SimpleSoundCloudPlayer.registerListener(getContext(), listener);
+    }
+
+    /**
+     * Unregister listener used to catch player events.
+     *
+     * @param listener listener to unregister.
+     */
+    public void unregisterPlayerListener(SimpleSoundCloudListener listener) {
+        SimpleSoundCloudPlayer.unregisterListener(getContext(), listener);
     }
 
     /**

@@ -3,6 +3,7 @@ package fr.tvbarthel.simplesoundcloud.library.player;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
@@ -14,6 +15,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -25,7 +27,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
  * Service used as SoundCloudPlayer.
  */
 public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener {
+        MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener {
 
     /**
      * Log cat and thread name prefix.
@@ -178,6 +180,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private String mSoundCloundClientId;
 
     /**
+     * Used to broadcast events.
+     */
+    private LocalBroadcastManager mLocalBroadcastManager;
+
+    /**
      * Start the playback. First track of the queue will be played.
      * <p/>
      * If the SoundCloud player is currently paused, the current track will be restart at the stopped position.
@@ -286,6 +293,36 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         context.startService(intent);
     }
 
+    /**
+     * Register a listener to catch player event.
+     *
+     * @param context  context used to register the listener.
+     * @param listener listener to register.
+     */
+    public static void registerListener(Context context, SimpleSoundCloudListener listener) {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SimpleSoundCloudListener.ACTION_PLAYLIST_RETRIEVED);
+        filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
+        filter.addAction(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
+        filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_ADDED);
+        filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_REMOVED);
+        filter.addAction(SimpleSoundCloudListener.ACTION_ON_SEEK_COMPLETE);
+
+        LocalBroadcastManager.getInstance(context.getApplicationContext())
+                .registerReceiver(listener, filter);
+    }
+
+    /**
+     * Unregister a registered listener.
+     *
+     * @param context  context used to unregister the listener.
+     * @param listener listener to unregister.
+     */
+    public static void unregisterListener(Context context, SimpleSoundCloudListener listener) {
+        LocalBroadcastManager.getInstance(context.getApplicationContext())
+                .unregisterReceiver(listener);
+    }
+
 
     @Override
     public void onCreate() {
@@ -303,6 +340,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mWifiLock = ((WifiManager) getBaseContext().getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
 
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
     }
 
     @Override
@@ -375,12 +413,27 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         nextTrack();
     }
 
+    @Override
+    public void onSeekComplete(MediaPlayer mp) {
+        // broadcast event
+        Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_SEEK_COMPLETE);
+        intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_SEEK, mp.getCurrentPosition());
+        mLocalBroadcastManager.sendBroadcast(intent);
+    }
+
 
     private void startPlayer() {
         if (mIsPaused) {
             // if player is paused, restart the current track.
             mIsPaused = false;
             mMediaPlayer.start();
+
+            // broadcast event
+            Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
+            intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, mPlaylist.get(mCurrentTrackIndex));
+            intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_INDEX, mCurrentTrackIndex);
+            mLocalBroadcastManager.sendBroadcast(intent);
+
         } else if (mPlaylist.size() > 0) {
             // if not paused and playlist isn't empty, play the first track;
             mCurrentTrackIndex = 0;
@@ -391,6 +444,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private void pausePlayer() {
         mIsPaused = true;
         mMediaPlayer.pause();
+
+        // broadcast event
+        Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
+        mLocalBroadcastManager.sendBroadcast(intent);
     }
 
     private void nextTrack() {
@@ -415,12 +472,23 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      *                play immediately.
      */
     private void enqueueTrack(SoundCloudTrack track, boolean playNow) {
+
+        int addedPosition = 0;
         if (playNow) {
             mPlaylist.add(++mCurrentTrackIndex, track);
+            addedPosition = mCurrentTrackIndex;
             playTrack(mPlaylist.get(mCurrentTrackIndex));
         } else {
             mPlaylist.add(track);
+            addedPosition = mPlaylist.size() - 1;
         }
+
+
+        // broadcast event
+        Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_ADDED);
+        intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, mPlaylist.get(mCurrentTrackIndex));
+        intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_INDEX, addedPosition);
+        mLocalBroadcastManager.sendBroadcast(intent);
     }
 
     private void removeTrack(int trackIndex) {
@@ -434,7 +502,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             }
 
             // remove the track from the playlist
-            mPlaylist.remove(trackIndex);
+            SoundCloudTrack removedTrack = mPlaylist.remove(trackIndex);
 
             // update the current index
             if (mPlaylist.size() == 0) {
@@ -451,6 +519,12 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                 // in the playlist
                 mCurrentTrackIndex = (mCurrentTrackIndex - 1) % mPlaylist.size();
             }
+
+            // broadcast event
+            Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_REMOVED);
+            intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, removedTrack);
+            intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_INDEX, trackIndex);
+            mLocalBroadcastManager.sendBroadcast(intent);
         }
     }
 
@@ -459,6 +533,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setOnCompletionListener(this);
+        mMediaPlayer.setOnSeekCompleteListener(this);
     }
 
     /**
@@ -485,6 +560,13 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
             // start the playback.
             mMediaPlayer.start();
+
+            // broadcast event
+            Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
+            intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, mPlaylist.get(mCurrentTrackIndex));
+            intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_INDEX, mCurrentTrackIndex);
+            mLocalBroadcastManager.sendBroadcast(intent);
+
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
         }
