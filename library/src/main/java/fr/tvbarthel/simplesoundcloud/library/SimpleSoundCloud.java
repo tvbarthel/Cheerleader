@@ -225,6 +225,13 @@ public final class SimpleSoundCloud {
     }
 
     /**
+     * Asynchronously request the internal player playlist.
+     */
+    public void requestPlaylist() {
+        SimpleSoundCloudPlayer.requestPlaylist(getContext(), mClientKey);
+    }
+
+    /**
      * Register a listener to catch player events.
      *
      * @param listener listener to register.

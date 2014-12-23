@@ -17,7 +17,7 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
     /**
      * package private, action used when playlist is retrieved.
      */
-    static final String ACTION_PLAYLIST_RETRIEVED = "simple_sc_listener_action_playlist_retrieved";
+    static final String ACTION_ON_PLAYLIST_RETRIEVED = "simple_sc_listener_action_on_playlist_retrieved";
 
     /**
      * package private, action used when the player started a track.
@@ -73,7 +73,7 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent != null) {
             switch (intent.getAction()) {
-                case ACTION_PLAYLIST_RETRIEVED:
+                case ACTION_ON_PLAYLIST_RETRIEVED:
                     onPlaylistRetrieved(
                             ((SoundCloudPlaylist) intent.getParcelableExtra(EXTRA_KEY_PLAYLIST)),
                             intent.getIntExtra(EXTRA_KEY_INDEX, 0));
@@ -110,7 +110,7 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
     }
 
     /**
-     * Called as a callback of TODO
+     * Async callback for internal playlist request.
      *
      * @param playlist     {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
      *                     currently added to the player.

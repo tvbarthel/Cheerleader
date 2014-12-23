@@ -21,6 +21,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 
 /**
@@ -85,6 +86,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private static final String ACTION_SEEK_TO = "sound_cloud_player_seek_to";
 
     /**
+     * Action used to broadcast the playlist.
+     */
+    private static final String ACTION_PLAYLIST_REQUESTED = "sound_cloud_broadcast_playlist";
+
+    /**
      * Bundle key used to pass client id.
      */
     private static final String BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID = "sound_cloud_player_bundle_key_client_id";
@@ -143,6 +149,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * what id used to identify remove track message.
      */
     private static final int WHAT_REMOVE_TRACK = 6;
+
+    /**
+     * what id used to identify playlist request
+     */
+    private static final int WHAT_BROADCAST_PLAYLIST = 7;
 
     /**
      * Handler used to execute works on an {@link android.os.HandlerThread}
@@ -294,6 +305,19 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     }
 
     /**
+     * Request the current playlist asynchronously.
+     *
+     * @param context  context from which the service will be started.
+     * @param clientId SoundCloud api client id.
+     */
+    public static void requestPlaylist(Context context, String clientId) {
+        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
+        intent.setAction(ACTION_PLAYLIST_REQUESTED);
+        intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
+        context.startService(intent);
+    }
+
+    /**
      * Register a listener to catch player event.
      *
      * @param context  context used to register the listener.
@@ -301,7 +325,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      */
     public static void registerListener(Context context, SimpleSoundCloudListener listener) {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(SimpleSoundCloudListener.ACTION_PLAYLIST_RETRIEVED);
+        filter.addAction(SimpleSoundCloudListener.ACTION_ON_PLAYLIST_RETRIEVED);
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_ADDED);
@@ -389,6 +413,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     break;
                 case ACTION_REMOVE_TRACK:
                     message.what = WHAT_REMOVE_TRACK;
+                    break;
+                case ACTION_PLAYLIST_REQUESTED:
+                    message.what = WHAT_BROADCAST_PLAYLIST;
                     break;
                 default:
                     break;
@@ -573,6 +600,18 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     }
 
     /**
+     * Broadcast the current playlist.
+     */
+    private void broadcastPlaylist() {
+        Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYLIST_RETRIEVED);
+        SoundCloudPlaylist playlist = new SoundCloudPlaylist();
+        playlist.addAllTracks(mPlaylist);
+        intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_PLAYLIST, playlist);
+        intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_INDEX, mCurrentTrackIndex);
+        mLocalBroadcastManager.sendBroadcast(intent);
+    }
+
+    /**
      * Looper used process player request.
      */
     private final class PlayerHandler extends Handler {
@@ -614,6 +653,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     break;
                 case WHAT_REMOVE_TRACK:
                     removeTrack(data.getInt(BUNDLE_KEY_SOUND_CLOUD_TRACK_INDEX));
+                    break;
+                case WHAT_BROADCAST_PLAYLIST:
+                    broadcastPlaylist();
                     break;
                 default:
                     break;
