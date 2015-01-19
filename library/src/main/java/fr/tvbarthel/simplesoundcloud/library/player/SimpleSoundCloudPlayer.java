@@ -1,5 +1,6 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,12 +16,14 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import fr.tvbarthel.simplesoundcloud.library.R;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 
@@ -34,6 +37,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Log cat and thread name prefix.
      */
     private static final String TAG = SimpleSoundCloudPlayer.class.getSimpleName();
+
+    /**
+     * Notification id.
+     */
+    private static final int NOTIFICATION_ID = 0x00000055;
 
     /**
      * Path param used to access streaming url.
@@ -194,6 +202,16 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Used to broadcast events.
      */
     private LocalBroadcastManager mLocalBroadcastManager;
+
+    /**
+     * Notification builder.
+     */
+    private NotificationCompat.Builder mNotificationBuilder;
+
+    /**
+     * System service used to manage notification.
+     */
+    private NotificationManager mNotificationManager;
 
     /**
      * Start the playback. First track of the queue will be played.
@@ -365,6 +383,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
+
+        mNotificationBuilder = new NotificationCompat.Builder(this);
+
+        mNotificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
     }
 
     @Override
@@ -461,6 +483,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_INDEX, mCurrentTrackIndex);
             mLocalBroadcastManager.sendBroadcast(intent);
 
+            startForeground();
+
         } else if (mPlaylist.size() > 0) {
             // if not paused and playlist isn't empty, play the first track;
             mCurrentTrackIndex = 0;
@@ -475,6 +499,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         // broadcast event
         Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
         mLocalBroadcastManager.sendBroadcast(intent);
+
+        stopForeground();
     }
 
     private void nextTrack() {
@@ -594,9 +620,34 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_INDEX, mCurrentTrackIndex);
             mLocalBroadcastManager.sendBroadcast(intent);
 
+            startForeground();
+
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
         }
+    }
+
+    /**
+     * Make the service run in foreground with an ongoing notification.
+     */
+    private void startForeground() {
+        SoundCloudTrack track = mPlaylist.get(mCurrentTrackIndex);
+        mNotificationBuilder
+                .setSmallIcon(R.drawable.abc_btn_switch_to_on_mtrl_00001)
+                .setContentTitle(track.getTitle())
+                .setTicker(track.getTitle())
+                .setContentText(track.getDescription());
+        startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
+    }
+
+    /**
+     * Remove foreground state and allow notification to be canceled manually.
+     */
+    private void stopForeground() {
+        stopForeground(true);
+        mNotificationBuilder.setTicker(null);
+        mNotificationBuilder.setOngoing(false);
+        mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
     }
 
     /**
