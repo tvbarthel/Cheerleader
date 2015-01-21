@@ -1,6 +1,5 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -16,14 +15,12 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import fr.tvbarthel.simplesoundcloud.library.R;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 
@@ -34,29 +31,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener {
 
     /**
-     * Log cat and thread name prefix.
+     * Action used for toggle playback event
+     * <p/>
+     * package private, used by the SimpleSoundCloudNotificationManager for PendingIntent.
      */
-    private static final String TAG = SimpleSoundCloudPlayer.class.getSimpleName();
-
-    /**
-     * Notification id.
-     */
-    private static final int NOTIFICATION_ID = 0x00000055;
-
-    /**
-     * Path param used to access streaming url.
-     */
-    private static final String SOUND_CLOUD_CLIENT_ID_PARAM = "?client_id=";
-
-    /**
-     * Tag used in debugging message for wifi lock.
-     */
-    private static final String WIFI_LOCK_TAG = TAG + "wifi_lock";
-
-    /**
-     * Name for the internal handler thread.
-     */
-    private static final String THREAD_NAME = TAG + "player_thread";
+    static final String ACTION_TOGGLE_PLAYBACK = "sound_cloud_toggle_playback";
 
     /**
      * Action used to add a sound cloud track to the queue.
@@ -164,6 +143,26 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private static final int WHAT_BROADCAST_PLAYLIST = 7;
 
     /**
+     * Log cat and thread name prefix.
+     */
+    private static final String TAG = SimpleSoundCloudPlayer.class.getSimpleName();
+
+    /**
+     * Path param used to access streaming url.
+     */
+    private static final String SOUND_CLOUD_CLIENT_ID_PARAM = "?client_id=";
+
+    /**
+     * Tag used in debugging message for wifi lock.
+     */
+    private static final String WIFI_LOCK_TAG = TAG + "wifi_lock";
+
+    /**
+     * Name for the internal handler thread.
+     */
+    private static final String THREAD_NAME = TAG + "player_thread";
+
+    /**
      * Handler used to execute works on an {@link android.os.HandlerThread}
      */
     private Handler mPlayerHandler;
@@ -204,14 +203,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private LocalBroadcastManager mLocalBroadcastManager;
 
     /**
-     * Notification builder.
+     * Sound cloud notification manager.
      */
-    private NotificationCompat.Builder mNotificationBuilder;
-
-    /**
-     * System service used to manage notification.
-     */
-    private NotificationManager mNotificationManager;
+    private SimpleSoundCloudNotificationManager mSimpleSoundCloudNotificationManager;
 
     /**
      * Start the playback. First track of the queue will be played.
@@ -384,9 +378,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
 
-        mNotificationBuilder = new NotificationCompat.Builder(this);
+        mSimpleSoundCloudNotificationManager = new SimpleSoundCloudNotificationManager(this);
 
-        mNotificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
     }
 
     @Override
@@ -407,12 +400,14 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             Message message = mPlayerHandler.obtainMessage();
             Bundle extra = intent.getExtras();
 
-            // client id should be passed for each command as service could have been restarted
-            // by the system.
-            mSoundCloundClientId = extra.getString(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID);
+            if (extra != null) {
+                // client id should be passed for each command as service could have been restarted
+                // by the system.
+                mSoundCloundClientId = extra.getString(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID);
 
-            // transfer args to the handler.
-            message.setData(extra);
+                // transfer args to the handler.
+                message.setData(extra);
+            }
 
             switch (intent.getAction()) {
                 case ACTION_START_PLAYER:
@@ -438,6 +433,13 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     break;
                 case ACTION_PLAYLIST_REQUESTED:
                     message.what = WHAT_BROADCAST_PLAYLIST;
+                    break;
+                case ACTION_TOGGLE_PLAYBACK:
+                    if (mIsPaused) {
+                        message.what = WHAT_START_PLAYER;
+                    } else {
+                        message.what = WHAT_PAUSE_PLAYER;
+                    }
                     break;
                 default:
                     break;
@@ -632,22 +634,16 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      */
     private void startForeground() {
         SoundCloudTrack track = mPlaylist.get(mCurrentTrackIndex);
-        mNotificationBuilder
-                .setSmallIcon(R.drawable.abc_btn_switch_to_on_mtrl_00001)
-                .setContentTitle(track.getTitle())
-                .setTicker(track.getTitle())
-                .setContentText(track.getDescription());
-        startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
+        mSimpleSoundCloudNotificationManager.notify(this, track, mIsPaused, false);
     }
 
     /**
-     * Remove foreground state and allow notification to be canceled manually.
+     * Remove foreground state and allow simple_sound_cloud_notification to be canceled manually.
      */
     private void stopForeground() {
-        stopForeground(true);
-        mNotificationBuilder.setTicker(null);
-        mNotificationBuilder.setOngoing(false);
-        mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+        stopForeground(false);
+        SoundCloudTrack track = mPlaylist.get(mCurrentTrackIndex);
+        mSimpleSoundCloudNotificationManager.notify(this, track, mIsPaused, true);
     }
 
     /**
