@@ -616,6 +616,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             // start the playback.
             mMediaPlayer.start();
 
+            mIsPaused = false;
+
             // broadcast event
             Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, mPlaylist.get(mCurrentTrackIndex));
