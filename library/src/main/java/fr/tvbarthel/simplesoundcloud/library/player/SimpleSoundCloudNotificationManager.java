@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import fr.tvbarthel.simplesoundcloud.library.R;
+import fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 
 /**
@@ -126,7 +127,10 @@ class SimpleSoundCloudNotificationManager {
         // new track is passed.
         int newTrackId = track.getId();
         if (mTrackId == -1 || mTrackId != newTrackId) {
-            loadArtwork(service, track.getArtworkUrl());
+            loadArtwork(
+                    service,
+                    SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XLARGE)
+            );
             mTrackId = newTrackId;
         }
     }
