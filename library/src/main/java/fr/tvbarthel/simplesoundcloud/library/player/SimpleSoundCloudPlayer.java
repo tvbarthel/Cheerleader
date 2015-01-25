@@ -38,6 +38,20 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     static final String ACTION_TOGGLE_PLAYBACK = "sound_cloud_toggle_playback";
 
     /**
+     * Action used to skip to the next track of the sound cloud player.
+     * <p/>
+     * package private, used by the SimpleSoundCloudNotificationManager for PendingIntent.
+     */
+    static final String ACTION_NEXT_TRACK = "sound_cloud_player_next";
+
+    /**
+     * Action used to skip to the previous track of the sound cloud player.
+     * <p/>
+     * package private, used by the SimpleSoundCloudNotificationManager for PendingIntent.
+     */
+    static final String ACTION_PREVIOUS_TRACK = "sound_cloud_player_previous";
+
+    /**
      * Action used to add a sound cloud track to the queue.
      */
     private static final String ACTION_ADD_TRACK = "sound_cloud_player_action_add_track";
@@ -56,16 +70,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Action used to pause the sound cloud player.
      */
     private static final String ACTION_PAUSE_PLAYER = "sound_cloud_player_pause";
-
-    /**
-     * Action used to skip to the next track of the sound cloud player.
-     */
-    private static final String ACTION_NEXT_TRACK = "sound_cloud_player_next";
-
-    /**
-     * Action used to skip to the previous track of the sound cloud player.
-     */
-    private static final String ACTION_PREVIOUS_TRACK = "sound_cloud_player_previous";
 
     /**
      * Action used to change the cursor of the current track.

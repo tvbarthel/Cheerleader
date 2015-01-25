@@ -6,4 +6,8 @@
     </item>
     <item name="simple_sound_cloud_notification_pause" type="drawable">@drawable/ic_pause_black
     </item>
+    <item name="simple_sound_cloud_notification_next" type="drawable">@drawable/ic_next_black
+    </item>
+    <item name="simple_sound_cloud_notification_previous" type="drawable">@drawable/ic_previous_black
+    </item>
 </resources>

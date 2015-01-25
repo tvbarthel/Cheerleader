@@ -34,6 +34,16 @@ class SimpleSoundCloudNotificationManager {
     private static final int REQUEST_CODE_PLAYBACK = 0x00000010;
 
     /**
+     * Next track pending intent request code.
+     */
+    private static final int REQUEST_CODE_NEXT = 0x00000020;
+
+    /**
+     * Previous track pending intent request code.
+     */
+    private static final int REQUEST_CODE_PREVIOUS = 0x00000030;
+
+    /**
      * Handler running on main thread to perform change on notification ui.
      */
     private Handler mMainThreadHandler;
@@ -67,6 +77,16 @@ class SimpleSoundCloudNotificationManager {
      * Pending intent set to the playback button.
      */
     private PendingIntent mTogglePlaybackPendingIntent;
+
+    /**
+     * Pending intent set to the next button.
+     */
+    private PendingIntent mNextPendingIntent;
+
+    /**
+     * Pending intent set to the previous button.
+     */
+    private PendingIntent mPreviousPendingIntent;
 
     /**
      * Encapsulate player notification behaviour.
@@ -106,6 +126,10 @@ class SimpleSoundCloudNotificationManager {
         // set the title
         mNotificationBuilder.setContentTitle(track.getTitle());
 
+        // set the previous track action button
+        mNotificationBuilder.addAction(R.drawable.simple_sound_cloud_notification_previous, "",
+                mPreviousPendingIntent);
+
         // set the right icon for the toggle playback action.
         if (isPaused) {
             mNotificationBuilder.addAction(R.drawable.simple_sound_cloud_notification_play, "",
@@ -114,6 +138,10 @@ class SimpleSoundCloudNotificationManager {
             mNotificationBuilder.addAction(R.drawable.simple_sound_cloud_notification_pause, "",
                     mTogglePlaybackPendingIntent);
         }
+
+        // set the next track action button
+        mNotificationBuilder.addAction(R.drawable.simple_sound_cloud_notification_next, "",
+                mNextPendingIntent);
 
         // set the dismiss policy.
         if (isDismissible) {
@@ -147,6 +175,18 @@ class SimpleSoundCloudNotificationManager {
         togglePlaybackIntent.setAction(SimpleSoundCloudPlayer.ACTION_TOGGLE_PLAYBACK);
         mTogglePlaybackPendingIntent = PendingIntent.getService(context, REQUEST_CODE_PLAYBACK,
                 togglePlaybackIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // next track
+        Intent nextPrendingIntent = new Intent(context, SimpleSoundCloudPlayer.class);
+        nextPrendingIntent.setAction(SimpleSoundCloudPlayer.ACTION_NEXT_TRACK);
+        mNextPendingIntent = PendingIntent.getService(context, REQUEST_CODE_NEXT,
+                nextPrendingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // previous track
+        Intent previousPendingIntent = new Intent(context, SimpleSoundCloudPlayer.class);
+        previousPendingIntent.setAction(SimpleSoundCloudPlayer.ACTION_PREVIOUS_TRACK);
+        mPreviousPendingIntent = PendingIntent.getService(context, REQUEST_CODE_PREVIOUS,
+                previousPendingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     /**
