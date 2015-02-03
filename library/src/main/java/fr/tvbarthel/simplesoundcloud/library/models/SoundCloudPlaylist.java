@@ -35,6 +35,7 @@ public class SoundCloudPlaylist implements Parcelable {
     }
 
     private SoundCloudPlaylist(Parcel in) {
+        this();
         in.readTypedList(this.mTracks, SoundCloudTrack.CREATOR);
     }
 
@@ -71,6 +72,18 @@ public class SoundCloudPlaylist implements Parcelable {
      */
     public void addTracks(SoundCloudTrack track) {
         mTracks.add(track);
+    }
+
+    /**
+     * Add a track at the given position.
+     * <p/>
+     * The track will be inserted before previous element at the specified position.
+     *
+     * @param position position at which the track will be inserted.
+     * @param track    track to add.
+     */
+    public void addTrack(int position, SoundCloudTrack track) {
+        mTracks.add(position, track);
     }
 
     /**

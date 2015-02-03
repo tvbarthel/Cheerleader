@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 
 /**
@@ -13,11 +12,6 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
  * {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudListener}
  */
 public class SimpleSoundCloudListener extends BroadcastReceiver {
-
-    /**
-     * package private, action used when playlist is retrieved.
-     */
-    static final String ACTION_ON_PLAYLIST_RETRIEVED = "simple_sc_listener_action_on_playlist_retrieved";
 
     /**
      * package private, action used when the player started a track.
@@ -73,11 +67,6 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent != null) {
             switch (intent.getAction()) {
-                case ACTION_ON_PLAYLIST_RETRIEVED:
-                    onPlaylistRetrieved(
-                            ((SoundCloudPlaylist) intent.getParcelableExtra(EXTRA_KEY_PLAYLIST)),
-                            intent.getIntExtra(EXTRA_KEY_INDEX, 0));
-                    break;
                 case ACTION_ON_TRACK_PLAYED:
                     onPlay(
                             ((SoundCloudTrack) intent.getParcelableExtra(EXTRA_KEY_TRACK)),
@@ -95,8 +84,7 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
                     break;
                 case ACTION_ON_TRACK_REMOVED:
                     onTrackRemoved(
-                            ((SoundCloudTrack) intent.getParcelableExtra(EXTRA_KEY_TRACK)),
-                            intent.getIntExtra(EXTRA_KEY_INDEX, 0)
+                            ((SoundCloudTrack) intent.getParcelableExtra(EXTRA_KEY_TRACK))
                     );
                     break;
                 case ACTION_ON_SEEK_COMPLETE:
@@ -107,17 +95,6 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
                     break;
             }
         }
-    }
-
-    /**
-     * Async callback for internal playlist request.
-     *
-     * @param playlist     {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
-     *                     currently added to the player.
-     * @param currentTrack position of the current track in the playlist.
-     */
-    protected void onPlaylistRetrieved(SoundCloudPlaylist playlist, int currentTrack) {
-
     }
 
     /**
@@ -150,10 +127,9 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
     /**
      * Called when a track has been removed from the player playlist.
      *
-     * @param track    track removed.
-     * @param position position of the track in the playlist.
+     * @param track track removed.
      */
-    protected void onTrackRemoved(SoundCloudTrack track, int position) {
+    protected void onTrackRemoved(SoundCloudTrack track) {
 
     }
 

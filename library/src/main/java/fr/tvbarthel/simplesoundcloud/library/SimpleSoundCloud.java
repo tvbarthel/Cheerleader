@@ -3,7 +3,9 @@ package fr.tvbarthel.simplesoundcloud.library;
 import android.content.Context;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
+import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
@@ -77,6 +79,26 @@ public final class SimpleSoundCloud {
     private String mClientKey;
 
     /**
+     * List of all track.
+     */
+    private SoundCloudPlaylist mPlaylist;
+
+    /**
+     * Internal listener used to catch service callbacks
+     */
+    private SimpleSoundCloudListener mInternalListener;
+
+    /**
+     * Used to know if the player is paused.
+     */
+    private boolean mIsPaused;
+
+    /**
+     * Index of the current track.
+     */
+    private int mCurrentTrackIndex;
+
+    /**
      * Singleton pattern.
      *
      * @param applicationContext context used to initiate
@@ -88,6 +110,8 @@ public final class SimpleSoundCloud {
         mClientKey = clientId;
 
         mSimpleSoundCloudRequestSignator = new SimpleSoundCloudRequestSignator(mClientKey);
+
+        mPlaylist = new SoundCloudPlaylist();
 
         mApplicationContext = new WeakReference<>(applicationContext);
 
@@ -105,6 +129,7 @@ public final class SimpleSoundCloud {
          */
         SimpleSoundCloudOffliner.initInstance(getContext(), false);
 
+        initInternalListener();
     }
 
     /**
@@ -160,13 +185,15 @@ public final class SimpleSoundCloud {
      * If the SoundCloud player is currently paused, the current track will be restart at the stopped position.
      */
     public void play() {
-        SimpleSoundCloudPlayer.play(getContext(), mClientKey);
+        mIsPaused = false;
+        SimpleSoundCloudPlayer.play(getContext(), mClientKey, mCurrentTrackIndex, mPlaylist);
     }
 
     /**
      * Pause the playback.
      */
     public void pause() {
+        mIsPaused = true;
         SimpleSoundCloudPlayer.pause(getContext(), mClientKey);
     }
 
@@ -176,7 +203,8 @@ public final class SimpleSoundCloud {
      * If the current played track is the last one, the first track will be loaded.
      */
     public void next() {
-        SimpleSoundCloudPlayer.next(getContext(), mClientKey);
+        mCurrentTrackIndex = (mCurrentTrackIndex + 1) % mPlaylist.getTracks().size();
+        play();
     }
 
     /**
@@ -185,7 +213,9 @@ public final class SimpleSoundCloud {
      * If the current played track is the first one, the last track will be loaded.
      */
     public void previous() {
-        SimpleSoundCloudPlayer.previous(getContext(), mClientKey);
+        int tracks = mPlaylist.getTracks().size();
+        mCurrentTrackIndex = (tracks + mCurrentTrackIndex - 1) % tracks;
+        play();
     }
 
     /**
@@ -210,7 +240,17 @@ public final class SimpleSoundCloud {
      *                false to simple add the track to the queue.
      */
     public void addTrack(SoundCloudTrack track, boolean playNow) {
-        SimpleSoundCloudPlayer.addTrack(getContext(), mClientKey, track, playNow);
+
+        if (playNow) {
+            mPlaylist.addTrack(++mCurrentTrackIndex, track);
+            play();
+        } else {
+            mPlaylist.addTracks(track);
+
+            // add track to the internal service playlist
+            SimpleSoundCloudPlayer.addTrack(getContext(), mClientKey, mCurrentTrackIndex, mPlaylist);
+        }
+
     }
 
     /**
@@ -221,15 +261,56 @@ public final class SimpleSoundCloud {
      * @param playlistIndex index of the track to be removed.
      */
     public void removeTrack(int playlistIndex) {
-        SimpleSoundCloudPlayer.removeTrack(getContext(), mClientKey, playlistIndex);
+
+        ArrayList<SoundCloudTrack> tracks = mPlaylist.getTracks();
+
+        boolean shouldPlayNewTrack = false;
+
+        // check if track is in the playlist
+        if (playlistIndex >= 0 && playlistIndex < tracks.size()) {
+
+            // stop the player when the removed track is also the current one.
+            if (mCurrentTrackIndex == playlistIndex) {
+                SimpleSoundCloudPlayer.stop(getContext(), mClientKey);
+            }
+
+            // remove the track from the playlist
+            SoundCloudTrack removedTrack = tracks.remove(playlistIndex);
+
+            // update the current index
+            if (tracks.size() == 0) {
+                // last song has been removed
+                mCurrentTrackIndex = 0;
+            } else if (mCurrentTrackIndex == playlistIndex) {
+                // update current index and start the nex track if player wasn't paused.
+                mCurrentTrackIndex = (mCurrentTrackIndex - 1) % tracks.size();
+                if (!mIsPaused) {
+                    shouldPlayNewTrack = true;
+                }
+            } else if (mCurrentTrackIndex > playlistIndex) {
+                // update current track index if the removed one was before
+                // in the playlist
+                mCurrentTrackIndex = (mCurrentTrackIndex - 1) % tracks.size();
+            }
+
+            if (shouldPlayNewTrack) {
+                play();
+            }
+
+            SimpleSoundCloudPlayer.removeTrack(getContext(), mClientKey, playlistIndex,
+                    mPlaylist, removedTrack);
+        }
     }
 
     /**
-     * Asynchronously request the internal player playlist.
+     * Retrieve the current playlist.
+     *
+     * @return current playlist.
      */
-    public void requestPlaylist() {
-        SimpleSoundCloudPlayer.requestPlaylist(getContext(), mClientKey);
+    public SoundCloudPlaylist getPlaylist() {
+        return mPlaylist;
     }
+
 
     /**
      * Register a listener to catch player events.
@@ -287,6 +368,24 @@ public final class SimpleSoundCloud {
             throw new IllegalStateException("WeakReference on application context null");
         }
         return mApplicationContext.get();
+    }
+
+    /**
+     * Register internal listener to keep current track up to date.
+     * <p/>
+     * TODO unregister listener ?
+     */
+    private void initInternalListener() {
+        mInternalListener = new SimpleSoundCloudListener() {
+            @Override
+            protected void onPlay(SoundCloudTrack track, int position) {
+                super.onPlay(track, position);
+                // since next/pause can be performed using the notification
+                // synchronized the current played track.
+                mCurrentTrackIndex = position;
+            }
+        };
+        SimpleSoundCloudPlayer.registerListener(getContext(), mInternalListener);
     }
 
 }
