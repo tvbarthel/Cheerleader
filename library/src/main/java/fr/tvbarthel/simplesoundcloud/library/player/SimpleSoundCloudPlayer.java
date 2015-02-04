@@ -218,6 +218,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      *
      * @param context  context from which the service will be started.
      * @param clientId SoundCloud api client id.
+     * @param position position of the track to be played.
+     * @param playlist current playlist.
      */
     public static void play(Context context, String clientId, int position, SoundCloudPlaylist playlist) {
         Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
