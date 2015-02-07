@@ -1,5 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
+import java.util.ArrayList;
+
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 
@@ -28,6 +30,7 @@ public final class SimpleSoundCloudPlayerPlaylist {
      */
     private SimpleSoundCloudPlayerPlaylist() {
         mSoundCloudPlaylist = new SoundCloudPlaylist();
+        mCurrentTrackIndex = -1;
     }
 
     /**
@@ -52,6 +55,18 @@ public final class SimpleSoundCloudPlayerPlaylist {
     }
 
     /**
+     * Return the current track.
+     *
+     * @return current track or null if none has been added to the player playlist.
+     */
+    public SoundCloudTrack getCurrentTrack() {
+        if (mCurrentTrackIndex > -1) {
+            return mSoundCloudPlaylist.getTracks().get(mCurrentTrackIndex);
+        }
+        return null;
+    }
+
+    /**
      * Add a track at the end of the playlist.
      *
      * @param track track to be added.
@@ -67,6 +82,9 @@ public final class SimpleSoundCloudPlayerPlaylist {
      * @param track    track to insert.
      */
     public void add(int position, SoundCloudTrack track) {
+        if (mCurrentTrackIndex == -1) {
+            mCurrentTrackIndex = 0;
+        }
         mSoundCloudPlaylist.addTrack(position, track);
     }
 
@@ -75,10 +93,19 @@ public final class SimpleSoundCloudPlayerPlaylist {
      * <p/>
      * If the track is currently played, it will be stopped before being removed.
      *
-     * @param playlistIndex index of the track to be removed.
+     * @param trackIndex index of the track to be removed.
+     * @return track removed or null if given index can't be found.
      */
-    public void remove(int playlistIndex) {
+    public SoundCloudTrack remove(int trackIndex) {
 
+        ArrayList<SoundCloudTrack> tracks = mSoundCloudPlaylist.getTracks();
+
+        // check if track is in the playlist
+        if (trackIndex >= 0 && trackIndex < tracks.size()) {
+            return tracks.remove(trackIndex);
+        }
+
+        return null;
     }
 
     /**
@@ -87,7 +114,8 @@ public final class SimpleSoundCloudPlayerPlaylist {
      * @return next track to be played.
      */
     public SoundCloudTrack next() {
-        return new SoundCloudTrack();
+        mCurrentTrackIndex = (mCurrentTrackIndex + 1) % mSoundCloudPlaylist.getTracks().size();
+        return mSoundCloudPlaylist.getTracks().get(mCurrentTrackIndex);
     }
 
     /**
@@ -96,6 +124,8 @@ public final class SimpleSoundCloudPlayerPlaylist {
      * @return previous track to be played.
      */
     public SoundCloudTrack previous() {
-        return new SoundCloudTrack();
+        int tracks = mSoundCloudPlaylist.getTracks().size();
+        mCurrentTrackIndex = (tracks + mCurrentTrackIndex - 1) % tracks;
+        return mSoundCloudPlaylist.getTracks().get(mCurrentTrackIndex);
     }
 }
