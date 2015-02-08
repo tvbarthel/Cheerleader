@@ -68,10 +68,7 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
         if (intent != null) {
             switch (intent.getAction()) {
                 case ACTION_ON_TRACK_PLAYED:
-                    onPlay(
-                            ((SoundCloudTrack) intent.getParcelableExtra(EXTRA_KEY_TRACK)),
-                            intent.getIntExtra(EXTRA_KEY_INDEX, 0)
-                    );
+                    onPlay(((SoundCloudTrack) intent.getParcelableExtra(EXTRA_KEY_TRACK)));
                     break;
                 case ACTION_ON_PLAYER_PAUSED:
                     onPause();
@@ -100,10 +97,9 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
     /**
      * Called when a track starts to be played.
      *
-     * @param track    played track.
-     * @param position position of the track in the playlist.
+     * @param track played track.
      */
-    protected void onPlay(SoundCloudTrack track, int position) {
+    protected void onPlay(SoundCloudTrack track) {
 
     }
 

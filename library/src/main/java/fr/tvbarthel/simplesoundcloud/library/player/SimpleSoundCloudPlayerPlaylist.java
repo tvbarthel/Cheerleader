@@ -98,14 +98,30 @@ public final class SimpleSoundCloudPlayerPlaylist {
      */
     public SoundCloudTrack remove(int trackIndex) {
 
+        SoundCloudTrack removedTrack = null;
         ArrayList<SoundCloudTrack> tracks = mSoundCloudPlaylist.getTracks();
 
         // check if track is in the playlist
         if (trackIndex >= 0 && trackIndex < tracks.size()) {
-            return tracks.remove(trackIndex);
+            removedTrack = tracks.remove(trackIndex);
+
+            // update the current index
+            if (tracks.size() == 0) {
+                // last song has been removed
+                mCurrentTrackIndex = 0;
+            } else if (mCurrentTrackIndex == trackIndex) {
+                // update current index and start the nex track if player wasn't paused.
+                mCurrentTrackIndex = (mCurrentTrackIndex - 1) % tracks.size();
+            } else if (mCurrentTrackIndex > trackIndex) {
+                // update current track index if the removed one was before
+                // in the playlist
+                mCurrentTrackIndex = (mCurrentTrackIndex - 1) % tracks.size();
+            }
+
         }
 
-        return null;
+
+        return removedTrack;
     }
 
     /**
