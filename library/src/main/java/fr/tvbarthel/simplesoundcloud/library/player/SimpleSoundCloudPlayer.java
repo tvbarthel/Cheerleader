@@ -95,11 +95,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private static final String BUNDLE_KEY_SOUND_CLOUD_TRACK_POSITION = "sound_cloud_player_bundle_key_seek_to";
 
     /**
-     * Bundle key used to pass a playlist.
-     */
-    private static final String BUNDLE_KEY_SOUND_CLOUD_PLAYLIST = "sound_cloud_player_bundle_key_playlist";
-
-    /**
      * what id used to identify "play" message.
      */
     private static final int WHAT_PLAY = 0;
@@ -279,8 +274,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         IntentFilter filter = new IntentFilter();
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
-        filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_ADDED);
-        filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_REMOVED);
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_SEEK_COMPLETE);
 
         LocalBroadcastManager.getInstance(context.getApplicationContext())

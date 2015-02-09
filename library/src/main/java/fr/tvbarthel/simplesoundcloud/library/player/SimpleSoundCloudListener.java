@@ -24,16 +24,6 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
     static final String ACTION_ON_PLAYER_PAUSED = "simple_sc_listener_action_on_track_paused";
 
     /**
-     * package private, action used when a track has been added to the player.
-     */
-    static final String ACTION_ON_TRACK_ADDED = "simple_sc_listener_action_on_track_added";
-
-    /**
-     * package private, action used when a track has been added to the player.
-     */
-    static final String ACTION_ON_TRACK_REMOVED = "simple_sc_listener_action_on_track_removed";
-
-    /**
      * package private, action used when the player completed a seek action.
      */
     static final String ACTION_ON_SEEK_COMPLETE = "simple_sc_listener_action_on_player_seek_complete";
@@ -42,16 +32,6 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
      * package private, extra key for passing a track.
      */
     static final String EXTRA_KEY_TRACK = "simple_sc_listener_extra_track";
-
-    /**
-     * package private, extra key for passing the playlist.
-     */
-    static final String EXTRA_KEY_PLAYLIST = "simple_sc_listener_extra_playlist";
-
-    /**
-     * package private, extra key for passing index.
-     */
-    static final String EXTRA_KEY_INDEX = "simple_sc_listener_extra_index";
 
     /**
      * package private, extra key for passing seek time
@@ -72,17 +52,6 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
                     break;
                 case ACTION_ON_PLAYER_PAUSED:
                     onPause();
-                    break;
-                case ACTION_ON_TRACK_ADDED:
-                    onTrackAdded(
-                            ((SoundCloudTrack) intent.getParcelableExtra(EXTRA_KEY_TRACK)),
-                            intent.getIntExtra(EXTRA_KEY_INDEX, 0)
-                    );
-                    break;
-                case ACTION_ON_TRACK_REMOVED:
-                    onTrackRemoved(
-                            ((SoundCloudTrack) intent.getParcelableExtra(EXTRA_KEY_TRACK))
-                    );
                     break;
                 case ACTION_ON_SEEK_COMPLETE:
                     onSeekTo(intent.getIntExtra(EXTRA_KEY_SEEK, 0));
@@ -107,25 +76,6 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
      * Called when a the player has been paused.
      */
     protected void onPause() {
-
-    }
-
-    /**
-     * Called when a track has been added to the player playlist.
-     *
-     * @param track    track added to the player.
-     * @param position position of the track in the playlist.
-     */
-    protected void onTrackAdded(SoundCloudTrack track, int position) {
-
-    }
-
-    /**
-     * Called when a track has been removed from the player playlist.
-     *
-     * @param track track removed.
-     */
-    protected void onTrackRemoved(SoundCloudTrack track) {
 
     }
 
