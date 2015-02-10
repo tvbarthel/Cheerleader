@@ -93,6 +93,17 @@ public final class SimpleSoundCloud {
      */
     private boolean mIsPaused;
 
+    /**
+     * Used to know if the current client instance has been closed.
+     */
+    private boolean mIsClosed;
+
+    /**
+     * Private default constructor.
+     */
+    private SimpleSoundCloud() {
+
+    }
 
     /**
      * Singleton pattern.
@@ -104,6 +115,8 @@ public final class SimpleSoundCloud {
     private SimpleSoundCloud(Context applicationContext, String clientId) {
 
         mClientKey = clientId;
+        mIsClosed = false;
+        mIsPaused = false;
 
         mSimpleSoundCloudRequestSignator = new SimpleSoundCloudRequestSignator(mClientKey);
 
@@ -124,6 +137,8 @@ public final class SimpleSoundCloud {
         SimpleSoundCloudOffliner.initInstance(getContext(), false);
 
         mPlayerPlaylist = SimpleSoundCloudPlayerPlaylist.getInstance();
+
+        initInternalListener(applicationContext);
     }
 
     /**
@@ -133,7 +148,7 @@ public final class SimpleSoundCloud {
      * @param clientId sound cloud client id.
      * @return instance of {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud}
      */
-    public static SimpleSoundCloud getInstance(Context context, String clientId) {
+    private static SimpleSoundCloud getInstance(Context context, String clientId) {
         if (clientId == null) {
             throw new IllegalArgumentException("Sound cloud client id can't be null.");
         }
@@ -146,12 +161,36 @@ public final class SimpleSoundCloud {
     }
 
     /**
+     * Release resources associated with this client.
+     */
+    public void close() {
+        if (mIsClosed) {
+            return;
+        }
+        mIsClosed = true;
+
+        SimpleSoundCloudPlayer.unregisterListener(getContext(), mInternalListener);
+        mInternalListener = null;
+
+        mRestAdapter = null;
+        mSimpleSoundCloudService = null;
+        mSimpleSoundCloudRequestSignator = null;
+
+        mApplicationContext.clear();
+        mApplicationContext = null;
+
+        mClientKey = null;
+        mPlayerPlaylist = null;
+    }
+
+    /**
      * Retrieve SoundCloud user profile.
      *
      * @param userId user id.
      * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser}
      */
     public Observable<SoundCloudUser> getUser(int userId) {
+        checkState();
         return mSimpleSoundCloudService.getUser(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -166,6 +205,7 @@ public final class SimpleSoundCloud {
      * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
      */
     public Observable<SoundCloudTrack> getTrack(int trackId) {
+        checkState();
         return mSimpleSoundCloudService.getTrack(trackId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -179,6 +219,7 @@ public final class SimpleSoundCloud {
      * If the SoundCloud player is currently paused, the current track will be restart at the stopped position.
      */
     public void play() {
+        checkState();
         if (mIsPaused) {
             SimpleSoundCloudPlayer.resume(getContext(), mClientKey);
         } else {
@@ -196,6 +237,7 @@ public final class SimpleSoundCloud {
      * Pause the playback.
      */
     public void pause() {
+        checkState();
         mIsPaused = true;
         SimpleSoundCloudPlayer.pause(getContext(), mClientKey);
     }
@@ -206,6 +248,7 @@ public final class SimpleSoundCloud {
      * If the current played track is the last one, the first track will be loaded.
      */
     public void next() {
+        checkState();
         SimpleSoundCloudPlayer.play(getContext(), mClientKey, mPlayerPlaylist.next());
     }
 
@@ -215,6 +258,7 @@ public final class SimpleSoundCloud {
      * If the current played track is the first one, the last track will be loaded.
      */
     public void previous() {
+        checkState();
         SimpleSoundCloudPlayer.play(getContext(), mClientKey, mPlayerPlaylist.previous());
     }
 
@@ -228,6 +272,7 @@ public final class SimpleSoundCloud {
      * @param milli time in milli of the position.
      */
     public void seekTo(int milli) {
+        checkState();
         SimpleSoundCloudPlayer.seekTo(getContext(), mClientKey, milli);
     }
 
@@ -238,6 +283,7 @@ public final class SimpleSoundCloud {
      *              added to the player.
      */
     public void addTrack(SoundCloudTrack track) {
+        checkState();
         mPlayerPlaylist.add(track);
     }
 
@@ -249,7 +295,7 @@ public final class SimpleSoundCloud {
      * @param playlistIndex index of the track to be removed.
      */
     public void removeTrack(int playlistIndex) {
-
+        checkState();
         mPlayerPlaylist.remove(playlistIndex);
 
         if (!mIsPaused) {
@@ -264,6 +310,7 @@ public final class SimpleSoundCloud {
      * @return current playlist.
      */
     public SoundCloudPlaylist getPlaylist() {
+        checkState();
         return mPlayerPlaylist.getPlaylist();
     }
 
@@ -274,6 +321,7 @@ public final class SimpleSoundCloud {
      * @param listener listener to register.
      */
     public void registerPlayerListener(SimpleSoundCloudListener listener) {
+        checkState();
         SimpleSoundCloudPlayer.registerListener(getContext(), listener);
     }
 
@@ -283,6 +331,7 @@ public final class SimpleSoundCloud {
      * @param listener listener to unregister.
      */
     public void unregisterPlayerListener(SimpleSoundCloudListener listener) {
+        checkState();
         SimpleSoundCloudPlayer.unregisterListener(getContext(), listener);
     }
 
@@ -304,7 +353,7 @@ public final class SimpleSoundCloud {
      * @param logLevel log policy.
      */
     public void setLog(int logLevel) {
-
+        checkState();
         if ((logLevel & LOG_RETROFIT) != 0) {
             mRestAdapter.setLogLevel(RestAdapter.LogLevel.FULL);
         } else {
@@ -324,6 +373,96 @@ public final class SimpleSoundCloud {
             throw new IllegalStateException("WeakReference on application context null");
         }
         return mApplicationContext.get();
+    }
+
+    /**
+     * Initialize the internal listener.
+     *
+     * @param context context used to register the internal listener.
+     */
+    private void initInternalListener(Context context) {
+        mInternalListener = new SimpleSoundCloudListener() {
+            @Override
+            protected void onPlay(SoundCloudTrack track) {
+                super.onPlay(track);
+                mIsPaused = false;
+            }
+
+            @Override
+            protected void onPause() {
+                super.onPause();
+                mIsPaused = true;
+            }
+        };
+        SimpleSoundCloudPlayer.registerListener(context, mInternalListener);
+    }
+
+    /**
+     * Used to check the state of the client instance.
+     */
+    private void checkState() {
+        if (mIsClosed) {
+            throw new IllegalStateException("Client instance can't be used after being closed.");
+        }
+    }
+
+    /**
+     * Builder used to build a {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud}
+     */
+    public static class Builder {
+
+        private Context context;
+        private String apiKey;
+
+        public Builder() {
+
+        }
+
+        /**
+         * Context from which the client will be build.
+         *
+         * @param context context used to instantiate internal components.
+         * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
+         */
+        public Builder from(Context context) {
+            this.context = context;
+            return this;
+        }
+
+        /**
+         * Api key with which SoundCloud call will be performed.
+         *
+         * @param apiKey sound cloud api key.
+         * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
+         */
+        public Builder with(String apiKey) {
+            if (apiKey == null) {
+                throw new IllegalArgumentException("SoundCloud api can't be null");
+            }
+            this.apiKey = apiKey;
+            return this;
+        }
+
+        /**
+         * Build the client.
+         *
+         * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud}
+         */
+        public SimpleSoundCloud build() {
+            if (this.context == null) {
+                throw new IllegalStateException("Context should be passed using 'Builder.from' to build the client.");
+            }
+
+            if (this.apiKey == null) {
+                throw new IllegalStateException("Api key should be passed using 'Builder.with' to build the client.");
+            }
+
+            SimpleSoundCloud instance = getInstance(this.context, this.apiKey);
+            if (!this.apiKey.equals(instance.mClientKey)) {
+                throw new IllegalStateException("Only one api key can be used at the same time.");
+            }
+            return sInstance;
+        }
     }
 
 }
