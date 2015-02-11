@@ -152,7 +152,7 @@ public final class SimpleSoundCloud {
         if (clientId == null) {
             throw new IllegalArgumentException("Sound cloud client id can't be null.");
         }
-        if (sInstance == null) {
+        if (sInstance == null || sInstance.mIsClosed) {
             sInstance = new SimpleSoundCloud(context.getApplicationContext(), clientId);
         } else {
             sInstance.mSimpleSoundCloudRequestSignator.setClientId(clientId);
