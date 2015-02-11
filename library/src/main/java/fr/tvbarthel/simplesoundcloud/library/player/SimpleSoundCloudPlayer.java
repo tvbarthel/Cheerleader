@@ -135,6 +135,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private static final String TAG = SimpleSoundCloudPlayer.class.getSimpleName();
 
     /**
+     * Delay used to avoid useless action in case of spam action.
+     */
+    private static final int MESSAGE_DELAY_MILLI = 100;
+
+    /**
      * Path param used to access streaming url.
      */
     private static final String SOUND_CLOUD_CLIENT_ID_PARAM = "?client_id=";
@@ -372,7 +377,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                 default:
                     break;
             }
-            mPlayerHandler.sendMessage(message);
+            mPlayerHandler.removeCallbacksAndMessages(null);
+            mPlayerHandler.sendMessageDelayed(message, MESSAGE_DELAY_MILLI);
         }
         return START_STICKY;
     }
