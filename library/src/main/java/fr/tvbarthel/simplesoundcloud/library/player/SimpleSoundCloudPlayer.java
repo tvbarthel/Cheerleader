@@ -130,6 +130,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private static final int WHAT_STOP_PLAYER = 6;
 
     /**
+     * what id used to stop the service.
+     */
+    private static final int WHAT_RELEASE_PLAYER = 7;
+
+    /**
      * Log cat and thread name prefix.
      */
     private static final String TAG = SimpleSoundCloudPlayer.class.getSimpleName();
@@ -138,6 +143,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Delay used to avoid useless action in case of spam action.
      */
     private static final int MESSAGE_DELAY_MILLI = 100;
+
+    /**
+     * Max idle period after which the service will be stopped.
+     */
+    private static final int IDLE_PERIOD_MILLI = 10000;
 
     /**
      * Path param used to access streaming url.
@@ -158,6 +168,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Handler used to execute works on an {@link android.os.HandlerThread}
      */
     private Handler mPlayerHandler;
+
+    /**
+     * Handler used to stop the service when idle period ends.
+     */
+    private Handler mStopServiceHandler;
 
     /**
      * MediaPlayer used to play music.
@@ -280,6 +295,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
         filter.addAction(SimpleSoundCloudListener.ACTION_ON_SEEK_COMPLETE);
+        filter.addAction(SimpleSoundCloudListener.ACTION_ON_PLAYER_DESTROYED);
 
         LocalBroadcastManager.getInstance(context.getApplicationContext())
                 .registerReceiver(listener, filter);
@@ -307,6 +323,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mMediaPlayer = new MediaPlayer();
 
         initializeMediaPlayer();
+        initializeStopHandler(thread.getLooper());
 
         mWifiLock = ((WifiManager) getBaseContext().getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
@@ -325,9 +342,14 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+
+        Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYER_DESTROYED);
+        mLocalBroadcastManager.sendBroadcast(intent);
+
         mMediaPlayer.release();
         mMediaPlayer = null;
+
+        super.onDestroy();
     }
 
     @Override
@@ -377,6 +399,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                 default:
                     break;
             }
+            gotoIdleState();
             mPlayerHandler.removeCallbacksAndMessages(null);
             mPlayerHandler.sendMessageDelayed(message, MESSAGE_DELAY_MILLI);
         }
@@ -394,8 +417,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     public void onCompletion(MediaPlayer mp) {
         // release lock on wifi.
         mWifiLock.release();
-
         nextTrack();
+        gotoIdleState();
     }
 
     @Override
@@ -518,6 +541,38 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         stopForeground(false);
         mSimpleSoundCloudNotificationManager.notify(
                 this, mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(), mIsPaused, true);
+    }
+
+    /**
+     * Initialize the handler used to stop the service when idle period ends.
+     *
+     * @param looper from a non ui-thread
+     */
+    private void initializeStopHandler(Looper looper) {
+        mStopServiceHandler = new Handler(looper) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+                if (msg.what != WHAT_RELEASE_PLAYER || !mIsPaused) {
+                    return;
+                }
+
+                stopSelf();
+            }
+        };
+    }
+
+    /**
+     * Start idle state.
+     * <p/>
+     * After {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer#IDLE_PERIOD_MILLI}
+     * the service will ne stopped.
+     */
+    private void gotoIdleState() {
+        mStopServiceHandler.removeCallbacksAndMessages(null);
+        mStopServiceHandler.sendEmptyMessageDelayed(WHAT_RELEASE_PLAYER, IDLE_PERIOD_MILLI);
+        stopForeground(true);
     }
 
     /**

@@ -393,6 +393,12 @@ public final class SimpleSoundCloud {
                 super.onPause();
                 mIsPaused = true;
             }
+
+            @Override
+            protected void onPlayerDestroyed() {
+                super.onPlayerDestroyed();
+                mIsPaused = false;
+            }
         };
         SimpleSoundCloudPlayer.registerListener(context, mInternalListener);
     }
@@ -414,6 +420,9 @@ public final class SimpleSoundCloud {
         private Context context;
         private String apiKey;
 
+        /**
+         * Default constructor.
+         */
         public Builder() {
 
         }

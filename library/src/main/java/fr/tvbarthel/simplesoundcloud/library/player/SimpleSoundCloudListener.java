@@ -29,6 +29,11 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
     static final String ACTION_ON_SEEK_COMPLETE = "simple_sc_listener_action_on_player_seek_complete";
 
     /**
+     * package private, action used when the player has been destroyed
+     */
+    static final String ACTION_ON_PLAYER_DESTROYED = "simple_sc_listener_action_on_player_destroyed";
+
+    /**
      * package private, extra key for passing a track.
      */
     static final String EXTRA_KEY_TRACK = "simple_sc_listener_extra_track";
@@ -55,6 +60,9 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
                     break;
                 case ACTION_ON_SEEK_COMPLETE:
                     onSeekTo(intent.getIntExtra(EXTRA_KEY_SEEK, 0));
+                    break;
+                case ACTION_ON_PLAYER_DESTROYED:
+                    onPlayerDestroyed();
                     break;
                 default:
                     Log.e(TAG, "unknown action : " + intent.getAction());
@@ -85,6 +93,13 @@ public class SimpleSoundCloudListener extends BroadcastReceiver {
      * @param milli time in milli of the seek.
      */
     protected void onSeekTo(int milli) {
+
+    }
+
+    /**
+     * Called when the player has been destroyed.
+     */
+    protected void onPlayerDestroyed() {
 
     }
 }
