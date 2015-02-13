@@ -164,6 +164,13 @@ class SimpleSoundCloudNotificationManager {
     }
 
     /**
+     * Cancel the player notification.
+     */
+    public void cancel() {
+        mNotificationManager.cancel(NOTIFICATION_ID);
+    }
+
+    /**
      * Initialize {@link android.app.PendingIntent} used for notification actions.
      *
      * @param context context used to instantiate intent.

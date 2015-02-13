@@ -343,6 +343,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     @Override
     public void onDestroy() {
 
+        mSimpleSoundCloudNotificationManager.cancel();
+
         Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYER_DESTROYED);
         mLocalBroadcastManager.sendBroadcast(intent);
 
