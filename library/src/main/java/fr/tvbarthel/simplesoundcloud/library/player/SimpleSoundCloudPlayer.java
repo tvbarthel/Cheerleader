@@ -574,7 +574,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private void gotoIdleState() {
         mStopServiceHandler.removeCallbacksAndMessages(null);
         mStopServiceHandler.sendEmptyMessageDelayed(WHAT_RELEASE_PLAYER, IDLE_PERIOD_MILLI);
-        stopForeground(true);
     }
 
     /**
