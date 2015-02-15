@@ -1,6 +1,8 @@
 package fr.tvbarthel.simplesoundcloud.library;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.v7.app.ActionBarActivity;
 
 import java.lang.ref.WeakReference;
 
@@ -314,7 +316,6 @@ public final class SimpleSoundCloud {
         return mPlayerPlaylist.getPlaylist();
     }
 
-
     /**
      * Register a listener to catch player events.
      *
@@ -413,12 +414,24 @@ public final class SimpleSoundCloud {
     }
 
     /**
+     * Define the activity which will be started after the user touches the player notification.
+     * <p/>
+     * This activity should display a media controller.
+     *
+     * @param activity started activity.
+     */
+    private void setNotificationActivity(Class<?> activity) {
+        SimpleSoundCloudPlayer.setPlayerActivity(getContext(), activity);
+    }
+
+    /**
      * Builder used to build a {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud}
      */
     public static class Builder {
 
         private Context context;
         private String apiKey;
+        private Class<?> notifActivity;
 
         /**
          * Default constructor.
@@ -453,6 +466,32 @@ public final class SimpleSoundCloud {
         }
 
         /**
+         * Define the activity which will be started when the user touches the player notification.
+         * <p/>
+         * This activity should display a media controller.
+         *
+         * @param activity started activity.
+         * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
+         */
+        public Builder notificationActivity(ActionBarActivity activity) {
+            notifActivity = activity.getClass();
+            return this;
+        }
+
+        /**
+         * Define the activity which will be started when the user touches the player notification.
+         * <p/>
+         * This activity should display a media controller.
+         *
+         * @param activity started activity.
+         * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
+         */
+        public Builder notificationActivity(Activity activity) {
+            notifActivity = activity.getClass();
+            return this;
+        }
+
+        /**
          * Build the client.
          *
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud}
@@ -469,6 +508,10 @@ public final class SimpleSoundCloud {
             SimpleSoundCloud instance = getInstance(this.context, this.apiKey);
             if (!this.apiKey.equals(instance.mClientKey)) {
                 throw new IllegalStateException("Only one api key can be used at the same time.");
+            }
+
+            if (notifActivity != null) {
+                sInstance.setNotificationActivity(notifActivity);
             }
             return sInstance;
         }

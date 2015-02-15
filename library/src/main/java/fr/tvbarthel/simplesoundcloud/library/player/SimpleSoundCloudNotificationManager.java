@@ -89,6 +89,11 @@ class SimpleSoundCloudNotificationManager {
     private PendingIntent mPreviousPendingIntent;
 
     /**
+     * Pending intent used to launch the player activity when the user press the notification.
+     */
+    private PendingIntent mContentIntent;
+
+    /**
      * Encapsulate player notification behaviour.
      *
      * @param context context used to instantiate internal component.
@@ -107,6 +112,16 @@ class SimpleSoundCloudNotificationManager {
 
         // initialize traget used to load artwork asynchronously.
         initializeArtworkTarget();
+    }
+
+    /**
+     * Set the pending intent used when user pressed the notification.
+     *
+     * @param contentIntent pending intent used to launch player activity
+     *                      when user press the notification.
+     */
+    public void setContentIntent(PendingIntent contentIntent) {
+        mContentIntent = contentIntent;
     }
 
     /**
@@ -224,9 +239,15 @@ class SimpleSoundCloudNotificationManager {
      * @param context context used to instantiate the builder.
      */
     private void resetBuilder(Context context) {
+
+
         mNotificationBuilder = new NotificationCompat.Builder(context)
                 .setStyle(mBigPictureStyle)
                 .setSmallIcon(R.drawable.simple_sound_cloud_notification_icon);
+
+        if (mContentIntent != null) {
+            mNotificationBuilder.setContentIntent(mContentIntent);
+        }
     }
 
     /**

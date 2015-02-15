@@ -1,5 +1,6 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,12 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
  */
 public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener {
+
+    /**
+     * This request code will be pass to the player activity in order to identify the start
+     * after user pressed the notification.
+     */
+    static final int REQUEST_DISPLAYING_CONTROLLER = 0x42004200;
 
     /**
      * Action used for toggle playback event
@@ -70,9 +77,15 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private static final String ACTION_STOP_PLAYER = "sound_cloud_player_stop";
 
     /**
+     * Action used to set the notification content intent.
+     */
+    private static final String ACTION_SET_CONTENT_INTENT = "sound_cloud_player_content_intent";
+
+    /**
      * Action used to change the cursor of the current track.
      */
     private static final String ACTION_SEEK_TO = "sound_cloud_player_seek_to";
+
 
     /**
      * Bundle key used to pass client id.
@@ -83,6 +96,12 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Bundle key used to pass track url.
      */
     private static final String BUNDLE_KEY_SOUND_CLOUD_TRACK = "sound_cloud_player_bundle_key_track_url";
+
+    /**
+     * Bundle key used to pass the activity which will be launched when the user touch the
+     * player notification.
+     */
+    private static final String BUNDLE_KEY_CONTENT_INTENT_ACITIVTY = "sound_cloud_content_intent_activity";
 
     /**
      * Bundle key used to pass a track index.
@@ -133,6 +152,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * what id used to stop the service.
      */
     private static final int WHAT_RELEASE_PLAYER = 7;
+
+    /**
+     * what id used to sst the notification content intent.
+     */
+    private static final int WHAT_CONTENT_INTENT = 8;
 
     /**
      * Log cat and thread name prefix.
@@ -285,6 +309,22 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     }
 
     /**
+     * Set the player activity which will be launched when the user pressed
+     * the player notification.
+     *
+     * @param context        context from which the service will be started.
+     * @param playerActivity activity which allow to control the player.
+     */
+    public static void setPlayerActivity(Context context, Class<?> playerActivity) {
+        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
+        intent.setAction(ACTION_SET_CONTENT_INTENT);
+        Bundle b = new Bundle();
+        b.putSerializable(BUNDLE_KEY_CONTENT_INTENT_ACITIVTY, playerActivity);
+        intent.putExtra(BUNDLE_KEY_CONTENT_INTENT_ACITIVTY, b);
+        context.startService(intent);
+    }
+
+    /**
      * Register a listener to catch player event.
      *
      * @param context  context used to register the listener.
@@ -398,6 +438,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                         message.what = WHAT_PAUSE_PLAYER;
                     }
                     break;
+                case ACTION_SET_CONTENT_INTENT:
+                    message.what = WHAT_CONTENT_INTENT;
+                    break;
                 default:
                     break;
             }
@@ -479,6 +522,13 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
     private void seekToPosition(int milli) {
         mMediaPlayer.seekTo(milli);
+    }
+
+    private void setContentIntent(Class<?> playerActivity) {
+        Intent i = new Intent(this, playerActivity);
+        PendingIntent p = PendingIntent.getActivity(this, REQUEST_DISPLAYING_CONTROLLER,
+                i, PendingIntent.FLAG_UPDATE_CURRENT);
+        mSimpleSoundCloudNotificationManager.setContentIntent(p);
     }
 
     private void initializeMediaPlayer() {
@@ -615,6 +665,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     break;
                 case WHAT_SEEK_TO:
                     seekToPosition(data.getInt(BUNDLE_KEY_SOUND_CLOUD_TRACK_POSITION));
+                    break;
+                case WHAT_CONTENT_INTENT:
+                    setContentIntent(((Class<?>) data.getBundle(BUNDLE_KEY_CONTENT_INTENT_ACITIVTY)
+                            .getSerializable(BUNDLE_KEY_CONTENT_INTENT_ACITIVTY)));
                     break;
                 default:
                     break;
