@@ -353,7 +353,7 @@ public final class SimpleSoundCloud {
      *
      * @param logLevel log policy.
      */
-    public void setLog(int logLevel) {
+    private void setLog(int logLevel) {
         checkState();
         if ((logLevel & LOG_RETROFIT) != 0) {
             mRestAdapter.setLogLevel(RestAdapter.LogLevel.FULL);
@@ -432,12 +432,13 @@ public final class SimpleSoundCloud {
         private Context context;
         private String apiKey;
         private Class<?> notifActivity;
+        private int logLevel;
 
         /**
          * Default constructor.
          */
         public Builder() {
-
+            logLevel = LOG_NONE;
         }
 
         /**
@@ -474,7 +475,7 @@ public final class SimpleSoundCloud {
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
         public Builder notificationActivity(ActionBarActivity activity) {
-            notifActivity = activity.getClass();
+            this.notifActivity = activity.getClass();
             return this;
         }
 
@@ -487,7 +488,30 @@ public final class SimpleSoundCloud {
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
         public Builder notificationActivity(Activity activity) {
-            notifActivity = activity.getClass();
+            this.notifActivity = activity.getClass();
+            return this;
+        }
+
+        /**
+         * Define the log policy.
+         * <p/>
+         * Note : some log configuration can increase memory foot print and/or reduce the performance.
+         * Use them with caution.
+         * <p/>
+         * {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud#LOG_NONE}
+         * {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud#LOG_RETROFIT}
+         * {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud#LOG_OFFLINER}
+         * <p/>
+         * Different log policies can be combine :
+         * <pre>
+         * simpleSoundCloud.setLog(SimpleSoundCloud.LOG_OFFLINER | SimpleSoundCloud.LOG_RETROFIT);
+         * </pre>
+         *
+         * @param logLevel log policy.
+         * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
+         */
+        public Builder log(int logLevel) {
+            this.logLevel = logLevel;
             return this;
         }
 
@@ -512,6 +536,10 @@ public final class SimpleSoundCloud {
 
             if (notifActivity != null) {
                 sInstance.setNotificationActivity(notifActivity);
+            }
+
+            if (logLevel != LOG_NONE) {
+                sInstance.setLog(logLevel);
             }
             return sInstance;
         }
