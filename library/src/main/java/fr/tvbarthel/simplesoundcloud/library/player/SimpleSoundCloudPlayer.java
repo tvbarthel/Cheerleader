@@ -57,6 +57,12 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     static final String ACTION_PREVIOUS_TRACK = "sound_cloud_player_previous";
 
     /**
+     * Action used to stop the player when audio signal has becoming noisy by the system.
+     * http://developer.android.com/reference/android/media/AudioManager.html#ACTION_AUDIO_BECOMING_NOISY
+     */
+    static final String ACTION_AUDIO_BECOMING_NOISY = "sound_cloud_player_becoming_noisy";
+
+    /**
      * Action used to play a track.
      */
     private static final String ACTION_PLAY = "sound_cloud_play";
@@ -440,6 +446,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     break;
                 case ACTION_SET_CONTENT_INTENT:
                     message.what = WHAT_CONTENT_INTENT;
+                    break;
+                case ACTION_AUDIO_BECOMING_NOISY:
+                    if (!mIsPaused) {
+                        message.what = WHAT_PAUSE_PLAYER;
+                    }
                     break;
                 default:
                     break;
