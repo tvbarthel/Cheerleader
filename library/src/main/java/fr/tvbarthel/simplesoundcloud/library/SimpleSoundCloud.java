@@ -11,6 +11,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudListener;
+import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationManager;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayerPlaylist;
 import retrofit.RestAdapter;
@@ -99,6 +100,7 @@ public final class SimpleSoundCloud {
      * Used to know if the current client instance has been closed.
      */
     private boolean mIsClosed;
+
 
     /**
      * Private default constructor.
@@ -433,12 +435,16 @@ public final class SimpleSoundCloud {
         private String apiKey;
         private Class<?> notifActivity;
         private int logLevel;
+        private int notificationIcon;
+        private int notificationColor;
 
         /**
          * Default constructor.
          */
         public Builder() {
             logLevel = LOG_NONE;
+            notificationIcon = R.drawable.simple_sound_cloud_notification_icon;
+            notificationColor = -1;
         }
 
         /**
@@ -463,6 +469,30 @@ public final class SimpleSoundCloud {
                 throw new IllegalArgumentException("SoundCloud api can't be null");
             }
             this.apiKey = apiKey;
+            return this;
+        }
+
+        /**
+         * Define the drawable used as icon in the notification displayed while playing.
+         *
+         * @param resId icon res id.
+         * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
+         */
+        public Builder notificationIcon(int resId) {
+            notificationIcon = resId;
+            return this;
+        }
+
+        /**
+         * Define the background color of the notification icon.
+         * <p/>
+         * Only for Lollipop device.
+         *
+         * @param color notification icon background color.
+         * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
+         */
+        public Builder notificationColor(int color) {
+            notificationColor = color;
             return this;
         }
 
@@ -541,6 +571,12 @@ public final class SimpleSoundCloud {
             if (logLevel != LOG_NONE) {
                 sInstance.setLog(logLevel);
             }
+
+            if (notificationColor != -1) {
+                SimpleSoundCloudNotificationManager.setNotificationColor(notificationColor);
+            }
+
+            SimpleSoundCloudNotificationManager.setNotificationIcon(notificationIcon);
             return sInstance;
         }
     }

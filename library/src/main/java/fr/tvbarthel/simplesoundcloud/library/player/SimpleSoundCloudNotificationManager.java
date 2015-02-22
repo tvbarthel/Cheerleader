@@ -21,7 +21,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 /**
  * Handle player notification behaviour.
  */
-class SimpleSoundCloudNotificationManager {
+public class SimpleSoundCloudNotificationManager {
 
     /**
      * Notification ID.
@@ -42,6 +42,16 @@ class SimpleSoundCloudNotificationManager {
      * Previous track pending intent request code.
      */
     private static final int REQUEST_CODE_PREVIOUS = 0x00000030;
+
+    /**
+     * Drawable used as icon for notification.
+     */
+    private static int sNotificationIcon;
+
+    /**
+     * Color used on Lollipop device as background for notification icon.
+     */
+    private static int sNotificationColor = -1;
 
     /**
      * Handler running on main thread to perform change on notification ui.
@@ -112,6 +122,26 @@ class SimpleSoundCloudNotificationManager {
 
         // initialize traget used to load artwork asynchronously.
         initializeArtworkTarget();
+    }
+
+    /**
+     * Set the icon display in the notification.
+     *
+     * @param iconResId res id of the notification icon.
+     */
+    public static void setNotificationIcon(int iconResId) {
+        sNotificationIcon = iconResId;
+    }
+
+    /**
+     * Only for Lollipop devices.
+     * <p/>
+     * Set the background color of the small icon.
+     *
+     * @param color accent color.
+     */
+    public static void setNotificationColor(int color) {
+        sNotificationColor = color;
     }
 
     /**
@@ -240,10 +270,13 @@ class SimpleSoundCloudNotificationManager {
      */
     private void resetBuilder(Context context) {
 
-
         mNotificationBuilder = new NotificationCompat.Builder(context)
                 .setStyle(mBigPictureStyle)
-                .setSmallIcon(R.drawable.simple_sound_cloud_notification_icon);
+                .setSmallIcon(sNotificationIcon);
+
+        if (sNotificationColor != -1) {
+            mNotificationBuilder.setColor(sNotificationColor);
+        }
 
         if (mContentIntent != null) {
             mNotificationBuilder.setContentIntent(mContentIntent);
