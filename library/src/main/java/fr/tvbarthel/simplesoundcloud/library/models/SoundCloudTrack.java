@@ -48,6 +48,7 @@ public class SoundCloudTrack implements Parcelable {
     private String mPurchaseUrl;
     private String mGenre;
     private String mTitle;
+    private String mArtist;
     private String mDescription;
     private String mLabelName;
     private String mTrackType;
@@ -88,6 +89,7 @@ public class SoundCloudTrack implements Parcelable {
         this.mPurchaseUrl = in.readString();
         this.mGenre = in.readString();
         this.mTitle = in.readString();
+        this.mArtist = in.readString();
         this.mDescription = in.readString();
         this.mLabelName = in.readString();
         this.mTrackType = in.readString();
@@ -128,6 +130,7 @@ public class SoundCloudTrack implements Parcelable {
         dest.writeString(this.mPurchaseUrl);
         dest.writeString(this.mGenre);
         dest.writeString(this.mTitle);
+        dest.writeString(this.mArtist);
         dest.writeString(this.mDescription);
         dest.writeString(this.mLabelName);
         dest.writeString(this.mTrackType);
@@ -628,6 +631,24 @@ public class SoundCloudTrack implements Parcelable {
     }
 
     /**
+     * track artist.
+     *
+     * @param artist track artist.
+     */
+    public void setArtist(String artist) {
+        mArtist = artist;
+    }
+
+    /**
+     * track artist.
+     *
+     * @return track artist.
+     */
+    public String getArtist() {
+        return mArtist;
+    }
+
+    /**
      * HTML description
      *
      * @return HTML description
@@ -727,6 +748,7 @@ public class SoundCloudTrack implements Parcelable {
 
     /**
      * URL to PNG waveform image
+     *
      * @return URL to PNG waveform image
      */
     public String getWaveFormUrl() {
@@ -735,6 +757,7 @@ public class SoundCloudTrack implements Parcelable {
 
     /**
      * URL to PNG waveform image
+     *
      * @param waveFormUrl URL to PNG waveform image
      */
     public void setWaveFormUrl(String waveFormUrl) {

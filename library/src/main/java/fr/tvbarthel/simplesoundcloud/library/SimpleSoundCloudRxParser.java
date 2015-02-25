@@ -86,6 +86,15 @@ final class SimpleSoundCloudRxParser {
                     track.setCreationDate(format.parse(createdAt));
                 }
 
+                String title = jsonObject.optString(TITLE);
+                int dashIndex = title.indexOf('-');
+                if (dashIndex == -1) {
+                    track.setTitle(title);
+                } else {
+                    track.setTitle(title.substring(dashIndex + 1, title.length()).trim());
+                    track.setArtist(title.substring(0, dashIndex).trim());
+                }
+
                 track.setStreamable(jsonObject.optBoolean(STREAMABLE));
                 track.setDownloadable(jsonObject.optBoolean(DOWNLOADABLE));
                 track.setCommentable(jsonObject.optBoolean(COMMENTABLE));
@@ -99,7 +108,6 @@ final class SimpleSoundCloudRxParser {
                 track.setPurchaseUrl(jsonObject.optString(PURCHASE_URL));
                 track.setUri(jsonObject.optString(URI));
                 track.setGenre(jsonObject.optString(GENRE));
-                track.setTitle(jsonObject.optString(TITLE));
                 track.setDescription(jsonObject.optString(DESCRIPTION));
                 track.setLabelName(jsonObject.optString(LABEL_NAME));
                 track.setTrackType(jsonObject.optString(TRACK_TYPE));
