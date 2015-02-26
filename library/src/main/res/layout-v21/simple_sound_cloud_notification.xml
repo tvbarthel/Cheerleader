@@ -7,13 +7,24 @@
     android:orientation="horizontal"
     tools:ignore="ContentDescription">
 
-
-    <ImageView
-        android:id="@+id/simple_sound_cloud_notification_thumbnail"
+    <FrameLayout
         android:layout_width="@dimen/simple_sound_cloud_notification_icon"
         android:layout_height="@dimen/simple_sound_cloud_notification_icon"
-        android:background="@color/material_blue_grey_800"
-        android:layout_marginRight="@dimen/simple_sound_cloud_notification_padding" />
+        android:padding="@dimen/simple_sound_cloud_notification_padding">
+
+        <ImageView
+            android:id="@+id/simple_sound_cloud_notification_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/simple_sound_cloud_notification_icon"
+            android:layout_width="@dimen/simple_sound_cloud_notification_small_icon"
+            android:layout_height="@dimen/simple_sound_cloud_notification_small_icon"
+            android:padding="@dimen/simple_sound_cloud_notification_small_icon_padding"
+            android:layout_gravity="bottom|end" />
+
+    </FrameLayout>
 
 
     <LinearLayout
@@ -30,7 +41,6 @@
             android:textColor="@color/simple_sound_cloud_notification_title"
             android:singleLine="true"
             android:ellipsize="end"
-            android:fontFamily="sans-serif-light"
             android:textSize="@dimen/simple_sound_cloud_notification_title"
             tools:text="IvanB" />
 

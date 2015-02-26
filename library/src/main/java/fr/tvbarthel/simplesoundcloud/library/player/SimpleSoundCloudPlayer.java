@@ -57,6 +57,13 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     static final String ACTION_PREVIOUS_TRACK = "sound_cloud_player_previous";
 
     /**
+     * Action used to skip to clear the notification.
+     * <p/>
+     * package private, used by the SimpleSoundCloudNotificationManager for PendingIntent.
+     */
+    static final String ACTION_CLEAR_NOTIFICATION = "sound_cloud_player_clear";
+
+    /**
      * Action used to stop the player when audio signal has becoming noisy by the system.
      * http://developer.android.com/reference/android/media/AudioManager.html#ACTION_AUDIO_BECOMING_NOISY
      */
@@ -163,6 +170,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * what id used to sst the notification content intent.
      */
     private static final int WHAT_CONTENT_INTENT = 8;
+
+    /**
+     * what id used to clear the player.
+     */
+    private static final int WHAT_CLEAR_PLAYER = 9;
 
     /**
      * Log cat and thread name prefix.
@@ -452,6 +464,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                         message.what = WHAT_PAUSE_PLAYER;
                     }
                     break;
+                case ACTION_CLEAR_NOTIFICATION:
+                    message.what = WHAT_CLEAR_PLAYER;
+                    break;
                 default:
                     break;
             }
@@ -498,7 +513,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
             mLocalBroadcastManager.sendBroadcast(intent);
 
-            stopForeground();
+            updateNotification();
         }
     }
 
@@ -515,7 +530,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     mSimpleSoundCloudPlayerPlaylist.getCurrentTrack());
             mLocalBroadcastManager.sendBroadcast(intent);
 
-            startForeground();
+            updateNotification();
         }
     }
 
@@ -582,7 +597,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, track);
             mLocalBroadcastManager.sendBroadcast(intent);
 
-            startForeground();
+            updateNotification();
 
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
@@ -590,20 +605,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     }
 
     /**
-     * Make the service run in foreground with an ongoing notification.
+     * Update the notification with the current track information.
      */
-    private void startForeground() {
-        mSimpleSoundCloudNotificationManager.notify(
-                this, mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(), mIsPaused, false);
-    }
-
-    /**
-     * Remove foreground state and allow simple_sound_cloud_notification to be canceled manually.
-     */
-    private void stopForeground() {
-        stopForeground(false);
-        mSimpleSoundCloudNotificationManager.notify(
-                this, mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(), mIsPaused, true);
+    private void updateNotification() {
+        mSimpleSoundCloudNotificationManager.notify(this, mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(), mIsPaused);
     }
 
     /**
@@ -680,6 +685,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                 case WHAT_CONTENT_INTENT:
                     setContentIntent(((Class<?>) data.getBundle(BUNDLE_KEY_CONTENT_INTENT_ACITIVTY)
                             .getSerializable(BUNDLE_KEY_CONTENT_INTENT_ACITIVTY)));
+                    break;
+                case WHAT_CLEAR_PLAYER:
+                    stopForeground(true);
+                    stopPlayer();
                     break;
                 default:
                     break;

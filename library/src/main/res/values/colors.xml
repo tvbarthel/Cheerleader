@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="notification_button_pressed">#55777777</color>
+    <color name="simple_sound_cloud_notification_title">#ffffff</color>
+    <color name="simple_sound_cloud_notification_subtitle">#979797</color>
+</resources>

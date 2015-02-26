@@ -2,12 +2,15 @@
 <resources>
     <item name="simple_sound_cloud_notification_icon" type="drawable">@drawable/ic_album_white
     </item>
-    <item name="simple_sound_cloud_notification_play" type="drawable">@drawable/ic_play_black
+    <item name="simple_sound_cloud_notification_play" type="drawable">@drawable/ic_play_grey
     </item>
-    <item name="simple_sound_cloud_notification_pause" type="drawable">@drawable/ic_pause_black
+    <item name="simple_sound_cloud_notification_pause" type="drawable">@drawable/ic_pause_grey
     </item>
-    <item name="simple_sound_cloud_notification_next" type="drawable">@drawable/ic_next_black
+    <item name="simple_sound_cloud_notification_next" type="drawable">@drawable/ic_next_grey
     </item>
-    <item name="simple_sound_cloud_notification_previous" type="drawable">@drawable/ic_previous_black
+    <item name="simple_sound_cloud_notification_previous" type="drawable">
+        @drawable/ic_previous_grey
+    </item>
+    <item name="simple_sound_cloud_notification_clear" type="drawable">@drawable/ic_clear_grey
     </item>
 </resources>

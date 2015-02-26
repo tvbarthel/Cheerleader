@@ -8,6 +8,9 @@
     </item>
     <item name="simple_sound_cloud_notification_next" type="drawable">@drawable/ic_next_white
     </item>
-    <item name="simple_sound_cloud_notification_previous" type="drawable">@drawable/ic_previous_white
+    <item name="simple_sound_cloud_notification_previous" type="drawable">
+        @drawable/ic_previous_white
+    </item>
+    <item name="simple_sound_cloud_notification_clear" type="drawable">@drawable/ic_clear_white
     </item>
 </resources>

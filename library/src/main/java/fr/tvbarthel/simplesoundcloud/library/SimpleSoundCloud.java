@@ -2,6 +2,7 @@ package fr.tvbarthel.simplesoundcloud.library;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.DrawableRes;
 import android.support.v7.app.ActionBarActivity;
 
 import java.lang.ref.WeakReference;
@@ -436,7 +437,7 @@ public final class SimpleSoundCloud {
         private Class<?> notifActivity;
         private int logLevel;
         private int notificationIcon;
-        private int notificationColor;
+        private int notificationIconBackground;
 
         /**
          * Default constructor.
@@ -444,7 +445,7 @@ public final class SimpleSoundCloud {
         public Builder() {
             logLevel = LOG_NONE;
             notificationIcon = R.drawable.simple_sound_cloud_notification_icon;
-            notificationColor = -1;
+            notificationIconBackground = R.drawable.notification_icon_background;
         }
 
         /**
@@ -484,15 +485,15 @@ public final class SimpleSoundCloud {
         }
 
         /**
-         * Define the background color of the notification icon.
+         * Define the background of the notification icon.
          * <p/>
          * Only for Lollipop device.
          *
-         * @param color notification icon background color.
+         * @param resId notification icon background.
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
-        public Builder notificationColor(int color) {
-            notificationColor = color;
+        public Builder notificationIconBackground(@DrawableRes int resId) {
+            notificationIconBackground = resId;
             return this;
         }
 
@@ -572,11 +573,9 @@ public final class SimpleSoundCloud {
                 sInstance.setLog(logLevel);
             }
 
-            if (notificationColor != -1) {
-                SimpleSoundCloudNotificationManager.setNotificationColor(notificationColor);
-            }
-
+            SimpleSoundCloudNotificationManager.setNotificationIconBackground(notificationIconBackground);
             SimpleSoundCloudNotificationManager.setNotificationIcon(notificationIcon);
+
             return sInstance;
         }
     }

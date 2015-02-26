@@ -8,8 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.DrawableRes;
 import android.support.v4.app.NotificationCompat;
+import android.widget.RemoteViews;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -44,6 +47,11 @@ public class SimpleSoundCloudNotificationManager {
     private static final int REQUEST_CODE_PREVIOUS = 0x00000030;
 
     /**
+     * Clear pending intent request code.
+     */
+    private static final int REQUEST_CODE_CLEAR = 0x00000040;
+
+    /**
      * Drawable used as icon for notification.
      */
     private static int sNotificationIcon;
@@ -51,7 +59,7 @@ public class SimpleSoundCloudNotificationManager {
     /**
      * Color used on Lollipop device as background for notification icon.
      */
-    private static int sNotificationColor = -1;
+    private static int sNotificationIconBackground = -1;
 
     /**
      * Handler running on main thread to perform change on notification ui.
@@ -79,6 +87,11 @@ public class SimpleSoundCloudNotificationManager {
     private NotificationCompat.Builder mNotificationBuilder;
 
     /**
+     * {@link android.widget.RemoteViews} set to the notification.
+     */
+    private RemoteViews mNotificationView;
+
+    /**
      * System service to manage notification.
      */
     private NotificationManager mNotificationManager;
@@ -97,6 +110,11 @@ public class SimpleSoundCloudNotificationManager {
      * Pending intent set to the previous button.
      */
     private PendingIntent mPreviousPendingIntent;
+
+    /**
+     * Pending intent set to clear the player.
+     */
+    private PendingIntent mClearPendingIntent;
 
     /**
      * Pending intent used to launch the player activity when the user press the notification.
@@ -122,6 +140,8 @@ public class SimpleSoundCloudNotificationManager {
 
         // initialize traget used to load artwork asynchronously.
         initializeArtworkTarget();
+
+        initNotificationBuilder(context);
     }
 
     /**
@@ -136,12 +156,12 @@ public class SimpleSoundCloudNotificationManager {
     /**
      * Only for Lollipop devices.
      * <p/>
-     * Set the background color of the small icon.
+     * Set the background drawable of the small icon.
      *
-     * @param color accent color.
+     * @param resId small right icon background.
      */
-    public static void setNotificationColor(int color) {
-        sNotificationColor = color;
+    public static void setNotificationIconBackground(@DrawableRes int resId) {
+        sNotificationIconBackground = resId;
     }
 
     /**
@@ -157,44 +177,32 @@ public class SimpleSoundCloudNotificationManager {
     /**
      * Post a notification displaying the given track in the status bare.
      *
-     * @param service       service started as foreground if no dismissible.
-     * @param track         track displayed.
-     * @param isPaused      true if the current player is paused. Then play action will be displayed.
-     *                      Otherwise, pause action will be displayed.
-     * @param isDismissible true if the notification can be dismissed.
+     * @param service  service started as foreground if no dismissible.
+     * @param track    track displayed.
+     * @param isPaused true if the current player is paused. Then play action will be displayed.
+     *                 Otherwise, pause action will be displayed.
      */
-    public void notify(final Service service, final SoundCloudTrack track, boolean isPaused, boolean isDismissible) {
+    public void notify(final Service service, final SoundCloudTrack track, boolean isPaused) {
 
-        // used to reset actions since removing action is not allowed.
-        resetBuilder(service);
 
         // set the title
-        mNotificationBuilder.setContentTitle(track.getTitle());
-
-        // set the previous track action button
-        mNotificationBuilder.addAction(R.drawable.simple_sound_cloud_notification_previous, "",
-                mPreviousPendingIntent);
+        mNotificationView.setTextViewText(R.id.simple_sound_cloud_notification_title, track.getArtist());
+        mNotificationView.setTextViewText(R.id.simple_sound_cloud_notification_subtitle, track.getTitle());
 
         // set the right icon for the toggle playback action.
         if (isPaused) {
-            mNotificationBuilder.addAction(R.drawable.simple_sound_cloud_notification_play, "",
-                    mTogglePlaybackPendingIntent);
+            mNotificationView.setImageViewResource(
+                    R.id.simple_sound_cloud_notification_play,
+                    R.drawable.simple_sound_cloud_notification_play
+            );
         } else {
-            mNotificationBuilder.addAction(R.drawable.simple_sound_cloud_notification_pause, "",
-                    mTogglePlaybackPendingIntent);
+            mNotificationView.setImageViewResource(
+                    R.id.simple_sound_cloud_notification_play,
+                    R.drawable.simple_sound_cloud_notification_pause
+            );
         }
 
-        // set the next track action button
-        mNotificationBuilder.addAction(R.drawable.simple_sound_cloud_notification_next, "",
-                mNextPendingIntent);
-
-        // set the dismiss policy.
-        if (isDismissible) {
-            mNotificationBuilder.setOngoing(false);
-            mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
-        } else {
-            service.startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
-        }
+        service.startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
 
         // since toggle playback is often pressed for the same track, only load the artwork when a
         // new track is passed.
@@ -239,6 +247,12 @@ public class SimpleSoundCloudNotificationManager {
         previousPendingIntent.setAction(SimpleSoundCloudPlayer.ACTION_PREVIOUS_TRACK);
         mPreviousPendingIntent = PendingIntent.getService(context, REQUEST_CODE_PREVIOUS,
                 previousPendingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // clear notification
+        Intent clearPendingIntent = new Intent(context, SimpleSoundCloudPlayer.class);
+        clearPendingIntent.setAction(SimpleSoundCloudPlayer.ACTION_CLEAR_NOTIFICATION);
+        mClearPendingIntent = PendingIntent.getService(context, REQUEST_CODE_CLEAR,
+                clearPendingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     /**
@@ -268,19 +282,47 @@ public class SimpleSoundCloudNotificationManager {
      *
      * @param context context used to instantiate the builder.
      */
-    private void resetBuilder(Context context) {
+    private void initNotificationBuilder(Context context) {
 
-        mNotificationBuilder = new NotificationCompat.Builder(context)
-                .setStyle(mBigPictureStyle)
-                .setSmallIcon(sNotificationIcon);
+        // inti builder.
+        mNotificationBuilder = new NotificationCompat.Builder(context);
+        mNotificationView = new RemoteViews(context.getPackageName(), R.layout.simple_sound_cloud_notification);
 
-        if (sNotificationColor != -1) {
-            mNotificationBuilder.setColor(sNotificationColor);
+        // add right icon on Lollipop.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            addSmallIcon(mNotificationView);
         }
 
+        // set pending intents
+        mNotificationView.setOnClickPendingIntent(
+                R.id.simple_sound_cloud_notification_previous, mPreviousPendingIntent);
+        mNotificationView.setOnClickPendingIntent(
+                R.id.simple_sound_cloud_notification_next, mNextPendingIntent);
+        mNotificationView.setOnClickPendingIntent(
+                R.id.simple_sound_cloud_notification_play, mTogglePlaybackPendingIntent);
+        mNotificationView.setOnClickPendingIntent(
+                R.id.simple_sound_cloud_notification_clear, mClearPendingIntent);
+
+        // add icon for action bar.
+        mNotificationBuilder.setSmallIcon(sNotificationIcon);
+
+        // set the remote view.
+        mNotificationBuilder.setContent(mNotificationView);
+
+        // add pending intent used when notification is pressed.
         if (mContentIntent != null) {
             mNotificationBuilder.setContentIntent(mContentIntent);
         }
+    }
+
+    /**
+     * Add the small right icon for Lollipop device.
+     *
+     * @param notificationView remotesview used in the notification.
+     */
+    private void addSmallIcon(RemoteViews notificationView) {
+        notificationView.setInt(R.id.simple_sound_cloud_notification_icon, "setBackgroundResource", sNotificationIconBackground);
+        notificationView.setImageViewResource(R.id.simple_sound_cloud_notification_icon, sNotificationIcon);
     }
 
     /**
