@@ -77,11 +77,6 @@ public class SimpleSoundCloudNotificationManager {
     private int mTrackId;
 
     /**
-     * Style used to display the track image into the notification.
-     */
-    private NotificationCompat.BigPictureStyle mBigPictureStyle;
-
-    /**
      * Builder used to build notification.
      */
     private NotificationCompat.Builder mNotificationBuilder;
@@ -131,7 +126,6 @@ public class SimpleSoundCloudNotificationManager {
         mTrackId = -1;
 
         mMainThreadHandler = new Handler(context.getApplicationContext().getMainLooper());
-        mBigPictureStyle = new NotificationCompat.BigPictureStyle();
 
         mNotificationManager = ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
 
@@ -262,7 +256,7 @@ public class SimpleSoundCloudNotificationManager {
         mArtworkTarget = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                mBigPictureStyle.bigPicture(bitmap);
+                mNotificationView.setImageViewBitmap(R.id.simple_sound_cloud_notification_thumbnail, bitmap);
                 mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
             }
 
@@ -321,8 +315,10 @@ public class SimpleSoundCloudNotificationManager {
      * @param notificationView remotesview used in the notification.
      */
     private void addSmallIcon(RemoteViews notificationView) {
-        notificationView.setInt(R.id.simple_sound_cloud_notification_icon, "setBackgroundResource", sNotificationIconBackground);
-        notificationView.setImageViewResource(R.id.simple_sound_cloud_notification_icon, sNotificationIcon);
+        notificationView.setInt(R.id.simple_sound_cloud_notification_icon,
+                "setBackgroundResource", sNotificationIconBackground);
+        notificationView.setImageViewResource(R.id.simple_sound_cloud_notification_icon,
+                sNotificationIcon);
     }
 
     /**

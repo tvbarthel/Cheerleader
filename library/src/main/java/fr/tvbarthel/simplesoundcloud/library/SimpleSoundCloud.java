@@ -436,16 +436,16 @@ public final class SimpleSoundCloud {
         private String apiKey;
         private Class<?> notifActivity;
         private int logLevel;
-        private int notificationIcon;
-        private int notificationIconBackground;
+        private int notifIcon;
+        private int notifIconBackground;
 
         /**
          * Default constructor.
          */
         public Builder() {
             logLevel = LOG_NONE;
-            notificationIcon = R.drawable.simple_sound_cloud_notification_icon;
-            notificationIconBackground = R.drawable.notification_icon_background;
+            notifIcon = R.drawable.simple_sound_cloud_notification_icon;
+            notifIconBackground = R.drawable.notification_icon_background;
         }
 
         /**
@@ -480,7 +480,7 @@ public final class SimpleSoundCloud {
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
         public Builder notificationIcon(int resId) {
-            notificationIcon = resId;
+            notifIcon = resId;
             return this;
         }
 
@@ -493,7 +493,7 @@ public final class SimpleSoundCloud {
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
         public Builder notificationIconBackground(@DrawableRes int resId) {
-            notificationIconBackground = resId;
+            notifIconBackground = resId;
             return this;
         }
 
@@ -573,8 +573,8 @@ public final class SimpleSoundCloud {
                 sInstance.setLog(logLevel);
             }
 
-            SimpleSoundCloudNotificationManager.setNotificationIconBackground(notificationIconBackground);
-            SimpleSoundCloudNotificationManager.setNotificationIcon(notificationIcon);
+            SimpleSoundCloudNotificationManager.setNotificationIconBackground(notifIconBackground);
+            SimpleSoundCloudNotificationManager.setNotificationIcon(notifIcon);
 
             return sInstance;
         }
