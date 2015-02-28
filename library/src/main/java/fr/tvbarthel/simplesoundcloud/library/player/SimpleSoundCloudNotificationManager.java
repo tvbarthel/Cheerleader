@@ -1,6 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -85,6 +86,11 @@ public class SimpleSoundCloudNotificationManager {
      * {@link android.widget.RemoteViews} set to the notification.
      */
     private RemoteViews mNotificationView;
+
+    /**
+     * {@link android.widget.RemoteViews} set as expanded notification content.
+     */
+    private RemoteViews mNotificationExpandedView;
 
     /**
      * System service to manage notification.
@@ -182,10 +188,16 @@ public class SimpleSoundCloudNotificationManager {
         // set the title
         mNotificationView.setTextViewText(R.id.simple_sound_cloud_notification_title, track.getArtist());
         mNotificationView.setTextViewText(R.id.simple_sound_cloud_notification_subtitle, track.getTitle());
+        mNotificationExpandedView.setTextViewText(R.id.simple_sound_cloud_notification_title, track.getArtist());
+        mNotificationExpandedView.setTextViewText(R.id.simple_sound_cloud_notification_subtitle, track.getTitle());
 
         // set the right icon for the toggle playback action.
         if (isPaused) {
             mNotificationView.setImageViewResource(
+                    R.id.simple_sound_cloud_notification_play,
+                    R.drawable.simple_sound_cloud_notification_play
+            );
+            mNotificationExpandedView.setImageViewResource(
                     R.id.simple_sound_cloud_notification_play,
                     R.drawable.simple_sound_cloud_notification_play
             );
@@ -194,9 +206,13 @@ public class SimpleSoundCloudNotificationManager {
                     R.id.simple_sound_cloud_notification_play,
                     R.drawable.simple_sound_cloud_notification_pause
             );
+            mNotificationExpandedView.setImageViewResource(
+                    R.id.simple_sound_cloud_notification_play,
+                    R.drawable.simple_sound_cloud_notification_pause
+            );
         }
 
-        service.startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
+        service.startForeground(NOTIFICATION_ID, buildNotification());
 
         // since toggle playback is often pressed for the same track, only load the artwork when a
         // new track is passed.
@@ -257,7 +273,11 @@ public class SimpleSoundCloudNotificationManager {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 mNotificationView.setImageViewBitmap(R.id.simple_sound_cloud_notification_thumbnail, bitmap);
-                mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+                mNotificationExpandedView.setImageViewBitmap(
+                        R.id.simple_sound_cloud_notification_thumbnail, bitmap);
+                mNotificationExpandedView.setImageViewBitmap(
+                        R.id.simple_sound_cloud_notification_expanded_thumbnail, bitmap);
+                mNotificationManager.notify(NOTIFICATION_ID, buildNotification());
             }
 
             @Override
@@ -272,7 +292,7 @@ public class SimpleSoundCloudNotificationManager {
     }
 
     /**
-     * Reset the notification builder to remove all actions.
+     * Init all static components of the notification.
      *
      * @param context context used to instantiate the builder.
      */
@@ -280,21 +300,33 @@ public class SimpleSoundCloudNotificationManager {
 
         // inti builder.
         mNotificationBuilder = new NotificationCompat.Builder(context);
-        mNotificationView = new RemoteViews(context.getPackageName(), R.layout.simple_sound_cloud_notification);
+        mNotificationView = new RemoteViews(context.getPackageName(),
+                R.layout.simple_sound_cloud_notification);
+        mNotificationExpandedView = new RemoteViews(context.getPackageName(),
+                R.layout.simple_sound_cloud_notification_expanded);
 
         // add right icon on Lollipop.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             addSmallIcon(mNotificationView);
+            addSmallIcon(mNotificationExpandedView);
         }
 
         // set pending intents
         mNotificationView.setOnClickPendingIntent(
                 R.id.simple_sound_cloud_notification_previous, mPreviousPendingIntent);
+        mNotificationExpandedView.setOnClickPendingIntent(
+                R.id.simple_sound_cloud_notification_previous, mPreviousPendingIntent);
         mNotificationView.setOnClickPendingIntent(
+                R.id.simple_sound_cloud_notification_next, mNextPendingIntent);
+        mNotificationExpandedView.setOnClickPendingIntent(
                 R.id.simple_sound_cloud_notification_next, mNextPendingIntent);
         mNotificationView.setOnClickPendingIntent(
                 R.id.simple_sound_cloud_notification_play, mTogglePlaybackPendingIntent);
+        mNotificationExpandedView.setOnClickPendingIntent(
+                R.id.simple_sound_cloud_notification_play, mTogglePlaybackPendingIntent);
         mNotificationView.setOnClickPendingIntent(
+                R.id.simple_sound_cloud_notification_clear, mClearPendingIntent);
+        mNotificationExpandedView.setOnClickPendingIntent(
                 R.id.simple_sound_cloud_notification_clear, mClearPendingIntent);
 
         // add icon for action bar.
@@ -307,6 +339,19 @@ public class SimpleSoundCloudNotificationManager {
         if (mContentIntent != null) {
             mNotificationBuilder.setContentIntent(mContentIntent);
         }
+    }
+
+    /**
+     * Build the notification with the internal {@link android.app.Notification.Builder}
+     *
+     * @return notification ready to be displayed.
+     */
+    private Notification buildNotification() {
+        Notification notification = mNotificationBuilder.build();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            notification.bigContentView = mNotificationExpandedView;
+        }
+        return notification;
     }
 
     /**
