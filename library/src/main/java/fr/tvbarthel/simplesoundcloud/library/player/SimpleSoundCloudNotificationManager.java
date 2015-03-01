@@ -335,6 +335,9 @@ public class SimpleSoundCloudNotificationManager {
         // set the remote view.
         mNotificationBuilder.setContent(mNotificationView);
 
+        // set the notification priority.
+        mNotificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+
         // add pending intent used when notification is pressed.
         if (mContentIntent != null) {
             mNotificationBuilder.setContentIntent(mContentIntent);
