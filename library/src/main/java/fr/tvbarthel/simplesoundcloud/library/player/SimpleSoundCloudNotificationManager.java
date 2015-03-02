@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.DrawableRes;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
@@ -26,6 +25,12 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
  * Handle player notification behaviour.
  */
 public class SimpleSoundCloudNotificationManager {
+
+    /**
+     * This request code will be pass to the player activity in order to identify the start
+     * after user pressed the notification.
+     */
+    static final int REQUEST_DISPLAYING_CONTROLLER = 0x42004200;
 
     /**
      * Notification ID.
@@ -51,16 +56,6 @@ public class SimpleSoundCloudNotificationManager {
      * Clear pending intent request code.
      */
     private static final int REQUEST_CODE_CLEAR = 0x00000040;
-
-    /**
-     * Drawable used as icon for notification.
-     */
-    private static int sNotificationIcon;
-
-    /**
-     * Color used on Lollipop device as background for notification icon.
-     */
-    private static int sNotificationIconBackground = -1;
 
     /**
      * Handler running on main thread to perform change on notification ui.
@@ -118,9 +113,9 @@ public class SimpleSoundCloudNotificationManager {
     private PendingIntent mClearPendingIntent;
 
     /**
-     * Pending intent used to launch the player activity when the user press the notification.
+     * Notification configuration.
      */
-    private PendingIntent mContentIntent;
+    private SimpleSoundCloudNotificationConfig mNotificationConfig;
 
     /**
      * Encapsulate player notification behaviour.
@@ -140,38 +135,15 @@ public class SimpleSoundCloudNotificationManager {
 
         // initialize traget used to load artwork asynchronously.
         initializeArtworkTarget();
-
-        initNotificationBuilder(context);
     }
 
     /**
-     * Set the icon display in the notification.
+     * Set the configuration for the playback notification.
      *
-     * @param iconResId res id of the notification icon.
+     * @param config notification config.
      */
-    public static void setNotificationIcon(int iconResId) {
-        sNotificationIcon = iconResId;
-    }
-
-    /**
-     * Only for Lollipop devices.
-     * <p/>
-     * Set the background drawable of the small icon.
-     *
-     * @param resId small right icon background.
-     */
-    public static void setNotificationIconBackground(@DrawableRes int resId) {
-        sNotificationIconBackground = resId;
-    }
-
-    /**
-     * Set the pending intent used when user pressed the notification.
-     *
-     * @param contentIntent pending intent used to launch player activity
-     *                      when user press the notification.
-     */
-    public void setContentIntent(PendingIntent contentIntent) {
-        mContentIntent = contentIntent;
+    public void setNotificationConfig(SimpleSoundCloudNotificationConfig config) {
+        mNotificationConfig = config;
     }
 
     /**
@@ -184,6 +156,9 @@ public class SimpleSoundCloudNotificationManager {
      */
     public void notify(final Service service, final SoundCloudTrack track, boolean isPaused) {
 
+        if (mNotificationBuilder == null) {
+            initNotificationBuilder(service);
+        }
 
         // set the title
         mNotificationView.setTextViewText(R.id.simple_sound_cloud_notification_title, track.getArtist());
@@ -330,7 +305,7 @@ public class SimpleSoundCloudNotificationManager {
                 R.id.simple_sound_cloud_notification_clear, mClearPendingIntent);
 
         // add icon for action bar.
-        mNotificationBuilder.setSmallIcon(sNotificationIcon);
+        mNotificationBuilder.setSmallIcon(mNotificationConfig.getNotificationIcon());
 
         // set the remote view.
         mNotificationBuilder.setContent(mNotificationView);
@@ -338,9 +313,13 @@ public class SimpleSoundCloudNotificationManager {
         // set the notification priority.
         mNotificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
 
-        // add pending intent used when notification is pressed.
-        if (mContentIntent != null) {
-            mNotificationBuilder.setContentIntent(mContentIntent);
+        // set the content intent.
+        Class<?> playerActivity = mNotificationConfig.getNotificationActivity();
+        if (playerActivity != null) {
+            Intent i = new Intent(context, playerActivity);
+            PendingIntent contentIntent = PendingIntent.getActivity(context, REQUEST_DISPLAYING_CONTROLLER,
+                    i, PendingIntent.FLAG_UPDATE_CURRENT);
+            mNotificationBuilder.setContentIntent(contentIntent);
         }
     }
 
@@ -364,9 +343,9 @@ public class SimpleSoundCloudNotificationManager {
      */
     private void addSmallIcon(RemoteViews notificationView) {
         notificationView.setInt(R.id.simple_sound_cloud_notification_icon,
-                "setBackgroundResource", sNotificationIconBackground);
+                "setBackgroundResource", mNotificationConfig.getNotificationIconBackground());
         notificationView.setImageViewResource(R.id.simple_sound_cloud_notification_icon,
-                sNotificationIcon);
+                mNotificationConfig.getNotificationIcon());
     }
 
     /**

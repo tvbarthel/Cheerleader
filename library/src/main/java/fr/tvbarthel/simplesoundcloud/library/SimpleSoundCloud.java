@@ -12,7 +12,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudListener;
-import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationManager;
+import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationConfig;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayerPlaylist;
 import retrofit.RestAdapter;
@@ -417,14 +417,13 @@ public final class SimpleSoundCloud {
     }
 
     /**
-     * Define the activity which will be started after the user touches the player notification.
-     * <p/>
-     * This activity should display a media controller.
+     * Define the {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationConfig}
+     * which will used to configure the playback notification.
      *
-     * @param activity started activity.
+     * @param config started activity.
      */
-    private void setNotificationActivity(Class<?> activity) {
-        SimpleSoundCloudPlayer.setPlayerActivity(getContext(), activity);
+    private void setNotificationConfig(SimpleSoundCloudNotificationConfig config) {
+        SimpleSoundCloudPlayer.setNotificationConfig(getContext(), config);
     }
 
     /**
@@ -434,18 +433,17 @@ public final class SimpleSoundCloud {
 
         private Context context;
         private String apiKey;
-        private Class<?> notifActivity;
         private int logLevel;
-        private int notifIcon;
-        private int notifIconBackground;
+        private SimpleSoundCloudNotificationConfig notificationConfig;
 
         /**
          * Default constructor.
          */
         public Builder() {
             logLevel = LOG_NONE;
-            notifIcon = R.drawable.simple_sound_cloud_notification_icon;
-            notifIconBackground = R.drawable.notification_icon_background;
+            notificationConfig = new SimpleSoundCloudNotificationConfig();
+            notificationConfig.setNotificationIcon(R.drawable.simple_sound_cloud_notification_icon);
+            notificationConfig.setNotificationIconBackground(R.drawable.notification_icon_background);
         }
 
         /**
@@ -479,8 +477,8 @@ public final class SimpleSoundCloud {
          * @param resId icon res id.
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
-        public Builder notificationIcon(int resId) {
-            notifIcon = resId;
+        public Builder notificationIcon(@DrawableRes int resId) {
+            notificationConfig.setNotificationIcon(resId);
             return this;
         }
 
@@ -493,7 +491,7 @@ public final class SimpleSoundCloud {
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
         public Builder notificationIconBackground(@DrawableRes int resId) {
-            notifIconBackground = resId;
+            notificationConfig.setNotificationIconBackground(resId);
             return this;
         }
 
@@ -506,7 +504,7 @@ public final class SimpleSoundCloud {
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
         public Builder notificationActivity(ActionBarActivity activity) {
-            this.notifActivity = activity.getClass();
+            notificationConfig.setNotificationActivity(activity);
             return this;
         }
 
@@ -519,7 +517,7 @@ public final class SimpleSoundCloud {
          * @return {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud.Builder}
          */
         public Builder notificationActivity(Activity activity) {
-            this.notifActivity = activity.getClass();
+            notificationConfig.setNotificationActivity(activity);
             return this;
         }
 
@@ -565,16 +563,11 @@ public final class SimpleSoundCloud {
                 throw new IllegalStateException("Only one api key can be used at the same time.");
             }
 
-            if (notifActivity != null) {
-                sInstance.setNotificationActivity(notifActivity);
-            }
+            sInstance.setNotificationConfig(notificationConfig);
 
             if (logLevel != LOG_NONE) {
                 sInstance.setLog(logLevel);
             }
-
-            SimpleSoundCloudNotificationManager.setNotificationIconBackground(notifIconBackground);
-            SimpleSoundCloudNotificationManager.setNotificationIcon(notifIcon);
 
             return sInstance;
         }
