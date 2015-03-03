@@ -574,6 +574,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             // set new data source
             mMediaPlayer.setDataSource(track.getStreamUrl() + SOUND_CLOUD_CLIENT_ID_PARAM + mSoundCloundClientId);
 
+            // update notification to avoid waiting for playback preparation
+            // this improve the global user experience
+            updateNotification();
+
             // prepare synchronously as the service run on it's own handler thread.
             mMediaPlayer.prepare();
 
@@ -586,8 +590,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, track);
             mLocalBroadcastManager.sendBroadcast(intent);
-
-            updateNotification();
 
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
