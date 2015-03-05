@@ -58,6 +58,11 @@ public class SimpleSoundCloudNotificationManager {
     private static final int REQUEST_CODE_CLEAR = 0x00000040;
 
     /**
+     * Singleton pattern.
+     */
+    private static SimpleSoundCloudNotificationManager sIntance;
+
+    /**
      * Handler running on main thread to perform change on notification ui.
      */
     private Handler mMainThreadHandler;
@@ -122,7 +127,7 @@ public class SimpleSoundCloudNotificationManager {
      *
      * @param context context used to instantiate internal component.
      */
-    public SimpleSoundCloudNotificationManager(Context context) {
+    private SimpleSoundCloudNotificationManager(Context context) {
 
         mTrackId = -1;
 
@@ -135,6 +140,19 @@ public class SimpleSoundCloudNotificationManager {
 
         // initialize traget used to load artwork asynchronously.
         initializeArtworkTarget();
+    }
+
+    /**
+     * Encapsulate player notification behaviour.
+     *
+     * @param context context used to instantiate internal component.
+     * @return unique instance of the notification manager.
+     */
+    public static SimpleSoundCloudNotificationManager getInstance(Context context) {
+        if (sIntance == null) {
+            sIntance = new SimpleSoundCloudNotificationManager(context);
+        }
+        return sIntance;
     }
 
     /**

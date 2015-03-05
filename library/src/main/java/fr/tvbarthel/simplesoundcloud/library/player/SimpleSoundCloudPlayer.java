@@ -83,15 +83,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private static final String ACTION_STOP_PLAYER = "sound_cloud_player_stop";
 
     /**
-     * Action used to set the notification configuration.
-     */
-    private static final String ACTION_SET_NOTIFICATION_CONFIG = "sound_cloud_player_set_config";
-
-    /**
      * Action used to change the cursor of the current track.
      */
     private static final String ACTION_SEEK_TO = "sound_cloud_player_seek_to";
-
 
     /**
      * Bundle key used to pass client id.
@@ -102,14 +96,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Bundle key used to pass track url.
      */
     private static final String BUNDLE_KEY_SOUND_CLOUD_TRACK = "sound_cloud_player_bundle_key_track_url";
-
-    /**
-     * Bundle key used to pass the
-     * {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationConfig}
-     * used by the {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationManager}
-     * to build the playback notification.
-     */
-    private static final String BUNDLE_KEY_NOTIFICATION_CONFIG = "sound_cloud_notification_config";
 
     /**
      * Bundle key used to pass a track index.
@@ -160,11 +146,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * what id used to stop the service.
      */
     private static final int WHAT_RELEASE_PLAYER = 7;
-
-    /**
-     * what id used to set the notification config.
-     */
-    private static final int WHAT_SET_NOTIFICATION_CONFIG = 8;
 
     /**
      * what id used to clear the player.
@@ -322,20 +303,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     }
 
     /**
-     * Set the player activity which will be launched when the user pressed
-     * the player notification.
-     *
-     * @param context context from which the service will be started.
-     * @param config  set the config of the playback notification.
-     */
-    public static void setNotificationConfig(Context context, SimpleSoundCloudNotificationConfig config) {
-        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
-        intent.setAction(ACTION_SET_NOTIFICATION_CONFIG);
-        intent.putExtra(BUNDLE_KEY_NOTIFICATION_CONFIG, config);
-        context.startService(intent);
-    }
-
-    /**
      * Register a listener to catch player event.
      *
      * @param context  context used to register the listener.
@@ -381,7 +348,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
 
-        mSimpleSoundCloudNotificationManager = new SimpleSoundCloudNotificationManager(this);
+        mSimpleSoundCloudNotificationManager = SimpleSoundCloudNotificationManager.getInstance(this);
 
         mSimpleSoundCloudPlayerPlaylist = SimpleSoundCloudPlayerPlaylist.getInstance();
     }
@@ -448,9 +415,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     } else {
                         message.what = WHAT_PAUSE_PLAYER;
                     }
-                    break;
-                case ACTION_SET_NOTIFICATION_CONFIG:
-                    message.what = WHAT_SET_NOTIFICATION_CONFIG;
                     break;
                 case ACTION_AUDIO_BECOMING_NOISY:
                     if (!mIsPaused) {
@@ -541,10 +505,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
     private void seekToPosition(int milli) {
         mMediaPlayer.seekTo(milli);
-    }
-
-    private void setNotificationConfig(SimpleSoundCloudNotificationConfig notificationConfig) {
-        mSimpleSoundCloudNotificationManager.setNotificationConfig(notificationConfig);
     }
 
     private void initializeMediaPlayer() {
@@ -673,10 +633,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     break;
                 case WHAT_SEEK_TO:
                     seekToPosition(data.getInt(BUNDLE_KEY_SOUND_CLOUD_TRACK_POSITION));
-                    break;
-                case WHAT_SET_NOTIFICATION_CONFIG:
-                    setNotificationConfig(((SimpleSoundCloudNotificationConfig)
-                            data.getParcelable(BUNDLE_KEY_NOTIFICATION_CONFIG)));
                     break;
                 case WHAT_CLEAR_PLAYER:
                     stopForeground(true);

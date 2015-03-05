@@ -13,6 +13,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudListener;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationConfig;
+import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationManager;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayerPlaylist;
 import retrofit.RestAdapter;
@@ -93,6 +94,11 @@ public final class SimpleSoundCloud {
     private SimpleSoundCloudPlayerPlaylist mPlayerPlaylist;
 
     /**
+     * Manage the notification.
+     */
+    private SimpleSoundCloudNotificationManager mNotificationManager;
+
+    /**
      * Used to know if the player is paused.
      */
     private boolean mIsPaused;
@@ -142,6 +148,7 @@ public final class SimpleSoundCloud {
         SimpleSoundCloudOffliner.initInstance(getContext(), false);
 
         mPlayerPlaylist = SimpleSoundCloudPlayerPlaylist.getInstance();
+        mNotificationManager = SimpleSoundCloudNotificationManager.getInstance(getContext());
 
         initInternalListener(applicationContext);
     }
@@ -423,7 +430,7 @@ public final class SimpleSoundCloud {
      * @param config started activity.
      */
     private void setNotificationConfig(SimpleSoundCloudNotificationConfig config) {
-        SimpleSoundCloudPlayer.setNotificationConfig(getContext(), config);
+        mNotificationManager.setNotificationConfig(config);
     }
 
     /**
