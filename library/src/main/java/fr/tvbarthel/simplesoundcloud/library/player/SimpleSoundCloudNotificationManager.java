@@ -24,7 +24,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 /**
  * Handle player notification behaviour.
  */
-public class SimpleSoundCloudNotificationManager {
+public final class SimpleSoundCloudNotificationManager {
 
     /**
      * This request code will be pass to the player activity in order to identify the start
@@ -60,7 +60,7 @@ public class SimpleSoundCloudNotificationManager {
     /**
      * Singleton pattern.
      */
-    private static SimpleSoundCloudNotificationManager sIntance;
+    private static SimpleSoundCloudNotificationManager sInstance;
 
     /**
      * Handler running on main thread to perform change on notification ui.
@@ -149,10 +149,10 @@ public class SimpleSoundCloudNotificationManager {
      * @return unique instance of the notification manager.
      */
     public static SimpleSoundCloudNotificationManager getInstance(Context context) {
-        if (sIntance == null) {
-            sIntance = new SimpleSoundCloudNotificationManager(context);
+        if (sInstance == null) {
+            sInstance = new SimpleSoundCloudNotificationManager(context);
         }
-        return sIntance;
+        return sInstance;
     }
 
     /**

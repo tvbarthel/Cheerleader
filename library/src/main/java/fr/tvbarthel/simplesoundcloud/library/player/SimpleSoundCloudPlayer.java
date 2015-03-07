@@ -203,6 +203,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private boolean mIsPaused;
 
     /**
+     * Used to know if the player has leary played a track.
+     */
+    private boolean mHasAlreadyPlayed;
+
+    /**
      * Lock used to keep wifi while playing.
      */
     private WifiManager.WifiLock mWifiLock;
@@ -351,6 +356,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mSimpleSoundCloudNotificationManager = SimpleSoundCloudNotificationManager.getInstance(this);
 
         mSimpleSoundCloudPlayerPlaylist = SimpleSoundCloudPlayerPlaylist.getInstance();
+
+        mHasAlreadyPlayed = false;
     }
 
     @Override
@@ -361,7 +368,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     @Override
     public void onDestroy() {
 
-        mSimpleSoundCloudNotificationManager.cancel();
+        mPlayerHandler.removeCallbacksAndMessages(null);
+        stopForeground(true);
 
         Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYER_DESTROYED);
         mLocalBroadcastManager.sendBroadcast(intent);
@@ -462,7 +470,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Pause the playback.
      */
     private void pause() {
-        if (!mIsPaused) {
+        if (mHasAlreadyPlayed && !mIsPaused) {
             mIsPaused = true;
             mMediaPlayer.pause();
 
@@ -493,6 +501,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
     private void stopPlayer() {
         mMediaPlayer.stop();
+        mIsPaused = true;
     }
 
     private void nextTrack() {
@@ -534,8 +543,10 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             // set new data source
             mMediaPlayer.setDataSource(track.getStreamUrl() + SOUND_CLOUD_CLIENT_ID_PARAM + mSoundCloundClientId);
 
+
             // update notification to avoid waiting for playback preparation
             // this improve the global user experience
+            mIsPaused = false;
             updateNotification();
 
             // prepare synchronously as the service run on it's own handler thread.
@@ -544,7 +555,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             // start the playback.
             mMediaPlayer.start();
 
-            mIsPaused = false;
+            mHasAlreadyPlayed = true;
 
             // broadcast event
             Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
@@ -635,8 +646,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     seekToPosition(data.getInt(BUNDLE_KEY_SOUND_CLOUD_TRACK_POSITION));
                     break;
                 case WHAT_CLEAR_PLAYER:
-                    stopForeground(true);
-                    stopPlayer();
+                    stopSelf();
                     break;
                 default:
                     break;
