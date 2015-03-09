@@ -21,6 +21,9 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import java.io.IOException;
@@ -239,8 +242,20 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      */
     private AudioManager mAudioManager;
 
+    /**
+     * Media session used to interact with media controllers, volume key and media buttons.
+     */
+    private MediaSessionCompat mMediaSession;
+
+    /**
+     * Component name used to register receiver which catch lock screen remote control client
+     * on pre Lollipop.
+     */
     private ComponentName mMediaButtonReceiverComponent;
 
+    /**
+     * Remote control client used on pre Lollipop.
+     */
     private RemoteControlClientCompat mRemoteControlClientCompat;
 
     /**
@@ -374,6 +389,12 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         initLockScreenRemoteControlClient();
+
+        mMediaSession = new MediaSessionCompat(this, TAG);
+        mMediaSession.setCallback(new MediaSessionCallback());
+        mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
     }
 
     @Override
@@ -384,7 +405,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     @Override
     public void onDestroy() {
 
-        mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
+        }
         mAudioManager.unregisterMediaButtonEventReceiver(mMediaButtonReceiverComponent);
         mAudioManager.abandonAudioFocus(null);
 
@@ -396,6 +419,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
         mMediaPlayer.release();
         mMediaPlayer = null;
+
+        mMediaSession.release();
 
         super.onDestroy();
     }
@@ -580,6 +605,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             // update notification to avoid waiting for playback preparation
             // this improve the global user experience
             mIsPaused = false;
+            mMediaSession.setActive(true);
             updateNotification();
 
             // prepare synchronously as the service run on it's own handler thread.
@@ -606,6 +632,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      */
     private void updateNotification() {
         mSimpleSoundCloudNotificationManager.notify(this, mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(), mIsPaused);
+        updatePlaybackState();
     }
 
     /**
@@ -681,6 +708,34 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
                     .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, track.getArtist())
                     .apply();
         }
+        MediaMetadataCompat metadataCompat = new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, track.getTitle())
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, track.getArtist())
+                .build();
+        mMediaSession.setMetadata(metadataCompat);
+    }
+
+    /**
+     * Update the current media player state.
+     */
+    private void updatePlaybackState() {
+
+        long position = PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN;
+        int state;
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            position = mMediaPlayer.getCurrentPosition();
+        }
+        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
+
+        if (mIsPaused) {
+            state = PlaybackStateCompat.STATE_PAUSED;
+        } else {
+            state = PlaybackStateCompat.STATE_PLAYING;
+        }
+
+        stateBuilder.setState(state, position, 1.0f);
+
+        mMediaSession.setPlaybackState(stateBuilder.build());
     }
 
     /**
@@ -731,4 +786,35 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             }
         }
     }
+
+    /**
+     * Catch callback from media session.
+     */
+    private final class MediaSessionCallback extends MediaSessionCompat.Callback {
+
+        @Override
+        public void onPlay() {
+            super.onPlay();
+            resume();
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            pause();
+        }
+
+        @Override
+        public void onSkipToNext() {
+            super.onSkipToNext();
+            nextTrack();
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            super.onSkipToPrevious();
+            previousTrack();
+        }
+    }
+
 }

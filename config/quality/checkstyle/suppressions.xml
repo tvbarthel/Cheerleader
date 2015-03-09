@@ -16,6 +16,9 @@
     <!-- model class with lot of getter and setter + comment !-->
     <suppress files="SoundCloudTrack" checks="FileLength" />
 
+    <!-- Player service well commented !-->
+    <suppress files="SimpleSoundCloudPlayer" checks="FileLength" />
+
     <!-- Google code !-->
     <suppress files="RemoteControlHelper.java" checks="[a-zA-Z0-9]*" />
     <suppress files="RemoteControlClientCompat.java" checks="[a-zA-Z0-9]*" />
