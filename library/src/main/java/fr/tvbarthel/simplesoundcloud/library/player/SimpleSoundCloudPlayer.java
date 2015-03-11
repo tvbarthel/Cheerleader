@@ -1,17 +1,12 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
-import android.media.RemoteControlClient;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -21,16 +16,12 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import java.io.IOException;
 
+import fr.tvbarthel.simplesoundcloud.library.media.MediaSessionWrapper;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
-import fr.tvbarthel.simplesoundcloud.library.remote.RemoteControlClientCompat;
-import fr.tvbarthel.simplesoundcloud.library.remote.RemoteControlHelper;
 
 /**
  * Service used as SoundCloudPlayer.
@@ -243,20 +234,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private AudioManager mAudioManager;
 
     /**
-     * Media session used to interact with media controllers, volume key and media buttons.
+     * Wrapper used to manage {@link android.support.v4.media.session.MediaSessionCompat}
+     * as well as {@link fr.tvbarthel.simplesoundcloud.library.remote.RemoteControlClientCompat}
      */
-    private MediaSessionCompat mMediaSession;
+    private MediaSessionWrapper mMediaSession;
 
-    /**
-     * Component name used to register receiver which catch lock screen remote control client
-     * on pre Lollipop.
-     */
-    private ComponentName mMediaButtonReceiverComponent;
-
-    /**
-     * Remote control client used on pre Lollipop.
-     */
-    private RemoteControlClientCompat mRemoteControlClientCompat;
 
     /**
      * Start the playback.
@@ -388,12 +370,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
-        initLockScreenRemoteControlClient();
-
-        mMediaSession = new MediaSessionCompat(this, TAG);
-        mMediaSession.setCallback(new MediaSessionCallback());
-        mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-                | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mMediaSession = new MediaSessionWrapper(this, new MediaSessionCallback(), mAudioManager);
 
     }
 
@@ -405,11 +382,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     @Override
     public void onDestroy() {
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
-        }
-        mAudioManager.unregisterMediaButtonEventReceiver(mMediaButtonReceiverComponent);
         mAudioManager.abandonAudioFocus(null);
+        mMediaSession.onDestroy();
 
         mPlayerHandler.removeCallbacksAndMessages(null);
         stopForeground(true);
@@ -419,8 +393,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
         mMediaPlayer.release();
         mMediaPlayer = null;
-
-        mMediaSession.release();
 
         super.onDestroy();
     }
@@ -514,7 +486,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     /**
      * Pause the playback.
      */
-    @SuppressWarnings("deprecation")
     private void pause() {
         if (mHasAlreadyPlayed && !mIsPaused) {
             mIsPaused = true;
@@ -525,16 +496,14 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             mLocalBroadcastManager.sendBroadcast(intent);
 
             updateNotification();
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
-            }
+
+            mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PAUSED);
         }
     }
 
     /**
      * Resume the playback.
      */
-    @SuppressWarnings("deprecation")
     private void resume() {
         if (mIsPaused) {
             mIsPaused = false;
@@ -546,17 +515,12 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             mLocalBroadcastManager.sendBroadcast(intent);
 
             updateNotification();
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
-            }
+            mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void stopPlayer() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
-        }
+        mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_STOPPED);
         mMediaPlayer.stop();
         mIsPaused = true;
     }
@@ -605,7 +569,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             // update notification to avoid waiting for playback preparation
             // this improve the global user experience
             mIsPaused = false;
-            mMediaSession.setActive(true);
             updateNotification();
 
             // prepare synchronously as the service run on it's own handler thread.
@@ -621,7 +584,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, track);
             mLocalBroadcastManager.sendBroadcast(intent);
 
-            updateMetaData(track);
+            mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
+            mMediaSession.setMetaData(track);
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
         }
@@ -631,8 +595,8 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Update the notification with the current track information.
      */
     private void updateNotification() {
-        mSimpleSoundCloudNotificationManager.notify(this, mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(), mIsPaused);
-        updatePlaybackState();
+        mSimpleSoundCloudNotificationManager.notify(
+                this, mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(), mIsPaused);
     }
 
     /**
@@ -666,77 +630,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mStopServiceHandler.sendEmptyMessageDelayed(WHAT_RELEASE_PLAYER, IDLE_PERIOD_MILLI);
     }
 
-    /**
-     * Initialize the remote control client on the lock screen.
-     */
-    @SuppressWarnings("deprecation")
-    private void initLockScreenRemoteControlClient() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            mMediaButtonReceiverComponent = new ComponentName(
-                    this.getPackageName(), SimpleSoundCloudMediaButtonReceiver.class.getName());
-            mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
-
-            if (mRemoteControlClientCompat == null) {
-                Intent remoteControlIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-                remoteControlIntent.setComponent(mMediaButtonReceiverComponent);
-                mRemoteControlClientCompat = new RemoteControlClientCompat(
-                        PendingIntent.getBroadcast(this, 0, remoteControlIntent, 0));
-                RemoteControlHelper.registerRemoteControlClient(mAudioManager, mRemoteControlClientCompat);
-
-            }
-            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
-            mRemoteControlClientCompat.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PLAY
-                    | RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
-                    | RemoteControlClient.FLAG_KEY_MEDIA_NEXT
-                    | RemoteControlClient.FLAG_KEY_MEDIA_STOP
-                    | RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
-                    | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE);
-        }
-    }
-
-    /**
-     * Update meta data used by the remote control client.
-     *
-     * @param track track currently played.
-     */
-    @SuppressWarnings("deprecation")
-    private void updateMetaData(SoundCloudTrack track) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
-            mRemoteControlClientCompat.editMetadata(true)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, track.getTitle())
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, track.getArtist())
-                    .apply();
-        }
-        MediaMetadataCompat metadataCompat = new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, track.getTitle())
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, track.getArtist())
-                .build();
-        mMediaSession.setMetadata(metadataCompat);
-    }
-
-    /**
-     * Update the current media player state.
-     */
-    private void updatePlaybackState() {
-
-        long position = PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN;
-        int state;
-        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-            position = mMediaPlayer.getCurrentPosition();
-        }
-        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
-
-        if (mIsPaused) {
-            state = PlaybackStateCompat.STATE_PAUSED;
-        } else {
-            state = PlaybackStateCompat.STATE_PLAYING;
-        }
-
-        stateBuilder.setState(state, position, 1.0f);
-
-        mMediaSession.setPlaybackState(stateBuilder.build());
-    }
 
     /**
      * Looper used process player request.
@@ -788,33 +681,37 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     }
 
     /**
-     * Catch callback from media session.
+     * Callback implementation to catch media session events.
      */
-    private final class MediaSessionCallback extends MediaSessionCompat.Callback {
+    private final class MediaSessionCallback implements MediaSessionWrapper.MediaSessionWrapperCallback {
 
         @Override
         public void onPlay() {
-            super.onPlay();
             resume();
         }
 
         @Override
         public void onPause() {
-            super.onPause();
             pause();
         }
 
         @Override
         public void onSkipToNext() {
-            super.onSkipToNext();
             nextTrack();
         }
 
         @Override
         public void onSkipToPrevious() {
-            super.onSkipToPrevious();
             previousTrack();
         }
-    }
 
+        @Override
+        public void onPlayPauseToggle() {
+            if (mIsPaused) {
+                resume();
+            } else {
+                pause();
+            }
+        }
+    }
 }
