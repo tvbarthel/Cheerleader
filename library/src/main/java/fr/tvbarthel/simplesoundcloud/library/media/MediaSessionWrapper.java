@@ -5,11 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
 import android.os.Build;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -96,12 +98,37 @@ public class MediaSessionWrapper {
      */
     private AudioManager mAudioManager;
 
+    /**
+     * App package name at runtime used for the Component name.
+     */
+    private String mRuntimePackageName;
+
+    /**
+     * Receiver used to catch lock screen event on pre Lollipop devices.
+     */
+    private LockScreenReceiver mLockScreenReceiver;
+
+    /**
+     * Used to register/unregister lock screen receiver.
+     */
+    private LocalBroadcastManager mLocalBroadcastManager;
+
     private Context mContext;
 
+    /**
+     * Wrapper used to encapsulate {@link android.support.v4.media.session.MediaSessionCompat} behaviour
+     * as well as a remote control client for lock screen on pre Lollipop.
+     *
+     * @param context      holding context.
+     * @param callback     callback used to catch media session or lock screen events.
+     * @param audioManager audio manager used to request the focus.
+     */
     public MediaSessionWrapper(Context context, MediaSessionWrapperCallback callback, AudioManager audioManager) {
         mContext = context;
         mCallback = callback;
         mAudioManager = audioManager;
+
+        mRuntimePackageName = context.getPackageName();
 
         initLockScreenRemoteControlClient(context);
 
@@ -119,6 +146,7 @@ public class MediaSessionWrapper {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
             mAudioManager.unregisterMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+            mLocalBroadcastManager.unregisterReceiver(mLockScreenReceiver);
         }
         mMediaSession.release();
     }
@@ -167,6 +195,8 @@ public class MediaSessionWrapper {
             mRemoteControlClientCompat.editMetadata(true)
                     .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, track.getTitle())
                     .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, track.getArtist())
+                    .putBitmap(RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,
+                            BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_album_black))
                     .apply();
         }
         MediaMetadataCompat metadataCompat = new MediaMetadataCompat.Builder()
@@ -202,12 +232,14 @@ public class MediaSessionWrapper {
 
     /**
      * Initialize the remote control client on the lock screen.
+     *
+     * @param context holding context.
      */
     @SuppressWarnings("deprecation")
     private void initLockScreenRemoteControlClient(Context context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             mMediaButtonReceiverComponent = new ComponentName(
-                    mContext.getPackageName(), MediaSessionReceiver.class.getName());
+                    mRuntimePackageName, MediaSessionReceiver.class.getName());
             mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
 
             if (mRemoteControlClientCompat == null) {
@@ -225,18 +257,24 @@ public class MediaSessionWrapper {
                     | RemoteControlClient.FLAG_KEY_MEDIA_STOP
                     | RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
                     | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE);
+
+            registerLockScreenReceiver(context);
         }
     }
 
-    private String getPackageName(Class<?> c) {
-        String canonical = c.getCanonicalName();
-        String simpleName = c.getSimpleName();
-        if (canonical == null) {
-            throw new IllegalStateException("Class : " + simpleName + " hasn't canonical name");
-        }
-
-        // a.b.C.class => a.b
-        return canonical.replace("." + simpleName, "");
+    /**
+     * Register the lock screen receiver used to catch lock screen media buttons events.
+     *
+     * @param context holding context.
+     */
+    private void registerLockScreenReceiver(Context context) {
+        mLockScreenReceiver = new LockScreenReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION_TOGGLE_PLAYBACK);
+        intentFilter.addAction(ACTION_NEXT_TRACK);
+        intentFilter.addAction(ACTION_PREVIOUS_TRACK);
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(context);
+        mLocalBroadcastManager.registerReceiver(mLockScreenReceiver, intentFilter);
     }
 
     /**
@@ -273,7 +311,7 @@ public class MediaSessionWrapper {
      * Catch callback from the {@link fr.tvbarthel.simplesoundcloud.library.media.MediaSessionReceiver}
      * which catch broadcast from the remote control client on the lock screen of pre Lollipop devices.
      */
-    private final class MediaSessionWrapperReceiver extends BroadcastReceiver {
+    private final class LockScreenReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {

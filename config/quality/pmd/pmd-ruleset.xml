@@ -23,7 +23,10 @@
     <rule ref="rulesets/java/imports.xml" />
     <rule ref="rulesets/java/logging-java.xml" />
     <rule ref="rulesets/java/braces.xml" />
-    <rule ref="rulesets/java/strings.xml" />
+    <rule ref="rulesets/java/strings.xml">
+        <!-- annotation "deprecation" used multiple time in a same class... !-->
+        <exclude name="AvoidDuplicateLiterals" />
+    </rule>
     <rule ref="rulesets/java/basic.xml" />
     <rule ref="rulesets/java/naming.xml">
         <exclude name="AbstractNaming" />
