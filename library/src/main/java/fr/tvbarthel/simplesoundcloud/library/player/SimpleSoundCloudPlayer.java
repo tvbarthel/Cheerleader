@@ -4,6 +4,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
@@ -18,8 +20,12 @@ import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
 import java.io.IOException;
 
+import fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper;
 import fr.tvbarthel.simplesoundcloud.library.media.MediaSessionWrapper;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 
@@ -239,6 +245,16 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      */
     private MediaSessionWrapper mMediaSession;
 
+    /**
+     * Picasso target used to retrieve the track artwork.
+     */
+    private Target mArtworkTarget;
+
+    /**
+     * Handler running on main thread to perform change on notification ui.
+     */
+    private Handler mMainThreadHandler;
+
 
     /**
      * Start the playback.
@@ -356,6 +372,13 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         initializeMediaPlayer();
         initializeStopHandler(thread.getLooper());
 
+        // instantiate target used to load track artwork.
+        mArtworkTarget = new ArtworkTarget();
+
+        // create handler on the main thread to avoid throwing error
+        // with picasso when bitmap is retrieved and loaded in notification.
+        mMainThreadHandler = new Handler(getApplicationContext().getMainLooper());
+
         mWifiLock = ((WifiManager) getBaseContext().getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
 
@@ -371,6 +394,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         mMediaSession = new MediaSessionWrapper(this, new MediaSessionCallback(), mAudioManager);
+
 
     }
 
@@ -565,27 +589,29 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             mMediaPlayer.setDataSource(track.getStreamUrl() + SOUND_CLOUD_CLIENT_ID_PARAM
                     + mSoundCloundClientId);
 
-
-            // update notification to avoid waiting for playback preparation
-            // this improve the global user experience
             mIsPaused = false;
-            updateNotification();
-
-            // prepare synchronously as the service run on it's own handler thread.
-            mMediaPlayer.prepare();
-
-            // start the playback.
-            mMediaPlayer.start();
-
             mHasAlreadyPlayed = true;
 
+            // 1 - UPDATE ALL VISUAL CALLBACK FIRST TO IMPROVE USER EXPERIENCE
+
+            updateNotification();
+            // update playback state as well as meta data.
+            mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
+            // start loading of the artwork.
+            loadArtwork(this,
+                    SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XXXLARGE));
             // broadcast event
             Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, track);
             mLocalBroadcastManager.sendBroadcast(intent);
 
-            mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
-            mMediaSession.setMetaData(track);
+            // 2 - THEN PREPARE THE TRACK STREAMING
+
+            // prepare synchronously as the service run on it's own handler thread.
+            mMediaPlayer.prepare();
+            // start the playback.
+            mMediaPlayer.start();
+
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
         }
@@ -628,6 +654,24 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     private void gotoIdleState() {
         mStopServiceHandler.removeCallbacksAndMessages(null);
         mStopServiceHandler.sendEmptyMessageDelayed(WHAT_RELEASE_PLAYER, IDLE_PERIOD_MILLI);
+    }
+
+    /**
+     * Load the track artwork.
+     *
+     * @param context    context used by {@link com.squareup.picasso.Picasso} to load the artwork asynchronously.
+     * @param artworkUrl artwork url of the track.
+     */
+    private void loadArtwork(final Context context, final String artworkUrl) {
+        mMainThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Picasso
+                        .with(context)
+                        .load(artworkUrl)
+                        .into(mArtworkTarget);
+            }
+        });
     }
 
 
@@ -712,6 +756,32 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             } else {
                 pause();
             }
+        }
+    }
+
+    /**
+     * Custom target used to load track artwork asynchronously.
+     */
+    private class ArtworkTarget implements Target {
+
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+            // update meta data with artwork.
+            // copy bitmap to avoid IllegalStateException "Can't parcel a recycled bitmap"
+            // from the remove control client on KitKat (IRemoteControlDisplay.java:340)
+            mMediaSession.setMetaData(mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(),
+                    bitmap.copy(bitmap.getConfig(), false));
+
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
         }
     }
 }

@@ -6,7 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
@@ -17,7 +17,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import fr.tvbarthel.simplesoundcloud.library.R;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.remote.RemoteControlClientCompat;
 import fr.tvbarthel.simplesoundcloud.library.remote.RemoteControlHelper;
@@ -190,22 +189,41 @@ public class MediaSessionWrapper {
      */
     @SuppressWarnings("deprecation")
     public void setMetaData(SoundCloudTrack track) {
+        setMetaData(track, null);
+    }
+
+    /**
+     * Update meta data used by the remote control client and the media session.
+     *
+     * @param track   track currently played.
+     * @param artwork track artwork.
+     */
+    @SuppressWarnings("deprecation")
+    public void setMetaData(SoundCloudTrack track, Bitmap artwork) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+
+            // set meta data on the lock screen for pre lollipop.
             mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
-            mRemoteControlClientCompat.editMetadata(true)
+            RemoteControlClientCompat.MetadataEditorCompat mediaEditorCompat
+                    = mRemoteControlClientCompat.editMetadata(true)
                     .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, track.getTitle())
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, track.getArtist())
-                    .putBitmap(RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,
-                            BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_album_black))
-                    .apply();
+                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, track.getArtist());
+            if (artwork != null) {
+                mediaEditorCompat.putBitmap(
+                        RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK, artwork);
+            }
+            mediaEditorCompat.apply();
         }
-        MediaMetadataCompat metadataCompat = new MediaMetadataCompat.Builder()
+
+        // set meta data to the media session.
+        MediaMetadataCompat.Builder metadataCompatBuilder = new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, track.getTitle())
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, track.getArtist())
-                .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
-                        BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_album_black))
-                .build();
-        mMediaSession.setMetadata(metadataCompat);
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, track.getArtist());
+        if (artwork != null) {
+            metadataCompatBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, artwork);
+        }
+        mMediaSession.setMetadata(metadataCompatBuilder.build());
+        setMediaSessionCompatPlaybackState(PlaybackStateCompat.STATE_PLAYING);
     }
 
     /**
