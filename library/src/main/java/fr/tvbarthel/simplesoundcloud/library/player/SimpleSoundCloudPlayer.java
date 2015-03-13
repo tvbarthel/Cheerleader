@@ -370,7 +370,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mMediaPlayer = new MediaPlayer();
 
         initializeMediaPlayer();
-        initializeStopHandler(thread.getLooper());
+        mStopServiceHandler = new StopHandler(thread.getLooper());
 
         // instantiate target used to load track artwork.
         mArtworkTarget = new ArtworkTarget();
@@ -626,26 +626,6 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     }
 
     /**
-     * Initialize the handler used to stop the service when idle period ends.
-     *
-     * @param looper from a non ui-thread
-     */
-    private void initializeStopHandler(Looper looper) {
-        mStopServiceHandler = new Handler(looper) {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-
-                if (msg.what != WHAT_RELEASE_PLAYER || !mIsPaused) {
-                    return;
-                }
-
-                stopSelf();
-            }
-        };
-    }
-
-    /**
      * Start idle state.
      * <p/>
      * After {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer#IDLE_PERIOD_MILLI}
@@ -782,6 +762,32 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
         @Override
         public void onPrepareLoad(Drawable placeHolderDrawable) {
+        }
+    }
+
+    /**
+     * Handler used to stop the service when idle period ends.
+     */
+    private class StopHandler extends Handler {
+
+        /**
+         * Handler used to stop the service when idle period ends.
+         *
+         * @param looper lopper from handler thread to avoid running on main thread.
+         */
+        public StopHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if (msg.what != WHAT_RELEASE_PLAYER || !mIsPaused) {
+                return;
+            }
+
+            stopSelf();
         }
     }
 }
