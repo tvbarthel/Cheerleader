@@ -33,7 +33,8 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
  * Service used as SoundCloudPlayer.
  */
 public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener {
+        MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener,
+        AudioManager.OnAudioFocusChangeListener {
 
     /**
      * Action used for toggle playback event
@@ -391,7 +392,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mHasAlreadyPlayed = false;
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         mMediaSession = new MediaSessionWrapper(this, new MediaSessionCallback(), mAudioManager);
 
@@ -406,7 +407,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     @Override
     public void onDestroy() {
 
-        mAudioManager.abandonAudioFocus(null);
+        mAudioManager.abandonAudioFocus(this);
         mMediaSession.onDestroy();
 
         mPlayerHandler.removeCallbacksAndMessages(null);
@@ -504,6 +505,35 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_SEEK_COMPLETE);
         intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_SEEK, mp.getCurrentPosition());
         mLocalBroadcastManager.sendBroadcast(intent);
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (mIsPaused) {
+                    resume();
+                }
+                mMediaPlayer.setVolume(1.0f, 1.0f);
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                if (!mIsPaused) {
+                    pause();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                if (!mIsPaused) {
+                    pause();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                if (!mIsPaused) {
+                    mMediaPlayer.setVolume(0.1f, 0.1f);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
 
