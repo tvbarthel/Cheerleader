@@ -203,7 +203,22 @@ public final class SimpleSoundCloud {
      */
     public Observable<SoundCloudUser> getUser(int userId) {
         checkState();
-        return mSimpleSoundCloudService.getUser(userId)
+        return mSimpleSoundCloudService.getUser(String.valueOf(userId))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
+                .map(SimpleSoundCloudRxParser.PARSE_USER);
+    }
+
+    /**
+     * Retrieve SoundCloud user profile.
+     *
+     * @param userName user name.
+     * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser}
+     */
+    public Observable<SoundCloudUser> getUser(String userName) {
+        checkState();
+        return mSimpleSoundCloudService.getUser(userName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)

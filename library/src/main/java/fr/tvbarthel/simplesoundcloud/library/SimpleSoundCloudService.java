@@ -14,11 +14,11 @@ interface SimpleSoundCloudService {
     /**
      * Retrieve a SoundCloud user profile.
      *
-     * @param userId SoundCloud user id.
+     * @param user SoundCloud user id as string or user name.
      * @return {@link rx.Observable} on {@link retrofit.client.Response}
      */
-    @GET("/users/{userId}.json")
-    public Observable<Response> getUser(@Path("userId") int userId);
+    @GET("/users/{user}.json")
+    public Observable<Response> getUser(@Path("user") String user);
 
     /**
      * Retrieve a SoundCloud track.
