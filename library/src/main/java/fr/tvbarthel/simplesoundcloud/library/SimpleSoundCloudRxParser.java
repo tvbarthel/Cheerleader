@@ -2,11 +2,13 @@ package fr.tvbarthel.simplesoundcloud.library;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
@@ -55,6 +57,28 @@ final class SimpleSoundCloudRxParser {
             }
 
             return simpleSoundCloudUser;
+        }
+    };
+
+    /**
+     * Parse all public {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
+     * of a user.
+     */
+    public static final Func1<String, ArrayList<SoundCloudTrack>> PARSE_USER_TRACKS
+            = new Func1<String, ArrayList<SoundCloudTrack>>() {
+        @Override
+        public ArrayList<SoundCloudTrack> call(String s) {
+            ArrayList<SoundCloudTrack> tracks = new ArrayList<>();
+            try {
+                JSONArray jsonArray = new JSONArray(s);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    tracks.add(PARSE_TRACK.call(jsonArray.getJSONObject(i).toString()));
+                }
+
+            } catch (JSONException e) {
+                Log.e(TAG, "FAILED TO PARSE USER TRACKS : " + s);
+            }
+            return tracks;
         }
     };
 

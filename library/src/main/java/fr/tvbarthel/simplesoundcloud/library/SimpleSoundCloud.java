@@ -6,6 +6,8 @@ import android.support.annotation.DrawableRes;
 import android.support.v7.app.ActionBarActivity;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
@@ -226,6 +228,21 @@ public final class SimpleSoundCloud {
     }
 
     /**
+     * Retrieve the public tracks of a user.
+     *
+     * @param userName user name.
+     * @return {@link rx.Observable} on an ArrayList of
+     */
+    public Observable<ArrayList<SoundCloudTrack>> getUserTracks(String userName) {
+        checkState();
+        return mSimpleSoundCloudService.getUserTracks(userName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
+                .map(SimpleSoundCloudRxParser.PARSE_USER_TRACKS);
+    }
+
+    /**
      * Retrieve a SoundCloud track according to its id.
      *
      * @param trackId SoundCloud track id.
@@ -312,6 +329,17 @@ public final class SimpleSoundCloud {
     public void addTrack(SoundCloudTrack track) {
         checkState();
         mPlayerPlaylist.add(track);
+    }
+
+    /**
+     * Add a list of track to thr current SoundCloud player playlist.
+     *
+     * @param tracks list of {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
+     *               to be added to the player.
+     */
+    public void addTracks(List<SoundCloudTrack> tracks) {
+        checkState();
+        mPlayerPlaylist.addAll(tracks);
     }
 
     /**

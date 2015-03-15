@@ -1,6 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
@@ -73,6 +74,17 @@ public final class SimpleSoundCloudPlayerPlaylist {
      */
     public void add(SoundCloudTrack track) {
         add(mSoundCloudPlaylist.getTracks().size(), track);
+    }
+
+    /**
+     * Add all tracks at the end of the playlist.
+     *
+     * @param tracks tracks to add.
+     */
+    public void addAll(List<SoundCloudTrack> tracks) {
+        for (SoundCloudTrack track : tracks) {
+            add(mSoundCloudPlaylist.getTracks().size(), track);
+        }
     }
 
     /**
