@@ -577,6 +577,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
         mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_STOPPED);
         mMediaPlayer.stop();
         mIsPaused = true;
+        stopSelf();
     }
 
     private void nextTrack() {

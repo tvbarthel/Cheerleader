@@ -176,6 +176,29 @@ public class SoundCloudTrack implements Parcelable {
                 + '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SoundCloudTrack track = (SoundCloudTrack) o;
+
+        if (mId != track.mId) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return mId;
+    }
+
     /**
      * Integer Id.
      *

@@ -351,12 +351,21 @@ public final class SimpleSoundCloud {
      */
     public void removeTrack(int playlistIndex) {
         checkState();
-        mPlayerPlaylist.remove(playlistIndex);
+        SoundCloudTrack currentTrack = mPlayerPlaylist.getCurrentTrack();
+        SoundCloudTrack removedTrack = mPlayerPlaylist.remove(playlistIndex);
 
-        if (!mIsPaused) {
-            play();
+        if (removedTrack == null) {
+            // nothing removed
+            return;
         }
 
+        if (mPlayerPlaylist.size() == 0) {
+            // playlist empty after deletion, stop player;
+            SimpleSoundCloudPlayer.stop(getContext(), mClientKey);
+        } else if (currentTrack.equals(removedTrack) && !mIsPaused) {
+            // play next track if removed one was the current and playing
+            play();
+        }
     }
 
     /**

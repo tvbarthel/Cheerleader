@@ -61,7 +61,7 @@ public final class SimpleSoundCloudPlayerPlaylist {
      * @return current track or null if none has been added to the player playlist.
      */
     public SoundCloudTrack getCurrentTrack() {
-        if (mCurrentTrackIndex > -1) {
+        if (mCurrentTrackIndex > -1 && mCurrentTrackIndex < mSoundCloudPlaylist.getTracks().size()) {
             return mSoundCloudPlaylist.getTracks().get(mCurrentTrackIndex);
         }
         return null;
@@ -117,22 +117,17 @@ public final class SimpleSoundCloudPlayerPlaylist {
         if (trackIndex >= 0 && trackIndex < tracks.size()) {
             removedTrack = tracks.remove(trackIndex);
 
-            // update the current index
             if (tracks.size() == 0) {
-                // last song has been removed
+                // track list empty after removal
                 mCurrentTrackIndex = 0;
-            } else if (mCurrentTrackIndex == trackIndex) {
-                // update current index and start the nex track if player wasn't paused.
+            } else if (trackIndex == tracks.size()) {
+                // last song removed
                 mCurrentTrackIndex = (mCurrentTrackIndex - 1) % tracks.size();
-            } else if (mCurrentTrackIndex > trackIndex) {
-                // update current track index if the removed one was before
-                // in the playlist
+            } else if (trackIndex >= 0 && trackIndex < mCurrentTrackIndex) {
+                // tracks translated on the right after a deletion before current played one.
                 mCurrentTrackIndex = (mCurrentTrackIndex - 1) % tracks.size();
             }
-
         }
-
-
         return removedTrack;
     }
 
@@ -141,6 +136,7 @@ public final class SimpleSoundCloudPlayerPlaylist {
      *
      * @return next track to be played.
      */
+
     public SoundCloudTrack next() {
         mCurrentTrackIndex = (mCurrentTrackIndex + 1) % mSoundCloudPlaylist.getTracks().size();
         return mSoundCloudPlaylist.getTracks().get(mCurrentTrackIndex);
@@ -155,5 +151,14 @@ public final class SimpleSoundCloudPlayerPlaylist {
         int tracks = mSoundCloudPlaylist.getTracks().size();
         mCurrentTrackIndex = (tracks + mCurrentTrackIndex - 1) % tracks;
         return mSoundCloudPlaylist.getTracks().get(mCurrentTrackIndex);
+    }
+
+    /**
+     * Retrieve the size of the playlist.
+     *
+     * @return Number of tracks in the playlist.
+     */
+    public int size() {
+        return mSoundCloudPlaylist.getTracks().size();
     }
 }
