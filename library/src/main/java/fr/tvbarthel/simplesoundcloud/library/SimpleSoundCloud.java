@@ -290,20 +290,32 @@ public final class SimpleSoundCloud {
      * Stop the current played track and load the next one if the playlist isn't empty.
      * <p/>
      * If the current played track is the last one, the first track will be loaded.
+     *
+     * @return false if current playlist is empty.
      */
-    public void next() {
+    public boolean next() {
         checkState();
+        if (mPlayerPlaylist.isEmpty()) {
+            return false;
+        }
         SimpleSoundCloudPlayer.play(getContext(), mClientKey, mPlayerPlaylist.next());
+        return true;
     }
 
     /**
      * Stop the current played track and load the previous one.
      * <p/>
      * If the current played track is the first one, the last track will be loaded.
+     *
+     * @return false if current playlist is empty.
      */
-    public void previous() {
+    public boolean previous() {
         checkState();
+        if (mPlayerPlaylist.isEmpty()) {
+            return false;
+        }
         SimpleSoundCloudPlayer.play(getContext(), mClientKey, mPlayerPlaylist.previous());
+        return true;
     }
 
     /**
@@ -317,7 +329,9 @@ public final class SimpleSoundCloud {
      */
     public void seekTo(int milli) {
         checkState();
-        SimpleSoundCloudPlayer.seekTo(getContext(), mClientKey, milli);
+        if (!mPlayerPlaylist.isEmpty()) {
+            SimpleSoundCloudPlayer.seekTo(getContext(), mClientKey, milli);
+        }
     }
 
     /**
@@ -359,7 +373,7 @@ public final class SimpleSoundCloud {
             return;
         }
 
-        if (mPlayerPlaylist.size() == 0) {
+        if (mPlayerPlaylist.isEmpty()) {
             // playlist empty after deletion, stop player;
             SimpleSoundCloudPlayer.stop(getContext(), mClientKey);
         } else if (currentTrack.equals(removedTrack) && !mIsPaused) {

@@ -161,4 +161,13 @@ public final class SimpleSoundCloudPlayerPlaylist {
     public int size() {
         return mSoundCloudPlaylist.getTracks().size();
     }
+
+    /**
+     * Used to know if the playlist is empty.
+     *
+     * @return true if the current playlist is empty.
+     */
+    public boolean isEmpty() {
+        return mSoundCloudPlaylist.getTracks().size() == 0;
+    }
 }
