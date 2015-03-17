@@ -2,7 +2,6 @@ package fr.tvbarthel.simplesoundcloud.library.player;
 
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -24,7 +23,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 /**
  * Handle player notification behaviour.
  */
-public final class SimpleSoundCloudNotificationManager {
+public final class NotificationManager {
 
     /**
      * This request code will be pass to the player activity in order to identify the start
@@ -60,7 +59,7 @@ public final class SimpleSoundCloudNotificationManager {
     /**
      * Singleton pattern.
      */
-    private static SimpleSoundCloudNotificationManager sInstance;
+    private static NotificationManager sInstance;
 
     /**
      * Handler running on main thread to perform change on notification ui.
@@ -95,7 +94,7 @@ public final class SimpleSoundCloudNotificationManager {
     /**
      * System service to manage notification.
      */
-    private NotificationManager mNotificationManager;
+    private android.app.NotificationManager mNotificationManager;
 
     /**
      * Pending intent set to the playback button.
@@ -120,20 +119,20 @@ public final class SimpleSoundCloudNotificationManager {
     /**
      * Notification configuration.
      */
-    private SimpleSoundCloudNotificationConfig mNotificationConfig;
+    private NotificationConfig mNotificationConfig;
 
     /**
      * Encapsulate player notification behaviour.
      *
      * @param context context used to instantiate internal component.
      */
-    private SimpleSoundCloudNotificationManager(Context context) {
+    private NotificationManager(Context context) {
 
         mTrackId = -1;
 
         mMainThreadHandler = new Handler(context.getApplicationContext().getMainLooper());
 
-        mNotificationManager = ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
+        mNotificationManager = ((android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
 
         // initialize actions' PendingIntents.
         initializePendingIntent(context);
@@ -148,9 +147,9 @@ public final class SimpleSoundCloudNotificationManager {
      * @param context context used to instantiate internal component.
      * @return unique instance of the notification manager.
      */
-    public static SimpleSoundCloudNotificationManager getInstance(Context context) {
+    public static NotificationManager getInstance(Context context) {
         if (sInstance == null) {
-            sInstance = new SimpleSoundCloudNotificationManager(context);
+            sInstance = new NotificationManager(context);
         }
         return sInstance;
     }
@@ -160,7 +159,7 @@ public final class SimpleSoundCloudNotificationManager {
      *
      * @param config notification config.
      */
-    public void setNotificationConfig(SimpleSoundCloudNotificationConfig config) {
+    public void setNotificationConfig(NotificationConfig config) {
         mNotificationConfig = config;
     }
 
@@ -234,26 +233,26 @@ public final class SimpleSoundCloudNotificationManager {
     private void initializePendingIntent(Context context) {
 
         // toggle playback
-        Intent togglePlaybackIntent = new Intent(context, SimpleSoundCloudPlayer.class);
-        togglePlaybackIntent.setAction(SimpleSoundCloudPlayer.ACTION_TOGGLE_PLAYBACK);
+        Intent togglePlaybackIntent = new Intent(context, PlaybackService.class);
+        togglePlaybackIntent.setAction(PlaybackService.ACTION_TOGGLE_PLAYBACK);
         mTogglePlaybackPendingIntent = PendingIntent.getService(context, REQUEST_CODE_PLAYBACK,
                 togglePlaybackIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // next track
-        Intent nextPrendingIntent = new Intent(context, SimpleSoundCloudPlayer.class);
-        nextPrendingIntent.setAction(SimpleSoundCloudPlayer.ACTION_NEXT_TRACK);
+        Intent nextPrendingIntent = new Intent(context, PlaybackService.class);
+        nextPrendingIntent.setAction(PlaybackService.ACTION_NEXT_TRACK);
         mNextPendingIntent = PendingIntent.getService(context, REQUEST_CODE_NEXT,
                 nextPrendingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // previous track
-        Intent previousPendingIntent = new Intent(context, SimpleSoundCloudPlayer.class);
-        previousPendingIntent.setAction(SimpleSoundCloudPlayer.ACTION_PREVIOUS_TRACK);
+        Intent previousPendingIntent = new Intent(context, PlaybackService.class);
+        previousPendingIntent.setAction(PlaybackService.ACTION_PREVIOUS_TRACK);
         mPreviousPendingIntent = PendingIntent.getService(context, REQUEST_CODE_PREVIOUS,
                 previousPendingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // clear notification
-        Intent clearPendingIntent = new Intent(context, SimpleSoundCloudPlayer.class);
-        clearPendingIntent.setAction(SimpleSoundCloudPlayer.ACTION_CLEAR_NOTIFICATION);
+        Intent clearPendingIntent = new Intent(context, PlaybackService.class);
+        clearPendingIntent.setAction(PlaybackService.ACTION_CLEAR_NOTIFICATION);
         mClearPendingIntent = PendingIntent.getService(context, REQUEST_CODE_CLEAR,
                 clearPendingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }

@@ -15,12 +15,12 @@
 
         <!-- Service used for music playback !-->
         <service
-            android:name=".player.SimpleSoundCloudPlayer"
+            android:name=".player.PlaybackService"
             android:exported="false" />
 
         <!-- receiver used to stop player when audio become noisy !-->
         <!-- http://developer.android.com/reference/android/media/AudioManager.html#ACTION_AUDIO_BECOMING_NOISY !-->
-        <receiver android:name=".player.SimpleSoundCloudPlayerReceiver">
+        <receiver android:name=".player.PlayerReceiver">
             <intent-filter>
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />
             </intent-filter>

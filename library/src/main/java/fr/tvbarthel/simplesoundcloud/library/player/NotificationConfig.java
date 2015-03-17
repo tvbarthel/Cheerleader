@@ -9,19 +9,19 @@ import android.support.v7.app.ActionBarActivity;
 /**
  * Encapsulate notification config.
  */
-public class SimpleSoundCloudNotificationConfig implements Parcelable {
+public class NotificationConfig implements Parcelable {
 
     /**
      * Parcelable.
      */
-    public static final Parcelable.Creator<SimpleSoundCloudNotificationConfig> CREATOR
-            = new Parcelable.Creator<SimpleSoundCloudNotificationConfig>() {
-        public SimpleSoundCloudNotificationConfig createFromParcel(Parcel source) {
-            return new SimpleSoundCloudNotificationConfig(source);
+    public static final Parcelable.Creator<NotificationConfig> CREATOR
+            = new Parcelable.Creator<NotificationConfig>() {
+        public NotificationConfig createFromParcel(Parcel source) {
+            return new NotificationConfig(source);
         }
 
-        public SimpleSoundCloudNotificationConfig[] newArray(int size) {
-            return new SimpleSoundCloudNotificationConfig[size];
+        public NotificationConfig[] newArray(int size) {
+            return new NotificationConfig[size];
         }
     };
 
@@ -43,7 +43,7 @@ public class SimpleSoundCloudNotificationConfig implements Parcelable {
     /**
      * Default constructor.
      */
-    public SimpleSoundCloudNotificationConfig() {
+    public NotificationConfig() {
     }
 
     /**
@@ -51,7 +51,7 @@ public class SimpleSoundCloudNotificationConfig implements Parcelable {
      *
      * @param in source.
      */
-    private SimpleSoundCloudNotificationConfig(Parcel in) {
+    private NotificationConfig(Parcel in) {
         mNotificationIcon = in.readInt();
         mNotificationIconBackground = in.readInt();
         mNotificationActivity = (Class<?>) in.readSerializable();

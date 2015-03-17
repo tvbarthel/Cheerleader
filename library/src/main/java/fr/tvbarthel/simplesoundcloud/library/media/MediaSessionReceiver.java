@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.KeyEvent;
 
-import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
+import fr.tvbarthel.simplesoundcloud.library.player.PlaybackService;
 
 /**
  * Receiver used to catch media buttons events from the lock screen.
@@ -56,7 +56,7 @@ public class MediaSessionReceiver extends BroadcastReceiver {
      * @param action  action to send.
      */
     private void sendAction(Context context, String action) {
-        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
+        Intent intent = new Intent(context, PlaybackService.class);
         intent.setAction(action);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }

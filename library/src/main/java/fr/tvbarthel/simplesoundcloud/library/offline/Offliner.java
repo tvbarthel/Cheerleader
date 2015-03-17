@@ -19,14 +19,14 @@ import rx.functions.Func1;
  * <p/>
  * Saved response body could then be retrieved for offline usage.
  */
-public final class SimpleSoundCloudOffliner {
+public final class Offliner {
 
     /**
      * Prepare an {@link rx.Observable} of {@link retrofit.client.Response} for offline usage.
      * <p/>
      * This will save JSON body or retrieved it for offline usage.
      * <p/>
-     * {@link fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner#initInstance(android.content.Context, boolean)}
+     * {@link Offliner#initInstance(android.content.Context, boolean)}
      * must have been called before.
      */
     public static final Observable.Transformer<Response, String> PREPARE_FOR_OFFLINE
@@ -41,12 +41,12 @@ public final class SimpleSoundCloudOffliner {
     /**
      * Tag for log cat.
      */
-    private static final String TAG = SimpleSoundCloudOffliner.class.getSimpleName();
+    private static final String TAG = Offliner.class.getSimpleName();
 
     /**
      * Instance.
      */
-    private static SimpleSoundCloudOffliner sInstance;
+    private static Offliner sInstance;
 
     /**
      * Used to encapsulate offline access and storage through {@link android.content.ContentResolver}.
@@ -120,7 +120,7 @@ public final class SimpleSoundCloudOffliner {
      * @param applicationContext context used to retrieve  {@link android.content.ContentResolver}
      * @param debug              true to enable setLog log.
      */
-    private SimpleSoundCloudOffliner(Context applicationContext, boolean debug) {
+    private Offliner(Context applicationContext, boolean debug) {
         this.mDebug = debug;
         this.mOfflinerQueryHandler = new OfflinerQueryHandler(applicationContext.getContentResolver());
         this.mContext = new WeakReference<>(applicationContext);
@@ -129,12 +129,12 @@ public final class SimpleSoundCloudOffliner {
     /**
      * Retrieve the static instance.
      * <p/>
-     * {@link SimpleSoundCloudOffliner#initInstance(android.content.Context, boolean)} must have
+     * {@link Offliner#initInstance(android.content.Context, boolean)} must have
      * been called.
      *
-     * @return {@link SimpleSoundCloudOffliner} instance.
+     * @return {@link Offliner} instance.
      */
-    public static SimpleSoundCloudOffliner getInstance() {
+    public static Offliner getInstance() {
         if (sInstance == null) {
             throw new IllegalStateException("initInstance must be called before get the instance");
         }
@@ -146,11 +146,11 @@ public final class SimpleSoundCloudOffliner {
      *
      * @param context context store in a {@link java.lang.ref.WeakReference} to avoid memory leak.
      * @param debug   true if setLog mode is enable.
-     * @return {@link SimpleSoundCloudOffliner} instance.
+     * @return {@link Offliner} instance.
      */
-    public static SimpleSoundCloudOffliner initInstance(Context context, boolean debug) {
+    public static Offliner initInstance(Context context, boolean debug) {
         if (sInstance == null) {
-            sInstance = new SimpleSoundCloudOffliner(context, debug);
+            sInstance = new Offliner(context, debug);
         } else {
             sInstance.mContext = new WeakReference<>(context);
         }

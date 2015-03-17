@@ -32,7 +32,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 /**
  * Service used as SoundCloudPlayer.
  */
-public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErrorListener,
+public class PlaybackService extends Service implements MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener,
         AudioManager.OnAudioFocusChangeListener {
 
@@ -158,7 +158,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     /**
      * Log cat and thread name prefix.
      */
-    private static final String TAG = SimpleSoundCloudPlayer.class.getSimpleName();
+    private static final String TAG = PlaybackService.class.getSimpleName();
 
     /**
      * Delay used to avoid useless action in case of spam action.
@@ -228,12 +228,12 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     /**
      * Sound cloud notification manager.
      */
-    private SimpleSoundCloudNotificationManager mSimpleSoundCloudNotificationManager;
+    private NotificationManager mNotificationManager;
 
     /**
      * Used to managed the internal playlist.
      */
-    private SimpleSoundCloudPlayerPlaylist mSimpleSoundCloudPlayerPlaylist;
+    private PlayerPlaylist mPlayerPlaylist;
 
     /**
      * System service used to managed audio through user device.
@@ -267,7 +267,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * @param track    the track which will be played.
      */
     public static void play(Context context, String clientId, SoundCloudTrack track) {
-        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
+        Intent intent = new Intent(context, PlaybackService.class);
         intent.setAction(ACTION_PLAY);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK, track);
@@ -281,7 +281,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * @param clientId SoundCloud api client id.
      */
     public static void pause(Context context, String clientId) {
-        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
+        Intent intent = new Intent(context, PlaybackService.class);
         intent.setAction(ACTION_PAUSE_PLAYER);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         context.startService(intent);
@@ -294,7 +294,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * @param clientId SoundCloud api client id.
      */
     public static void resume(Context context, String clientId) {
-        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
+        Intent intent = new Intent(context, PlaybackService.class);
         intent.setAction(ACTION_RESUME_PLAYER);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         context.startService(intent);
@@ -307,7 +307,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * @param clientId SoundCloud api client id.
      */
     public static void stop(Context context, String clientId) {
-        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
+        Intent intent = new Intent(context, PlaybackService.class);
         intent.setAction(ACTION_STOP_PLAYER);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         context.startService(intent);
@@ -325,7 +325,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * @param milli    time in milli of the position.
      */
     public static void seekTo(Context context, String clientId, int milli) {
-        Intent intent = new Intent(context, SimpleSoundCloudPlayer.class);
+        Intent intent = new Intent(context, PlaybackService.class);
         intent.setAction(ACTION_SEEK_TO);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_CLIENT_ID, clientId);
         intent.putExtra(BUNDLE_KEY_SOUND_CLOUD_TRACK_POSITION, milli);
@@ -385,9 +385,9 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
 
-        mSimpleSoundCloudNotificationManager = SimpleSoundCloudNotificationManager.getInstance(this);
+        mNotificationManager = NotificationManager.getInstance(this);
 
-        mSimpleSoundCloudPlayerPlaylist = SimpleSoundCloudPlayerPlaylist.getInstance();
+        mPlayerPlaylist = PlayerPlaylist.getInstance();
 
         mHasAlreadyPlayed = false;
 
@@ -565,7 +565,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
 
             Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK,
-                    mSimpleSoundCloudPlayerPlaylist.getCurrentTrack());
+                    mPlayerPlaylist.getCurrentTrack());
             mLocalBroadcastManager.sendBroadcast(intent);
 
             updateNotification();
@@ -581,11 +581,11 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
     }
 
     private void nextTrack() {
-        playTrack(mSimpleSoundCloudPlayerPlaylist.next());
+        playTrack(mPlayerPlaylist.next());
     }
 
     private void previousTrack() {
-        playTrack(mSimpleSoundCloudPlayerPlaylist.previous());
+        playTrack(mPlayerPlaylist.previous());
     }
 
     private void seekToPosition(int milli) {
@@ -652,14 +652,14 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
      * Update the notification with the current track information.
      */
     private void updateNotification() {
-        mSimpleSoundCloudNotificationManager.notify(
-                this, mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(), mIsPaused);
+        mNotificationManager.notify(
+                this, mPlayerPlaylist.getCurrentTrack(), mIsPaused);
     }
 
     /**
      * Start idle state.
      * <p/>
-     * After {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer#IDLE_PERIOD_MILLI}
+     * After {@link PlaybackService#IDLE_PERIOD_MILLI}
      * the service will ne stopped.
      */
     private void gotoIdleState() {
@@ -781,7 +781,7 @@ public class SimpleSoundCloudPlayer extends Service implements MediaPlayer.OnErr
             // update meta data with artwork.
             // copy bitmap to avoid IllegalStateException "Can't parcel a recycled bitmap"
             // from the remove control client on KitKat (IRemoteControlDisplay.java:340)
-            mMediaSession.setMetaData(mSimpleSoundCloudPlayerPlaylist.getCurrentTrack(),
+            mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(),
                     bitmap.copy(bitmap.getConfig(), false));
 
         }

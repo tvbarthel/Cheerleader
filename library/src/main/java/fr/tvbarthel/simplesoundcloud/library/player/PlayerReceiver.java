@@ -9,15 +9,15 @@ import android.content.Intent;
  * <p/>
  * Propagate event to the player.
  */
-public class SimpleSoundCloudPlayerReceiver extends BroadcastReceiver {
+public class PlayerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(
                 android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
             // signal player service to stop playback
-            Intent i = new Intent(context, SimpleSoundCloudPlayer.class);
-            i.setAction(SimpleSoundCloudPlayer.ACTION_AUDIO_BECOMING_NOISY);
+            Intent i = new Intent(context, PlaybackService.class);
+            i.setAction(PlaybackService.ACTION_AUDIO_BECOMING_NOISY);
             context.startService(i);
         }
     }

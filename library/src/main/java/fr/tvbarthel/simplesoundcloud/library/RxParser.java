@@ -17,7 +17,7 @@ import rx.functions.Func1;
 /**
  * Parser for SoundCloud api based on Reactive Java.
  */
-final class SimpleSoundCloudRxParser {
+final class RxParser {
 
     /**
      * Parse {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser} retrieved from
@@ -157,7 +157,7 @@ final class SimpleSoundCloudRxParser {
     /**
      * Log cat.
      */
-    private static final String TAG = SimpleSoundCloudRxParser.class.getSimpleName();
+    private static final String TAG = RxParser.class.getSimpleName();
 
     /**
      * FIELD
@@ -215,7 +215,7 @@ final class SimpleSoundCloudRxParser {
     /**
      * Non instantiable class.
      */
-    private SimpleSoundCloudRxParser() {
+    private RxParser() {
 
     }
 }

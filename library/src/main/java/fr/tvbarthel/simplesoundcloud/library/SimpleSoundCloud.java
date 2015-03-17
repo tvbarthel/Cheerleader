@@ -12,12 +12,12 @@ import java.util.List;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
-import fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner;
+import fr.tvbarthel.simplesoundcloud.library.offline.Offliner;
+import fr.tvbarthel.simplesoundcloud.library.player.NotificationConfig;
+import fr.tvbarthel.simplesoundcloud.library.player.PlaybackService;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudListener;
-import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationConfig;
-import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationManager;
-import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
-import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayerPlaylist;
+import fr.tvbarthel.simplesoundcloud.library.player.NotificationManager;
+import fr.tvbarthel.simplesoundcloud.library.player.PlayerPlaylist;
 import retrofit.RestAdapter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -61,19 +61,19 @@ public final class SimpleSoundCloud {
     private static SimpleSoundCloud sInstance;
 
     /**
-     * Rest adapter used to create {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloudService}
+     * Rest adapter used to create {@link RetrofitService}
      */
     private RestAdapter mRestAdapter;
 
     /**
      * "Retrofit service" which encapsulate communication with sound cloud api.
      */
-    private SimpleSoundCloudService mSimpleSoundCloudService;
+    private RetrofitService mRetrofitService;
 
     /**
      * {@link retrofit.RequestInterceptor} used to sign each request with sound cloud client id.
      */
-    private SimpleSoundCloudRequestSignator mSimpleSoundCloudRequestSignator;
+    private RequestSignator mRequestSignator;
 
     /**
      * WeakReference on the application context.
@@ -93,12 +93,12 @@ public final class SimpleSoundCloud {
     /**
      * Manage the playlist used by the player.
      */
-    private SimpleSoundCloudPlayerPlaylist mPlayerPlaylist;
+    private PlayerPlaylist mPlayerPlaylist;
 
     /**
      * Manage the notification.
      */
-    private SimpleSoundCloudNotificationManager mNotificationManager;
+    private NotificationManager mNotificationManager;
 
     /**
      * Used to know if the player is paused.
@@ -122,7 +122,7 @@ public final class SimpleSoundCloud {
      * Singleton pattern.
      *
      * @param applicationContext context used to initiate
-     *                           {@link fr.tvbarthel.simplesoundcloud.library.offline.SimpleSoundCloudOffliner}
+     *                           {@link fr.tvbarthel.simplesoundcloud.library.offline.Offliner}
      * @param clientId           SoundCloud api client key.
      */
     private SimpleSoundCloud(Context applicationContext, String clientId) {
@@ -131,7 +131,7 @@ public final class SimpleSoundCloud {
         mIsClosed = false;
         mIsPaused = false;
 
-        mSimpleSoundCloudRequestSignator = new SimpleSoundCloudRequestSignator(mClientKey);
+        mRequestSignator = new RequestSignator(mClientKey);
 
         mApplicationContext = new WeakReference<>(applicationContext);
 
@@ -140,17 +140,17 @@ public final class SimpleSoundCloud {
          */
         mRestAdapter = new RestAdapter.Builder()
                 .setEndpoint(SOUND_CLOUD_API)
-                .setRequestInterceptor(mSimpleSoundCloudRequestSignator)
+                .setRequestInterceptor(mRequestSignator)
                 .build();
-        mSimpleSoundCloudService = mRestAdapter.create(SimpleSoundCloudService.class);
+        mRetrofitService = mRestAdapter.create(RetrofitService.class);
 
         /**
          * Initialize the Offliner component for offline storage.
          */
-        SimpleSoundCloudOffliner.initInstance(getContext(), false);
+        Offliner.initInstance(getContext(), false);
 
-        mPlayerPlaylist = SimpleSoundCloudPlayerPlaylist.getInstance();
-        mNotificationManager = SimpleSoundCloudNotificationManager.getInstance(getContext());
+        mPlayerPlaylist = PlayerPlaylist.getInstance();
+        mNotificationManager = NotificationManager.getInstance(getContext());
 
         initInternalListener(applicationContext);
     }
@@ -169,7 +169,7 @@ public final class SimpleSoundCloud {
         if (sInstance == null || sInstance.mIsClosed) {
             sInstance = new SimpleSoundCloud(context.getApplicationContext(), clientId);
         } else {
-            sInstance.mSimpleSoundCloudRequestSignator.setClientId(clientId);
+            sInstance.mRequestSignator.setClientId(clientId);
         }
         return sInstance;
     }
@@ -183,12 +183,12 @@ public final class SimpleSoundCloud {
         }
         mIsClosed = true;
 
-        SimpleSoundCloudPlayer.unregisterListener(getContext(), mInternalListener);
+        PlaybackService.unregisterListener(getContext(), mInternalListener);
         mInternalListener = null;
 
         mRestAdapter = null;
-        mSimpleSoundCloudService = null;
-        mSimpleSoundCloudRequestSignator = null;
+        mRetrofitService = null;
+        mRequestSignator = null;
 
         mApplicationContext.clear();
         mApplicationContext = null;
@@ -205,11 +205,11 @@ public final class SimpleSoundCloud {
      */
     public Observable<SoundCloudUser> getUser(int userId) {
         checkState();
-        return mSimpleSoundCloudService.getUser(String.valueOf(userId))
+        return mRetrofitService.getUser(String.valueOf(userId))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
-                .map(SimpleSoundCloudRxParser.PARSE_USER);
+                .compose(Offliner.PREPARE_FOR_OFFLINE)
+                .map(RxParser.PARSE_USER);
     }
 
     /**
@@ -220,11 +220,11 @@ public final class SimpleSoundCloud {
      */
     public Observable<SoundCloudUser> getUser(String userName) {
         checkState();
-        return mSimpleSoundCloudService.getUser(userName)
+        return mRetrofitService.getUser(userName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
-                .map(SimpleSoundCloudRxParser.PARSE_USER);
+                .compose(Offliner.PREPARE_FOR_OFFLINE)
+                .map(RxParser.PARSE_USER);
     }
 
     /**
@@ -235,11 +235,11 @@ public final class SimpleSoundCloud {
      */
     public Observable<ArrayList<SoundCloudTrack>> getUserTracks(String userName) {
         checkState();
-        return mSimpleSoundCloudService.getUserTracks(userName)
+        return mRetrofitService.getUserTracks(userName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
-                .map(SimpleSoundCloudRxParser.PARSE_USER_TRACKS);
+                .compose(Offliner.PREPARE_FOR_OFFLINE)
+                .map(RxParser.PARSE_USER_TRACKS);
     }
 
     /**
@@ -250,11 +250,11 @@ public final class SimpleSoundCloud {
      */
     public Observable<SoundCloudTrack> getTrack(int trackId) {
         checkState();
-        return mSimpleSoundCloudService.getTrack(trackId)
+        return mRetrofitService.getTrack(trackId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(SimpleSoundCloudOffliner.PREPARE_FOR_OFFLINE)
-                .map(SimpleSoundCloudRxParser.PARSE_TRACK);
+                .compose(Offliner.PREPARE_FOR_OFFLINE)
+                .map(RxParser.PARSE_TRACK);
     }
 
     /**
@@ -265,11 +265,11 @@ public final class SimpleSoundCloud {
     public void play() {
         checkState();
         if (mIsPaused) {
-            SimpleSoundCloudPlayer.resume(getContext(), mClientKey);
+            PlaybackService.resume(getContext(), mClientKey);
         } else {
             SoundCloudTrack track = mPlayerPlaylist.getCurrentTrack();
             if (track != null) {
-                SimpleSoundCloudPlayer.play(getContext(), mClientKey, track);
+                PlaybackService.play(getContext(), mClientKey, track);
             } else {
                 return;
             }
@@ -283,7 +283,7 @@ public final class SimpleSoundCloud {
     public void pause() {
         checkState();
         mIsPaused = true;
-        SimpleSoundCloudPlayer.pause(getContext(), mClientKey);
+        PlaybackService.pause(getContext(), mClientKey);
     }
 
     /**
@@ -298,7 +298,7 @@ public final class SimpleSoundCloud {
         if (mPlayerPlaylist.isEmpty()) {
             return false;
         }
-        SimpleSoundCloudPlayer.play(getContext(), mClientKey, mPlayerPlaylist.next());
+        PlaybackService.play(getContext(), mClientKey, mPlayerPlaylist.next());
         return true;
     }
 
@@ -314,7 +314,7 @@ public final class SimpleSoundCloud {
         if (mPlayerPlaylist.isEmpty()) {
             return false;
         }
-        SimpleSoundCloudPlayer.play(getContext(), mClientKey, mPlayerPlaylist.previous());
+        PlaybackService.play(getContext(), mClientKey, mPlayerPlaylist.previous());
         return true;
     }
 
@@ -330,7 +330,7 @@ public final class SimpleSoundCloud {
     public void seekTo(int milli) {
         checkState();
         if (!mPlayerPlaylist.isEmpty()) {
-            SimpleSoundCloudPlayer.seekTo(getContext(), mClientKey, milli);
+            PlaybackService.seekTo(getContext(), mClientKey, milli);
         }
     }
 
@@ -375,7 +375,7 @@ public final class SimpleSoundCloud {
 
         if (mPlayerPlaylist.isEmpty()) {
             // playlist empty after deletion, stop player;
-            SimpleSoundCloudPlayer.stop(getContext(), mClientKey);
+            PlaybackService.stop(getContext(), mClientKey);
         } else if (currentTrack.equals(removedTrack) && !mIsPaused) {
             // play next track if removed one was the current and playing
             play();
@@ -399,7 +399,7 @@ public final class SimpleSoundCloud {
      */
     public void registerPlayerListener(SimpleSoundCloudListener listener) {
         checkState();
-        SimpleSoundCloudPlayer.registerListener(getContext(), listener);
+        PlaybackService.registerListener(getContext(), listener);
     }
 
     /**
@@ -409,7 +409,7 @@ public final class SimpleSoundCloud {
      */
     public void unregisterPlayerListener(SimpleSoundCloudListener listener) {
         checkState();
-        SimpleSoundCloudPlayer.unregisterListener(getContext(), listener);
+        PlaybackService.unregisterListener(getContext(), listener);
     }
 
     /**
@@ -436,7 +436,7 @@ public final class SimpleSoundCloud {
         } else {
             mRestAdapter.setLogLevel(RestAdapter.LogLevel.NONE);
         }
-        SimpleSoundCloudOffliner.debug((logLevel & LOG_OFFLINER) != 0);
+        Offliner.debug((logLevel & LOG_OFFLINER) != 0);
 
     }
 
@@ -477,7 +477,7 @@ public final class SimpleSoundCloud {
                 mIsPaused = false;
             }
         };
-        SimpleSoundCloudPlayer.registerListener(context, mInternalListener);
+        PlaybackService.registerListener(context, mInternalListener);
     }
 
     /**
@@ -490,12 +490,12 @@ public final class SimpleSoundCloud {
     }
 
     /**
-     * Define the {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudNotificationConfig}
+     * Define the {@link fr.tvbarthel.simplesoundcloud.library.player.NotificationConfig}
      * which will used to configure the playback notification.
      *
      * @param config started activity.
      */
-    private void setNotificationConfig(SimpleSoundCloudNotificationConfig config) {
+    private void setNotificationConfig(NotificationConfig config) {
         mNotificationManager.setNotificationConfig(config);
     }
 
@@ -507,14 +507,14 @@ public final class SimpleSoundCloud {
         private Context context;
         private String apiKey;
         private int logLevel;
-        private SimpleSoundCloudNotificationConfig notificationConfig;
+        private NotificationConfig notificationConfig;
 
         /**
          * Default constructor.
          */
         public Builder() {
             logLevel = LOG_NONE;
-            notificationConfig = new SimpleSoundCloudNotificationConfig();
+            notificationConfig = new NotificationConfig();
             notificationConfig.setNotificationIcon(R.drawable.simple_sound_cloud_notification_icon);
             notificationConfig.setNotificationIconBackground(R.drawable.notification_icon_background);
         }

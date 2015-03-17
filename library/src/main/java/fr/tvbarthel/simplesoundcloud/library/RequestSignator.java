@@ -5,7 +5,7 @@ import retrofit.RequestInterceptor;
 /**
  * {@link retrofit.RequestInterceptor} used to sign each call for the SoundCloud api.
  */
-class SimpleSoundCloudRequestSignator implements RequestInterceptor {
+class RequestSignator implements RequestInterceptor {
 
     /**
      * Query param used to sign each request.
@@ -22,7 +22,7 @@ class SimpleSoundCloudRequestSignator implements RequestInterceptor {
      *
      * @param clientId client id.
      */
-    public SimpleSoundCloudRequestSignator(String clientId) {
+    public RequestSignator(String clientId) {
         setClientId(clientId);
     }
 

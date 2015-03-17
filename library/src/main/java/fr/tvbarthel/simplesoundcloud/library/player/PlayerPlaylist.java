@@ -9,12 +9,12 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 /**
  * Used to manage the player playlist.
  */
-public final class SimpleSoundCloudPlayerPlaylist {
+public final class PlayerPlaylist {
 
     /**
      * Singleton pattern.
      */
-    private static SimpleSoundCloudPlayerPlaylist sInstance;
+    private static PlayerPlaylist sInstance;
 
     /**
      * Current playlist.
@@ -29,7 +29,7 @@ public final class SimpleSoundCloudPlayerPlaylist {
     /**
      * Singleton.
      */
-    private SimpleSoundCloudPlayerPlaylist() {
+    private PlayerPlaylist() {
         mSoundCloudPlaylist = new SoundCloudPlaylist();
         mCurrentTrackIndex = -1;
     }
@@ -39,9 +39,9 @@ public final class SimpleSoundCloudPlayerPlaylist {
      *
      * @return instance.
      */
-    public static SimpleSoundCloudPlayerPlaylist getInstance() {
+    public static PlayerPlaylist getInstance() {
         if (sInstance == null) {
-            sInstance = new SimpleSoundCloudPlayerPlaylist();
+            sInstance = new PlayerPlaylist();
         }
         return sInstance;
     }

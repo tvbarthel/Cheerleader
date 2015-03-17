@@ -9,7 +9,7 @@ import rx.Observable;
 /**
  * Interface used to access the SoundCloud API.
  */
-interface SimpleSoundCloudService {
+interface RetrofitService {
 
     /**
      * Retrieve a SoundCloud user profile.
