@@ -1,4 +1,4 @@
-package fr.tvbarthel.simplesoundcloud.library;
+package fr.tvbarthel.simplesoundcloud.library.client;
 
 import retrofit.RequestInterceptor;
 

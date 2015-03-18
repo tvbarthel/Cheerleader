@@ -23,7 +23,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 /**
  * Handle player notification behaviour.
  */
-public final class NotificationManager {
+final class NotificationManager {
 
     /**
      * This request code will be pass to the player activity in order to identify the start

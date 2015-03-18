@@ -9,7 +9,7 @@ import android.support.v7.app.ActionBarActivity;
 /**
  * Encapsulate notification config.
  */
-public class NotificationConfig implements Parcelable {
+final class NotificationConfig implements Parcelable {
 
     /**
      * Parcelable.

@@ -9,7 +9,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 /**
  * Used to manage the player playlist.
  */
-public final class PlayerPlaylist {
+final class PlayerPlaylist {
 
     /**
      * Singleton pattern.
