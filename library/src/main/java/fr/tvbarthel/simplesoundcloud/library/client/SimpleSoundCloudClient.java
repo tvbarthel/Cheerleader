@@ -166,8 +166,6 @@ public final class SimpleSoundCloudClient {
     public Observable<SoundCloudUser> getUser(int userId) {
         checkState();
         return mRetrofitService.getUser(String.valueOf(userId))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .compose(Offliner.PREPARE_FOR_OFFLINE)
                 .map(RxParser.PARSE_USER);
     }
@@ -181,8 +179,6 @@ public final class SimpleSoundCloudClient {
     public Observable<SoundCloudUser> getUser(String userName) {
         checkState();
         return mRetrofitService.getUser(userName)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .compose(Offliner.PREPARE_FOR_OFFLINE)
                 .map(RxParser.PARSE_USER);
     }
@@ -196,8 +192,6 @@ public final class SimpleSoundCloudClient {
     public Observable<ArrayList<SoundCloudTrack>> getUserTracks(String userName) {
         checkState();
         return mRetrofitService.getUserTracks(userName)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .compose(Offliner.PREPARE_FOR_OFFLINE)
                 .map(RxParser.PARSE_USER_TRACKS);
     }
@@ -211,8 +205,6 @@ public final class SimpleSoundCloudClient {
     public Observable<SoundCloudTrack> getTrack(int trackId) {
         checkState();
         return mRetrofitService.getTrack(trackId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .compose(Offliner.PREPARE_FOR_OFFLINE)
                 .map(RxParser.PARSE_TRACK);
     }
