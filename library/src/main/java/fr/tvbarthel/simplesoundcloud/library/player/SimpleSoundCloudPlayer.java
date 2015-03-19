@@ -6,16 +6,18 @@ import android.support.annotation.DrawableRes;
 import android.support.v7.app.ActionBarActivity;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.tvbarthel.simplesoundcloud.library.R;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import rx.functions.Action1;
 
 /**
  * Encapsulate network and player features to work with sound cloud.
  */
-public final class SimpleSoundCloudPlayer {
+public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundCloudTrack>> {
 
     /**
      * Instance, singleton pattern.
@@ -103,6 +105,11 @@ public final class SimpleSoundCloudPlayer {
             sInstance.mClientKey = clientId;
         }
         return sInstance;
+    }
+
+    @Override
+    public void call(ArrayList<SoundCloudTrack> soundCloudTracks) {
+        addTracks(soundCloudTracks);
     }
 
     /**
