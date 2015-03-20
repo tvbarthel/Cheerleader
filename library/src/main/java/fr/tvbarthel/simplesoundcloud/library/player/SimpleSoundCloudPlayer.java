@@ -131,6 +131,14 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         mPlayerPlaylist = null;
     }
 
+    /**
+     * Used to know if the player is playing or not.
+     *
+     * @return true if the player is playing a track.
+     */
+    public boolean isPlaying() {
+        return !mIsPaused;
+    }
 
     /**
      * Start the playback. First track of the queue will be played.
