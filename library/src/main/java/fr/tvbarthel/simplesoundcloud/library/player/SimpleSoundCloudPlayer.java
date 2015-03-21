@@ -19,6 +19,10 @@ import rx.functions.Action1;
  */
 public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundCloudTrack>> {
 
+    private static final int STATE_STOPPED = 0x00000000;
+    private static final int STATE_PAUSED = 0x00000001;
+    private static final int STATE_PLAYING = 0x00000002;
+
     /**
      * Instance, singleton pattern.
      */
@@ -50,9 +54,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     private NotificationManager mNotificationManager;
 
     /**
-     * Used to know if the player is paused.
+     * Used to know the player state
      */
-    private boolean mIsPaused;
+    private int mState;
 
     /**
      * Used to know if the current client instance has been closed.
@@ -78,7 +82,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
 
         mClientKey = clientId;
         mIsClosed = false;
-        mIsPaused = false;
+        mState = STATE_STOPPED;
 
         mApplicationContext = new WeakReference<>(applicationContext);
 
@@ -132,24 +136,15 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     }
 
     /**
-     * Used to know if the player is playing or not.
-     *
-     * @return true if the player is playing a track.
-     */
-    public boolean isPlaying() {
-        return !mIsPaused;
-    }
-
-    /**
      * Start the playback. First track of the queue will be played.
      * <p/>
      * If the SoundCloud player is currently paused, the current track will be restart at the stopped position.
      */
     public void play() {
         checkState();
-        if (mIsPaused) {
+        if (mState == STATE_PAUSED) {
             PlaybackService.resume(getContext(), mClientKey);
-        } else {
+        } else if (mState == STATE_STOPPED) {
             SoundCloudTrack track = mPlayerPlaylist.getCurrentTrack();
             if (track != null) {
                 PlaybackService.play(getContext(), mClientKey, track);
@@ -157,7 +152,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
                 return;
             }
         }
-        mIsPaused = false;
+        mState = STATE_PLAYING;
     }
 
     /**
@@ -165,8 +160,29 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      */
     public void pause() {
         checkState();
-        mIsPaused = true;
-        PlaybackService.pause(getContext(), mClientKey);
+        if (mState == STATE_PLAYING) {
+            PlaybackService.pause(getContext(), mClientKey);
+            mState = STATE_PAUSED;
+        }
+    }
+
+    /**
+     * Toggle playback.
+     * <p/>
+     * Basically, pause the player if playing and play if paused.
+     */
+    public void togglePlayback() {
+        switch (mState) {
+            case STATE_STOPPED:
+            case STATE_PAUSED:
+                play();
+                break;
+            case STATE_PLAYING:
+                pause();
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -259,11 +275,21 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         if (mPlayerPlaylist.isEmpty()) {
             // playlist empty after deletion, stop player;
             PlaybackService.stop(getContext(), mClientKey);
-        } else if (currentTrack.equals(removedTrack) && !mIsPaused) {
+        } else if (currentTrack.equals(removedTrack) && mState == STATE_PLAYING) {
             // play next track if removed one was the current and playing
             play();
         }
     }
+
+    /**
+     * Used to know if the player is playing or not.
+     *
+     * @return true if the player is playing a track.
+     */
+    public boolean isPlaying() {
+        return mState == STATE_PLAYING;
+    }
+
 
     /**
      * Retrieve the current playlist.
@@ -317,19 +343,19 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             @Override
             protected void onPlay(SoundCloudTrack track) {
                 super.onPlay(track);
-                mIsPaused = false;
+                mState = STATE_PLAYING;
             }
 
             @Override
             protected void onPause() {
                 super.onPause();
-                mIsPaused = true;
+                mState = STATE_PAUSED;
             }
 
             @Override
             protected void onPlayerDestroyed() {
                 super.onPlayerDestroyed();
-                mIsPaused = false;
+                mState = STATE_STOPPED;
             }
         };
         PlaybackService.registerListener(context, mInternalListener);
