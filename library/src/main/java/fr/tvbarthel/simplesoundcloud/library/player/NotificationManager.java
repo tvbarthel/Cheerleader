@@ -132,7 +132,8 @@ final class NotificationManager {
 
         mMainThreadHandler = new Handler(context.getApplicationContext().getMainLooper());
 
-        mNotificationManager = ((android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
+        mNotificationManager = ((android.app.NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE));
 
         // initialize actions' PendingIntents.
         initializePendingIntent(context);

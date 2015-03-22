@@ -156,6 +156,21 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     }
 
     /**
+     * Play a track at a given position in the player playlist.
+     *
+     * @param position position of the track in the playlist.
+     */
+    public void play(int position) {
+        checkState();
+        ArrayList<SoundCloudTrack> tracks = mPlayerPlaylist.getPlaylist().getTracks();
+        if (position >= 0 && position < tracks.size()) {
+            SoundCloudTrack trackToPlay = tracks.get(position);
+            PlaybackService.play(getContext(), mClientKey, trackToPlay);
+        }
+
+    }
+
+    /**
      * Pause the playback.
      */
     public void pause() {

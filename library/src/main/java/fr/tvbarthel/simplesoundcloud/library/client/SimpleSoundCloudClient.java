@@ -10,8 +10,6 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.Offliner;
 import retrofit.RestAdapter;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Encapsulate network and player features to work with sound cloud.
