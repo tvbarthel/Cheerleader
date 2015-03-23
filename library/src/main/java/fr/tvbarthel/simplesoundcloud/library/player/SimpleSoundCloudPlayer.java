@@ -41,7 +41,12 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Internal listener used to catch service callbacks
      */
-    private SimpleSoundCloudListener mInternalListener;
+    private PlaybackListener mInternalListener;
+
+    /**
+     * Listener which should be notified of playback events.
+     */
+    private ArrayList<SimpleSoundCloudListener> mListeners;
 
     /**
      * Manage the playlist used by the player.
@@ -83,6 +88,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         mClientKey = clientId;
         mIsClosed = false;
         mState = STATE_STOPPED;
+        mListeners = new ArrayList<>();
 
         mApplicationContext = new WeakReference<>(applicationContext);
 
@@ -133,6 +139,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
 
         mClientKey = null;
         mPlayerPlaylist = null;
+        mListeners.clear();
     }
 
     /**
@@ -323,7 +330,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      */
     public void registerPlayerListener(SimpleSoundCloudListener listener) {
         checkState();
-        PlaybackService.registerListener(getContext(), listener);
+        mListeners.add(listener);
     }
 
     /**
@@ -333,7 +340,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      */
     public void unregisterPlayerListener(SimpleSoundCloudListener listener) {
         checkState();
-        PlaybackService.unregisterListener(getContext(), listener);
+        mListeners.remove(listener);
     }
 
     /**
@@ -354,23 +361,40 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      * @param context context used to register the internal listener.
      */
     private void initInternalListener(Context context) {
-        mInternalListener = new SimpleSoundCloudListener() {
+        mInternalListener = new PlaybackListener() {
             @Override
             protected void onPlay(SoundCloudTrack track) {
                 super.onPlay(track);
                 mState = STATE_PLAYING;
+                for (SimpleSoundCloudListener listener : mListeners) {
+                    listener.onPlayerPlay(track);
+                }
             }
 
             @Override
             protected void onPause() {
                 super.onPause();
                 mState = STATE_PAUSED;
+                for (SimpleSoundCloudListener listener : mListeners) {
+                    listener.onPlayerPause();
+                }
             }
 
             @Override
             protected void onPlayerDestroyed() {
                 super.onPlayerDestroyed();
                 mState = STATE_STOPPED;
+                for (SimpleSoundCloudListener listener : mListeners) {
+                    listener.onPlayerDestroyed();
+                }
+            }
+
+            @Override
+            protected void onSeekTo(int milli) {
+                super.onSeekTo(milli);
+                for (SimpleSoundCloudListener listener : mListeners) {
+                    listener.onPlayerSeekTo(milli);
+                }
             }
         };
         PlaybackService.registerListener(context, mInternalListener);

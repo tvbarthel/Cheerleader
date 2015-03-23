@@ -338,12 +338,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      * @param context  context used to register the listener.
      * @param listener listener to register.
      */
-    public static void registerListener(Context context, SimpleSoundCloudListener listener) {
+    public static void registerListener(Context context, PlaybackListener listener) {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
-        filter.addAction(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
-        filter.addAction(SimpleSoundCloudListener.ACTION_ON_SEEK_COMPLETE);
-        filter.addAction(SimpleSoundCloudListener.ACTION_ON_PLAYER_DESTROYED);
+        filter.addAction(PlaybackListener.ACTION_ON_TRACK_PLAYED);
+        filter.addAction(PlaybackListener.ACTION_ON_PLAYER_PAUSED);
+        filter.addAction(PlaybackListener.ACTION_ON_SEEK_COMPLETE);
+        filter.addAction(PlaybackListener.ACTION_ON_PLAYER_DESTROYED);
 
         LocalBroadcastManager.getInstance(context.getApplicationContext())
                 .registerReceiver(listener, filter);
@@ -355,7 +355,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      * @param context  context used to unregister the listener.
      * @param listener listener to unregister.
      */
-    public static void unregisterListener(Context context, SimpleSoundCloudListener listener) {
+    public static void unregisterListener(Context context, PlaybackListener listener) {
         LocalBroadcastManager.getInstance(context.getApplicationContext())
                 .unregisterReceiver(listener);
     }
@@ -413,7 +413,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mPlayerHandler.removeCallbacksAndMessages(null);
         stopForeground(true);
 
-        Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYER_DESTROYED);
+        Intent intent = new Intent(PlaybackListener.ACTION_ON_PLAYER_DESTROYED);
         mLocalBroadcastManager.sendBroadcast(intent);
 
         mMediaPlayer.release();
@@ -502,8 +502,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     @Override
     public void onSeekComplete(MediaPlayer mp) {
         // broadcast event
-        Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_SEEK_COMPLETE);
-        intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_SEEK, mp.getCurrentPosition());
+        Intent intent = new Intent(PlaybackListener.ACTION_ON_SEEK_COMPLETE);
+        intent.putExtra(PlaybackListener.EXTRA_KEY_SEEK, mp.getCurrentPosition());
         mLocalBroadcastManager.sendBroadcast(intent);
     }
 
@@ -546,7 +546,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             mMediaPlayer.pause();
 
             // broadcast event
-            Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_PLAYER_PAUSED);
+            Intent intent = new Intent(PlaybackListener.ACTION_ON_PLAYER_PAUSED);
             mLocalBroadcastManager.sendBroadcast(intent);
 
             updateNotification();
@@ -563,8 +563,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             mIsPaused = false;
             mMediaPlayer.start();
 
-            Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
-            intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK,
+            Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
+            intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK,
                     mPlayerPlaylist.getCurrentTrack());
             mLocalBroadcastManager.sendBroadcast(intent);
 
@@ -632,8 +632,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             loadArtwork(this,
                     SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XXXLARGE));
             // broadcast event
-            Intent intent = new Intent(SimpleSoundCloudListener.ACTION_ON_TRACK_PLAYED);
-            intent.putExtra(SimpleSoundCloudListener.EXTRA_KEY_TRACK, track);
+            Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
+            intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK, track);
             mLocalBroadcastManager.sendBroadcast(intent);
 
             // 2 - THEN PREPARE THE TRACK STREAMING
