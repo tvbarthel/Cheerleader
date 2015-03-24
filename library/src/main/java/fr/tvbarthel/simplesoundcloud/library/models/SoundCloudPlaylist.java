@@ -94,4 +94,5 @@ public class SoundCloudPlaylist implements Parcelable {
     public void addAllTracks(Collection<SoundCloudTrack> tracks) {
         mTracks.addAll(tracks);
     }
+
 }

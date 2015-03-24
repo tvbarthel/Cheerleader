@@ -6,7 +6,7 @@ import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
  * Listener interface used to catch {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer}
  * events.
  */
-public interface SimpleSoundCloudListener {
+public interface SimpleSoundCloudPlayerListener {
     /**
      * Called when a track starts to be played.
      *
@@ -30,4 +30,5 @@ public interface SimpleSoundCloudListener {
      * Called when the player has been destroyed.
      */
     public void onPlayerDestroyed();
+
 }

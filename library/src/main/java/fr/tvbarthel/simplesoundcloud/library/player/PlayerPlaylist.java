@@ -68,6 +68,15 @@ final class PlayerPlaylist {
     }
 
     /**
+     * Return the current track index.
+     *
+     * @return current track index.
+     */
+    public int getCurrentTrackIndex() {
+        return mCurrentTrackIndex;
+    }
+
+    /**
      * Add a track at the end of the playlist.
      *
      * @param track track to be added.

@@ -781,8 +781,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             // update meta data with artwork.
             // copy bitmap to avoid IllegalStateException "Can't parcel a recycled bitmap"
             // from the remove control client on KitKat (IRemoteControlDisplay.java:340)
-            mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(),
-                    bitmap.copy(bitmap.getConfig(), false));
+            SoundCloudTrack track = mPlayerPlaylist.getCurrentTrack();
+            if (track != null) {
+                mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(),
+                        bitmap.copy(bitmap.getConfig(), false));
+            }
 
         }
 

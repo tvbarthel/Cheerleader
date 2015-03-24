@@ -46,7 +46,12 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Listener which should be notified of playback events.
      */
-    private ArrayList<SimpleSoundCloudListener> mListeners;
+    private ArrayList<SimpleSoundCloudPlayerListener> mSimpleSoundCloudPlayerListeners;
+
+    /**
+     * Listener which should be notified of playlist events.
+     */
+    private ArrayList<SimpleSoundCloudPlaylistListener> mSimpleSoundCloudPlaylistListeners;
 
     /**
      * Manage the playlist used by the player.
@@ -88,7 +93,8 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         mClientKey = clientId;
         mIsClosed = false;
         mState = STATE_STOPPED;
-        mListeners = new ArrayList<>();
+        mSimpleSoundCloudPlayerListeners = new ArrayList<>();
+        mSimpleSoundCloudPlaylistListeners = new ArrayList<>();
 
         mApplicationContext = new WeakReference<>(applicationContext);
 
@@ -139,7 +145,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
 
         mClientKey = null;
         mPlayerPlaylist = null;
-        mListeners.clear();
+        mSimpleSoundCloudPlayerListeners.clear();
     }
 
     /**
@@ -264,6 +270,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     public void addTrack(SoundCloudTrack track) {
         checkState();
         mPlayerPlaylist.add(track);
+        for (SimpleSoundCloudPlaylistListener listener : mSimpleSoundCloudPlaylistListeners) {
+            listener.onTrackAdded(track);
+        }
     }
 
     /**
@@ -274,7 +283,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      */
     public void addTracks(List<SoundCloudTrack> tracks) {
         checkState();
-        mPlayerPlaylist.addAll(tracks);
+        for (SoundCloudTrack track : tracks) {
+            addTrack(track);
+        }
     }
 
     /**
@@ -297,9 +308,13 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         if (mPlayerPlaylist.isEmpty()) {
             // playlist empty after deletion, stop player;
             PlaybackService.stop(getContext(), mClientKey);
-        } else if (currentTrack.equals(removedTrack) && mState == STATE_PLAYING) {
+        } else if (currentTrack != null && currentTrack.equals(removedTrack) && mState == STATE_PLAYING) {
             // play next track if removed one was the current and playing
-            play();
+            play(mPlayerPlaylist.getCurrentTrackIndex());
+        }
+
+        for (SimpleSoundCloudPlaylistListener listener : mSimpleSoundCloudPlaylistListeners) {
+            listener.onTrackRemoved(removedTrack, mPlayerPlaylist.isEmpty());
         }
     }
 
@@ -328,9 +343,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      *
      * @param listener listener to register.
      */
-    public void registerPlayerListener(SimpleSoundCloudListener listener) {
+    public void registerPlayerListener(SimpleSoundCloudPlayerListener listener) {
         checkState();
-        mListeners.add(listener);
+        mSimpleSoundCloudPlayerListeners.add(listener);
     }
 
     /**
@@ -338,9 +353,29 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      *
      * @param listener listener to unregister.
      */
-    public void unregisterPlayerListener(SimpleSoundCloudListener listener) {
+    public void unregisterPlayerListener(SimpleSoundCloudPlayerListener listener) {
         checkState();
-        mListeners.remove(listener);
+        mSimpleSoundCloudPlayerListeners.remove(listener);
+    }
+
+    /**
+     * Register a listener to catch playlist events.
+     *
+     * @param listener listener to register.
+     */
+    public void registerPlaylistListener(SimpleSoundCloudPlaylistListener listener) {
+        checkState();
+        mSimpleSoundCloudPlaylistListeners.add(listener);
+    }
+
+    /**
+     * Unregister listener used to catch playlist events.
+     *
+     * @param listener listener to unregister.
+     */
+    public void unregisterPlaylistListener(SimpleSoundCloudPlaylistListener listener) {
+        checkState();
+        mSimpleSoundCloudPlaylistListeners.remove(listener);
     }
 
     /**
@@ -366,7 +401,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             protected void onPlay(SoundCloudTrack track) {
                 super.onPlay(track);
                 mState = STATE_PLAYING;
-                for (SimpleSoundCloudListener listener : mListeners) {
+                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
                     listener.onPlayerPlay(track);
                 }
             }
@@ -375,7 +410,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             protected void onPause() {
                 super.onPause();
                 mState = STATE_PAUSED;
-                for (SimpleSoundCloudListener listener : mListeners) {
+                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
                     listener.onPlayerPause();
                 }
             }
@@ -384,7 +419,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             protected void onPlayerDestroyed() {
                 super.onPlayerDestroyed();
                 mState = STATE_STOPPED;
-                for (SimpleSoundCloudListener listener : mListeners) {
+                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
                     listener.onPlayerDestroyed();
                 }
             }
@@ -392,7 +427,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             @Override
             protected void onSeekTo(int milli) {
                 super.onSeekTo(milli);
-                for (SimpleSoundCloudListener listener : mListeners) {
+                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
                     listener.onPlayerSeekTo(milli);
                 }
             }
