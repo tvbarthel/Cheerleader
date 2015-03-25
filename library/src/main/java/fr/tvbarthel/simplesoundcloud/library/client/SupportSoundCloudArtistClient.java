@@ -12,9 +12,9 @@ import retrofit.RestAdapter;
 import rx.Observable;
 
 /**
- * Encapsulate network and player features to work with sound cloud.
+ * Encapsulate network features used to support an artist on SoundCloud.
  */
-public final class SimpleSoundCloudClient {
+public final class SupportSoundCloudArtistClient {
 
     /**
      * Disable all logs.
@@ -46,7 +46,7 @@ public final class SimpleSoundCloudClient {
     /**
      * Instance, singleton pattern.
      */
-    private static SimpleSoundCloudClient sInstance;
+    private static SupportSoundCloudArtistClient sInstance;
 
     /**
      * Rest adapter used to create {@link RetrofitService}
@@ -79,9 +79,14 @@ public final class SimpleSoundCloudClient {
     private boolean mIsClosed;
 
     /**
+     * Cheer artist on.
+     */
+    private String mArtistName;
+
+    /**
      * Private default constructor.
      */
-    private SimpleSoundCloudClient() {
+    private SupportSoundCloudArtistClient() {
 
     }
 
@@ -91,9 +96,11 @@ public final class SimpleSoundCloudClient {
      * @param applicationContext context used to initiate
      *                           {@link fr.tvbarthel.simplesoundcloud.library.offline.Offliner}
      * @param clientId           SoundCloud api client key.
+     * @param artistName         sound cloud artiste name.
      */
-    private SimpleSoundCloudClient(Context applicationContext, String clientId) {
+    private SupportSoundCloudArtistClient(Context applicationContext, String clientId, String artistName) {
 
+        mArtistName = artistName;
         mClientKey = clientId;
         mIsClosed = false;
 
@@ -119,19 +126,24 @@ public final class SimpleSoundCloudClient {
     /**
      * Simple Sound cloud client initialized with a client id.
      *
-     * @param context  context used to instantiate internal components, no hard reference will be kept.
-     * @param clientId sound cloud client id.
-     * @return instance of {@link SimpleSoundCloudClient}
+     * @param context    context used to instantiate internal components, no hard reference will be kept.
+     * @param clientId   sound cloud client id.
+     * @param artistName sound cloud artiste name.
+     * @return instance of {@link SupportSoundCloudArtistClient}
      */
-    private static SimpleSoundCloudClient getInstance(Context context, String clientId) {
+    private static SupportSoundCloudArtistClient getInstance(Context context, String clientId, String artistName) {
         if (clientId == null) {
             throw new IllegalArgumentException("Sound cloud client id can't be null.");
         }
+        if (artistName == null) {
+            throw new IllegalArgumentException("Sound cloud artistName can't be null.");
+        }
         if (sInstance == null || sInstance.mIsClosed) {
-            sInstance = new SimpleSoundCloudClient(context.getApplicationContext(), clientId);
+            sInstance = new SupportSoundCloudArtistClient(context.getApplicationContext(), clientId, artistName);
         } else {
             sInstance.mRequestSignator.setClientId(clientId);
             sInstance.mClientKey = clientId;
+            sInstance.mArtistName = artistName;
         }
         return sInstance;
     }
@@ -156,55 +168,27 @@ public final class SimpleSoundCloudClient {
     }
 
     /**
-     * Retrieve SoundCloud user profile.
+     * Retrieve the public tracks of the supported artist.
      *
-     * @param userId user id.
-     * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser}
+     * @return {@link rx.Observable} on an ArrayList of the artist's tracks.
      */
-    public Observable<SoundCloudUser> getUser(int userId) {
+    public Observable<ArrayList<SoundCloudTrack>> getArtistTracks() {
         checkState();
-        return mRetrofitService.getUser(String.valueOf(userId))
-                .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_USER);
-    }
-
-    /**
-     * Retrieve SoundCloud user profile.
-     *
-     * @param userName user name.
-     * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser}
-     */
-    public Observable<SoundCloudUser> getUser(String userName) {
-        checkState();
-        return mRetrofitService.getUser(userName)
-                .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_USER);
-    }
-
-    /**
-     * Retrieve the public tracks of a user.
-     *
-     * @param userName user name.
-     * @return {@link rx.Observable} on an ArrayList of
-     */
-    public Observable<ArrayList<SoundCloudTrack>> getUserTracks(String userName) {
-        checkState();
-        return mRetrofitService.getUserTracks(userName)
+        return mRetrofitService.getUserTracks(mArtistName)
                 .compose(Offliner.PREPARE_FOR_OFFLINE)
                 .map(RxParser.PARSE_USER_TRACKS);
     }
 
     /**
-     * Retrieve a SoundCloud track according to its id.
+     * Retrieve SoundCloud artist profile.
      *
-     * @param trackId SoundCloud track id.
-     * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
+     * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser}
      */
-    public Observable<SoundCloudTrack> getTrack(int trackId) {
+    public Observable<SoundCloudUser> getArtistProfile() {
         checkState();
-        return mRetrofitService.getTrack(trackId)
+        return mRetrofitService.getUser(mArtistName)
                 .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_TRACK);
+                .map(RxParser.PARSE_USER);
     }
 
     /**
@@ -213,9 +197,9 @@ public final class SimpleSoundCloudClient {
      * Note : some log configuration can increase memory foot print and/or reduce the performance.
      * Use them with caution.
      * <p/>
-     * {@link SimpleSoundCloudClient#LOG_NONE}
-     * {@link SimpleSoundCloudClient#LOG_RETROFIT}
-     * {@link SimpleSoundCloudClient#LOG_OFFLINER}
+     * {@link SupportSoundCloudArtistClient#LOG_NONE}
+     * {@link SupportSoundCloudArtistClient#LOG_RETROFIT}
+     * {@link SupportSoundCloudArtistClient#LOG_OFFLINER}
      * <p/>
      * Different log policies can be combine :
      * <pre>
@@ -258,12 +242,13 @@ public final class SimpleSoundCloudClient {
 
 
     /**
-     * Builder used to build a {@link SimpleSoundCloudClient}
+     * Builder used to build a {@link SupportSoundCloudArtistClient}
      */
     public static class Builder {
 
         private Context context;
         private String apiKey;
+        private String artistName;
         private int logLevel;
 
         /**
@@ -277,7 +262,7 @@ public final class SimpleSoundCloudClient {
          * Context from which the client will be build.
          *
          * @param context context used to instantiate internal components.
-         * @return {@link SimpleSoundCloudClient.Builder}
+         * @return {@link SupportSoundCloudArtistClient.Builder}
          */
         public Builder from(Context context) {
             this.context = context;
@@ -288,7 +273,7 @@ public final class SimpleSoundCloudClient {
          * Api key with which SoundCloud call will be performed.
          *
          * @param apiKey sound cloud api key.
-         * @return {@link SimpleSoundCloudClient.Builder}
+         * @return {@link SupportSoundCloudArtistClient.Builder}
          */
         public Builder with(String apiKey) {
             if (apiKey == null) {
@@ -299,14 +284,28 @@ public final class SimpleSoundCloudClient {
         }
 
         /**
+         * Set the SoundCloud name of the artist you would like to supports.
+         *
+         * @param artistName sound cloud artiste name.
+         * @return {@link SupportSoundCloudArtistClient.Builder}
+         */
+        public Builder supports(String artistName) {
+            if (artistName == null) {
+                throw new IllegalStateException("Artist name can't be null");
+            }
+            this.artistName = artistName;
+            return this;
+        }
+
+        /**
          * Define the log policy.
          * <p/>
          * Note : some log configuration can increase memory foot print and/or reduce the performance.
          * Use them with caution.
          * <p/>
-         * {@link SimpleSoundCloudClient#LOG_NONE}
-         * {@link SimpleSoundCloudClient#LOG_RETROFIT}
-         * {@link SimpleSoundCloudClient#LOG_OFFLINER}
+         * {@link SupportSoundCloudArtistClient#LOG_NONE}
+         * {@link SupportSoundCloudArtistClient#LOG_RETROFIT}
+         * {@link SupportSoundCloudArtistClient#LOG_OFFLINER}
          * <p/>
          * Different log policies can be combine :
          * <pre>
@@ -314,7 +313,7 @@ public final class SimpleSoundCloudClient {
          * </pre>
          *
          * @param logLevel log policy.
-         * @return {@link SimpleSoundCloudClient.Builder}
+         * @return {@link SupportSoundCloudArtistClient.Builder}
          */
         public Builder log(int logLevel) {
             this.logLevel = logLevel;
@@ -324,18 +323,26 @@ public final class SimpleSoundCloudClient {
         /**
          * Build the client.
          *
-         * @return {@link SimpleSoundCloudClient}
+         * @return {@link SupportSoundCloudArtistClient}
          */
-        public SimpleSoundCloudClient build() {
+        public SupportSoundCloudArtistClient build() {
             if (this.context == null) {
-                throw new IllegalStateException("Context should be passed using 'Builder.from' to build the client.");
+                throw new IllegalStateException("Context should be passed using "
+                        + "'Builder.from' to build the client.");
             }
 
             if (this.apiKey == null) {
-                throw new IllegalStateException("Api key should be passed using 'Builder.with' to build the client.");
+                throw new IllegalStateException("Api key should be passed using "
+                        + "'Builder.with' to build the client.");
             }
 
-            SimpleSoundCloudClient instance = getInstance(this.context, this.apiKey);
+            if (this.artistName == null) {
+                throw new IllegalStateException("Artist name should be passed using "
+                        + "'Builder.supports' to build the client.");
+            }
+
+            SupportSoundCloudArtistClient instance
+                    = getInstance(this.context, this.apiKey, this.artistName);
             if (!this.apiKey.equals(instance.mClientKey)) {
                 throw new IllegalStateException("Only one api key can be used at the same time.");
             }
