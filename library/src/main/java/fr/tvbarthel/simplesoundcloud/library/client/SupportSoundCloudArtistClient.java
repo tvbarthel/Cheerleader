@@ -5,6 +5,7 @@ import android.content.Context;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.Offliner;
@@ -189,6 +190,20 @@ public final class SupportSoundCloudArtistClient {
         return mRetrofitService.getUser(mArtistName)
                 .compose(Offliner.PREPARE_FOR_OFFLINE)
                 .map(RxParser.PARSE_USER);
+    }
+
+    /**
+     * Retrieve comments related to a track of the supported artist.
+     *
+     * @param track track of which comment are related.
+     * @return {@link rx.Observable} on {@link java.util.ArrayList}
+     * of {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment}
+     */
+    public Observable<ArrayList<SoundCloudComment>> getTrackComments(SoundCloudTrack track) {
+        checkState();
+        return mRetrofitService.getTrackComments(track.getId())
+                .compose(Offliner.PREPARE_FOR_OFFLINE)
+                .map(RxParser.PARSE_COMMENTS);
     }
 
     /**

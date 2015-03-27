@@ -1,19 +1,92 @@
 package fr.tvbarthel.simplesoundcloud.library.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
 /**
  * A SoundCloud comment written by a SoundCloud user related to a SoundCloud track.
+ * <p/>
+ * <p/>
+ * https://developers.soundcloud.com/docs/api/reference#comments
+ * Comments can be made on tracks by any user who has access to a track, except for non
+ * commentable tracks. As you see in the SoundCloud player comments can also be associated
+ * with a specific timestamp in a track.
  */
-public class SoundCloudComment {
+public class SoundCloudComment implements Parcelable {
+
+    /**
+     * Parcelable.
+     */
+    public static final Parcelable.Creator<SoundCloudComment> CREATOR
+            = new Parcelable.Creator<SoundCloudComment>() {
+        public SoundCloudComment createFromParcel(Parcel source) {
+            return new SoundCloudComment(source);
+        }
+
+        public SoundCloudComment[] newArray(int size) {
+            return new SoundCloudComment[size];
+        }
+    };
+
     private int mId;
     private Date mCreationDate;
     private int mTrackId;
     private int mTrackTimeStamp;
-    private int mContent;
+    private String mContent;
     private int mUserId;
-    private int mUserName;
-    private int mUserAvatarUrl;
+    private String mUserName;
+    private String mUserAvatarUrl;
+
+    /**
+     * Default constructor.
+     */
+    public SoundCloudComment() {
+    }
+
+    private SoundCloudComment(Parcel in) {
+        this.mId = in.readInt();
+        long tmpMCreationDate = in.readLong();
+        this.mCreationDate = tmpMCreationDate == -1 ? null : new Date(tmpMCreationDate);
+        this.mTrackId = in.readInt();
+        this.mTrackTimeStamp = in.readInt();
+        this.mContent = in.readString();
+        this.mUserId = in.readInt();
+        this.mUserName = in.readString();
+        this.mUserAvatarUrl = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.mId);
+        dest.writeLong(mCreationDate != null ? mCreationDate.getTime() : -1);
+        dest.writeInt(this.mTrackId);
+        dest.writeInt(this.mTrackTimeStamp);
+        dest.writeString(this.mContent);
+        dest.writeInt(this.mUserId);
+        dest.writeString(this.mUserName);
+        dest.writeString(this.mUserAvatarUrl);
+    }
+
+    @Override
+    public String toString() {
+        return "SoundCloudComment{"
+                + "mId=" + mId
+                + ", mCreationDate=" + mCreationDate
+                + ", mTrackId=" + mTrackId
+                + ", mTrackTimeStamp=" + mTrackTimeStamp
+                + ", mContent=" + mContent
+                + ", mUserId=" + mUserId
+                + ", mUserName=" + mUserName
+                + ", mUserAvatarUrl=" + mUserAvatarUrl
+                + '}';
+    }
 
     /**
      * Id used to identify the comment.
@@ -96,7 +169,7 @@ public class SoundCloudComment {
      *
      * @return comment message.
      */
-    public int getContent() {
+    public String getContent() {
         return mContent;
     }
 
@@ -105,7 +178,7 @@ public class SoundCloudComment {
      *
      * @param content comment message.
      */
-    public void setContent(int content) {
+    public void setContent(String content) {
         this.mContent = content;
     }
 
@@ -132,7 +205,7 @@ public class SoundCloudComment {
      *
      * @return name of the user who made the comment.
      */
-    public int getUserName() {
+    public String getUserName() {
         return mUserName;
     }
 
@@ -141,7 +214,7 @@ public class SoundCloudComment {
      *
      * @param userName name of the user who made the comment.
      */
-    public void setUserName(int userName) {
+    public void setUserName(String userName) {
         this.mUserName = userName;
     }
 
@@ -150,7 +223,7 @@ public class SoundCloudComment {
      *
      * @return url of the avatar.
      */
-    public int getUserAvatarUrl() {
+    public String getUserAvatarUrl() {
         return mUserAvatarUrl;
     }
 
@@ -159,7 +232,7 @@ public class SoundCloudComment {
      *
      * @param userAvatarUrl url of the avatar.
      */
-    public void setUserAvatarUrl(int userAvatarUrl) {
+    public void setUserAvatarUrl(String userAvatarUrl) {
         this.mUserAvatarUrl = userAvatarUrl;
     }
 }

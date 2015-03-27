@@ -37,4 +37,13 @@ interface RetrofitService {
      */
     @GET("/tracks/{trackId}.json")
     public Observable<Response> getTrack(@Path("trackId") int trackId);
+
+    /**
+     * Retrieve the list of comments related to the
+     *
+     * @param trackId SoundCloud track id.
+     * @return {@link rx.Observable} on {@link retrofit.client.Response}
+     */
+    @GET("/tracks/{trackId}/comments.json")
+    public Observable<Response> getTrackComments(@Path("trackId") int trackId);
 }

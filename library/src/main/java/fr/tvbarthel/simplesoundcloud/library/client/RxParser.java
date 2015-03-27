@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import rx.functions.Func1;
@@ -155,6 +156,66 @@ final class RxParser {
     };
 
     /**
+     * Parse a list of {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment}
+     * retrieved from SoundCloud API.
+     */
+    public static final Func1<String, ArrayList<SoundCloudComment>> PARSE_COMMENTS
+            = new Func1<String, ArrayList<SoundCloudComment>>() {
+        @Override
+        public ArrayList<SoundCloudComment> call(String s) {
+            ArrayList<SoundCloudComment> comments = new ArrayList<>();
+            try {
+                JSONArray jsonComments = new JSONArray(s);
+                for (int i = 0; i < jsonComments.length(); i++) {
+                    comments.add(PARSE_COMMENT.call(jsonComments.getJSONObject(i).toString()));
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "Error while parsing comments list : " + s);
+            }
+            return comments;
+        }
+    };
+
+    /**
+     * Parse {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment} retrieved from
+     * SoundCloud API.
+     */
+    public static final Func1<String, SoundCloudComment> PARSE_COMMENT = new Func1<String, SoundCloudComment>() {
+        @Override
+        public SoundCloudComment call(String s) {
+            SoundCloudComment comment = new SoundCloudComment();
+            try {
+                JSONObject jsonComment = new JSONObject(s);
+
+                comment.setId(jsonComment.optInt(ID));
+
+                SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                String createdAt = jsonComment.optString(CREATED_AT);
+                if (createdAt != null) {
+                    comment.setCreationDate(format.parse(createdAt));
+                }
+
+                comment.setTrackId(jsonComment.optInt(TRACK_ID));
+                comment.setTrackTimeStamp(jsonComment.optInt(TIMESTAMP));
+                comment.setContent(jsonComment.optString(BODY));
+
+                JSONObject userJson = jsonComment.optJSONObject(USER);
+                if (userJson != null) {
+                    comment.setUserId(userJson.optInt(ID));
+                    comment.setUserName(userJson.optString(USERNAME));
+                    comment.setUserAvatarUrl(userJson.optString(AVATAR_URL));
+                }
+
+            } catch (JSONException e) {
+                Log.e(TAG, "Error while parsing comment : " + s);
+            } catch (ParseException e) {
+                Log.e(TAG, "Error while parsing creation date of comment : " + s);
+            }
+            return comment;
+        }
+    };
+
+    /**
      * Log cat.
      */
     private static final String TAG = RxParser.class.getSimpleName();
@@ -164,6 +225,7 @@ final class RxParser {
      */
     private static final String ID = "id";
     private static final String USER_ID = "user_id";
+    private static final String USER = "user";
     private static final String PERMALINK = "permalink";
     private static final String PERMALINK_URL = "permalink_url";
     private static final String ARTWORK_URL = "artwork_url";
@@ -187,6 +249,9 @@ final class RxParser {
     private static final String WEBSITE_TITLE = "website_title";
     private static final String ONLINE = "online";
     private static final String TRACK_COUNT = "track_count";
+    private static final String TRACK_ID = "track_id";
+    private static final String TIMESTAMP = "timestamp";
+    private static final String BODY = "body";
     private static final String PLAYLIST_COUNT = "playlist_count";
     private static final String PUBLIC_FAVORITE_COUNT = "public_favorite_count";
     private static final String FOLLOWERS_COUNT = "followers_count";
