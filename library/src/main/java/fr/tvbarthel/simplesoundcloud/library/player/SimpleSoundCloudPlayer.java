@@ -129,9 +129,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     }
 
     /**
-     * Release resources associated with this client.
+     * Release resources associated with the player.
      */
-    public void close() {
+    public void destroy() {
         if (mIsClosed) {
             return;
         }

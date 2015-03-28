@@ -3,6 +3,7 @@ package fr.tvbarthel.simplesoundcloud.library.client;
 import android.content.Context;
 import android.util.SparseArray;
 
+import java.io.Closeable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -15,7 +16,7 @@ import rx.functions.Func1;
 /**
  * Encapsulate network features used to support an artist on SoundCloud.
  */
-public final class SupportSoundCloudArtistClient {
+public final class SupportSoundCloudArtistClient implements Closeable {
 
     /**
      * Disable all logs.
@@ -160,7 +161,10 @@ public final class SupportSoundCloudArtistClient {
 
     /**
      * Release resources associated with this client.
+     * <p/>
+     * {@inheritDoc}
      */
+    @Override
     public void close() {
         if (mIsClosed) {
             return;
