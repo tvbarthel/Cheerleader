@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.tvbarthel.simplesoundcloud.library.R;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudPlaylist;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 import rx.functions.Action1;
 
 /**
@@ -264,7 +264,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Add a track to the current SoundCloud player playlist.
      *
-     * @param track {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack} to be
+     * @param track {@link fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack} to be
      *              added to the player.
      */
     public void addTrack(SoundCloudTrack track) {
@@ -278,7 +278,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Add a list of track to thr current SoundCloud player playlist.
      *
-     * @param tracks list of {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
+     * @param tracks list of {@link fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack}
      *               to be added to the player.
      */
     public void addTracks(List<SoundCloudTrack> tracks) {

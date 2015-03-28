@@ -18,7 +18,7 @@ import com.squareup.picasso.Target;
 
 import fr.tvbarthel.simplesoundcloud.library.R;
 import fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 
 /**
  * Handle player notification behaviour.

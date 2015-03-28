@@ -10,9 +10,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import rx.functions.Func1;
 
 /**
@@ -21,7 +18,7 @@ import rx.functions.Func1;
 final class RxParser {
 
     /**
-     * Parse {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser} retrieved from
+     * Parse {@link SoundCloudUser} retrieved from
      * SoundCloud API.
      */
     public static final Func1<String, SoundCloudUser> PARSE_USER = new Func1<String, SoundCloudUser>() {
@@ -62,7 +59,7 @@ final class RxParser {
     };
 
     /**
-     * Parse all public {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack}
+     * Parse all public {@link SoundCloudTrack}
      * of a user.
      */
     public static final Func1<String, ArrayList<SoundCloudTrack>> PARSE_USER_TRACKS
@@ -84,7 +81,7 @@ final class RxParser {
     };
 
     /**
-     * Parse {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack} retrieved from
+     * Parse {@link SoundCloudTrack} retrieved from
      * SoundCloud API.
      */
     public static final Func1<String, SoundCloudTrack> PARSE_TRACK = new Func1<String, SoundCloudTrack>() {
@@ -156,7 +153,7 @@ final class RxParser {
     };
 
     /**
-     * Parse a list of {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment}
+     * Parse a list of {@link SoundCloudComment}
      * retrieved from SoundCloud API.
      */
     public static final Func1<String, ArrayList<SoundCloudComment>> PARSE_COMMENTS
@@ -177,7 +174,7 @@ final class RxParser {
     };
 
     /**
-     * Parse {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment} retrieved from
+     * Parse {@link SoundCloudComment} retrieved from
      * SoundCloud API.
      */
     public static final Func1<String, SoundCloudComment> PARSE_COMMENT = new Func1<String, SoundCloudComment>() {

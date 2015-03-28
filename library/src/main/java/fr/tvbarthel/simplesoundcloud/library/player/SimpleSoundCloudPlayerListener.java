@@ -1,6 +1,6 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 
 /**
  * Listener interface used to catch {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer}

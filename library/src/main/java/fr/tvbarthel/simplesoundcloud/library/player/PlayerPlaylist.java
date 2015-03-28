@@ -3,8 +3,8 @@ package fr.tvbarthel.simplesoundcloud.library.player;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudPlaylist;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudPlaylist;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 
 /**
  * Used to manage the player playlist.

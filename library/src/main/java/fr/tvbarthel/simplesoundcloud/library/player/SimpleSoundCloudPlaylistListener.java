@@ -1,6 +1,6 @@
 package fr.tvbarthel.simplesoundcloud.library.player;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 
 /**
  * Listener used to catch events performed on the play playlist.

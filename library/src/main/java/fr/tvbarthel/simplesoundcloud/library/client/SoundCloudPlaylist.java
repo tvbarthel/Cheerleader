@@ -1,4 +1,4 @@
-package fr.tvbarthel.simplesoundcloud.library.models;
+package fr.tvbarthel.simplesoundcloud.library.client;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,16 +1,16 @@
 package fr.tvbarthel.simplesoundcloud.library.client;
 
 import android.content.Context;
+import android.util.SparseArray;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.offline.Offliner;
 import retrofit.RestAdapter;
 import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Func1;
 
 /**
  * Encapsulate network features used to support an artist on SoundCloud.
@@ -85,6 +85,12 @@ public final class SupportSoundCloudArtistClient {
     private String mArtistName;
 
     /**
+     * Object used as cache RAM in order to avoid spamming API with multiple
+     * call of {@link SupportSoundCloudArtistClient#getArtistProfile()}
+     */
+    private CacheRam mCacheRam;
+
+    /**
      * Private default constructor.
      */
     private SupportSoundCloudArtistClient() {
@@ -115,6 +121,7 @@ public final class SupportSoundCloudArtistClient {
         mRestAdapter = new RestAdapter.Builder()
                 .setEndpoint(SOUND_CLOUD_API)
                 .setRequestInterceptor(mRequestSignator)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
         mRetrofitService = mRestAdapter.create(RetrofitService.class);
 
@@ -122,6 +129,8 @@ public final class SupportSoundCloudArtistClient {
          * Initialize the Offliner component for offline storage.
          */
         Offliner.initInstance(getContext(), false);
+
+        mCacheRam = new CacheRam();
     }
 
     /**
@@ -175,21 +184,43 @@ public final class SupportSoundCloudArtistClient {
      */
     public Observable<ArrayList<SoundCloudTrack>> getArtistTracks() {
         checkState();
-        return mRetrofitService.getUserTracks(mArtistName)
-                .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_USER_TRACKS);
+        if (mCacheRam.tracks.size() != 0) {
+            return Observable.create(new Observable.OnSubscribe<ArrayList<SoundCloudTrack>>() {
+                @Override
+                public void call(Subscriber<? super ArrayList<SoundCloudTrack>> subscriber) {
+                    subscriber.onNext(mCacheRam.tracks);
+                    subscriber.onCompleted();
+                }
+            });
+        } else {
+            return mRetrofitService.getUserTracks(mArtistName)
+                    .compose(Offliner.PREPARE_FOR_OFFLINE)
+                    .map(RxParser.PARSE_USER_TRACKS)
+                    .map(cacheTracks());
+        }
     }
 
     /**
      * Retrieve SoundCloud artist profile.
      *
-     * @return {@link rx.Observable} on {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser}
+     * @return {@link rx.Observable} on {@link SoundCloudUser}
      */
     public Observable<SoundCloudUser> getArtistProfile() {
         checkState();
-        return mRetrofitService.getUser(mArtistName)
-                .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_USER);
+        if (mCacheRam.artistProfile != null) {
+            return Observable.create(new Observable.OnSubscribe<SoundCloudUser>() {
+                @Override
+                public void call(Subscriber<? super SoundCloudUser> subscriber) {
+                    subscriber.onNext(mCacheRam.artistProfile);
+                    subscriber.onCompleted();
+                }
+            });
+        } else {
+            return mRetrofitService.getUser(mArtistName)
+                    .compose(Offliner.PREPARE_FOR_OFFLINE)
+                    .map(RxParser.PARSE_USER)
+                    .map(cacheArtistProfile());
+        }
     }
 
     /**
@@ -197,13 +228,24 @@ public final class SupportSoundCloudArtistClient {
      *
      * @param track track of which comment are related.
      * @return {@link rx.Observable} on {@link java.util.ArrayList}
-     * of {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudComment}
+     * of {@link SoundCloudComment}
      */
-    public Observable<ArrayList<SoundCloudComment>> getTrackComments(SoundCloudTrack track) {
+    public Observable<ArrayList<SoundCloudComment>> getTrackComments(final SoundCloudTrack track) {
         checkState();
-        return mRetrofitService.getTrackComments(track.getId())
-                .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_COMMENTS);
+        if (mCacheRam.tracksComments.get(track.getId()) != null) {
+            return Observable.create(new Observable.OnSubscribe<ArrayList<SoundCloudComment>>() {
+                @Override
+                public void call(Subscriber<? super ArrayList<SoundCloudComment>> subscriber) {
+                    subscriber.onNext(mCacheRam.tracksComments.get(track.getId()));
+                    subscriber.onCompleted();
+                }
+            });
+        } else {
+            return mRetrofitService.getTrackComments(track.getId())
+                    .compose(Offliner.PREPARE_FOR_OFFLINE)
+                    .map(RxParser.PARSE_COMMENTS)
+                    .map(cacheTrackComments());
+        }
     }
 
     /**
@@ -253,6 +295,58 @@ public final class SupportSoundCloudArtistClient {
         if (mIsClosed) {
             throw new IllegalStateException("Client instance can't be used after being closed.");
         }
+    }
+
+    /**
+     * "Cache" the artist profile retrieved from network in RAM
+     * to avoid requesting SoundCloud API for next call.
+     *
+     * @return {@link rx.functions.Func1} used to save the retrieved artist
+     */
+    private Func1<SoundCloudUser, SoundCloudUser> cacheArtistProfile() {
+        return new Func1<SoundCloudUser, SoundCloudUser>() {
+            @Override
+            public SoundCloudUser call(SoundCloudUser soundCloudUser) {
+                mCacheRam.artistProfile = soundCloudUser;
+                return soundCloudUser;
+            }
+        };
+    }
+
+    /**
+     * "Cache" the comments linked to a track retrieved from network in RAM
+     * to avoid requesting SoundCloud API for next call.
+     *
+     * @return {@link rx.functions.Func1} used to save the retrieved comments list
+     */
+    private Func1<ArrayList<SoundCloudComment>, ArrayList<SoundCloudComment>> cacheTrackComments() {
+        return new Func1<ArrayList<SoundCloudComment>, ArrayList<SoundCloudComment>>() {
+            @Override
+            public ArrayList<SoundCloudComment> call(ArrayList<SoundCloudComment> trackComments) {
+                if (trackComments.size() > 0) {
+                    mCacheRam.tracksComments.put(trackComments.get(0).getTrackId(), trackComments);
+                }
+                return trackComments;
+            }
+        };
+    }
+
+    /**
+     * "Cache" the tracks list of the supported artist retrieved from network in RAM
+     * to avoid requesting SoundCloud API for next call.
+     *
+     * @return {@link rx.functions.Func1} used to save the retrieved tracks list
+     */
+    private Func1<ArrayList<SoundCloudTrack>, ArrayList<SoundCloudTrack>> cacheTracks() {
+        return new Func1<ArrayList<SoundCloudTrack>, ArrayList<SoundCloudTrack>>() {
+            @Override
+            public ArrayList<SoundCloudTrack> call(ArrayList<SoundCloudTrack> soundCloudTracks) {
+                if (soundCloudTracks.size() > 0) {
+                    mCacheRam.tracks = soundCloudTracks;
+                }
+                return soundCloudTracks;
+            }
+        };
     }
 
 
@@ -367,6 +461,21 @@ public final class SupportSoundCloudArtistClient {
             }
 
             return sInstance;
+        }
+    }
+
+    /**
+     * Used to cache retrieve object in RAM in order to avoid spamming SoundCloud API
+     * to due multiple call.
+     */
+    private static final class CacheRam {
+        private SoundCloudUser artistProfile;
+        private SparseArray<ArrayList<SoundCloudComment>> tracksComments;
+        private ArrayList<SoundCloudTrack> tracks;
+
+        CacheRam() {
+            tracksComments = new SparseArray<>();
+            tracks = new ArrayList<>();
         }
     }
 

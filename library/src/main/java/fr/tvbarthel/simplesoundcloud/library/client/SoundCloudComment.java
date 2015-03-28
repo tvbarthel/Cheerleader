@@ -1,4 +1,4 @@
-package fr.tvbarthel.simplesoundcloud.library.models;
+package fr.tvbarthel.simplesoundcloud.library.client;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -98,15 +98,6 @@ public class SoundCloudComment implements Parcelable {
     }
 
     /**
-     * Id used to identify the comment.
-     *
-     * @param id used to identify the comment.
-     */
-    public void setId(int id) {
-        this.mId = id;
-    }
-
-    /**
      * Comment creation date.
      *
      * @return date of the creation of the comment.
@@ -116,30 +107,12 @@ public class SoundCloudComment implements Parcelable {
     }
 
     /**
-     * Comment creation date.
-     *
-     * @param creationDate date of the creation of the comment.
-     */
-    public void setCreationDate(Date creationDate) {
-        this.mCreationDate = creationDate;
-    }
-
-    /**
      * The track id of the related track.
      *
      * @return The track id of the related track.
      */
     public int getTrackId() {
         return mTrackId;
-    }
-
-    /**
-     * The track id of the related track.
-     *
-     * @param trackId The track id of the related track.
-     */
-    public void setTrackId(int trackId) {
-        this.mTrackId = trackId;
     }
 
     /**
@@ -154,32 +127,12 @@ public class SoundCloudComment implements Parcelable {
     }
 
     /**
-     * Associated position in the track.
-     * <p/>
-     * For instance 10000, user made his comment at 10sec
-     *
-     * @param trackTimeStamp playback milliseconds at which user made the comment.
-     */
-    public void setTrackTimeStamp(int trackTimeStamp) {
-        this.mTrackTimeStamp = trackTimeStamp;
-    }
-
-    /**
      * Content of the comment.
      *
      * @return comment message.
      */
     public String getContent() {
         return mContent;
-    }
-
-    /**
-     * Content of the comment.
-     *
-     * @param content comment message.
-     */
-    public void setContent(String content) {
-        this.mContent = content;
     }
 
     /**
@@ -192,30 +145,12 @@ public class SoundCloudComment implements Parcelable {
     }
 
     /**
-     * User id of the user who made the comment
-     *
-     * @param userId SoundCloud user id.
-     */
-    public void setUserId(int userId) {
-        this.mUserId = userId;
-    }
-
-    /**
      * Name of the user who made the comment.
      *
      * @return name of the user who made the comment.
      */
     public String getUserName() {
         return mUserName;
-    }
-
-    /**
-     * Name of the user who made the comment.
-     *
-     * @param userName name of the user who made the comment.
-     */
-    public void setUserName(String userName) {
-        this.mUserName = userName;
     }
 
     /**
@@ -228,11 +163,76 @@ public class SoundCloudComment implements Parcelable {
     }
 
     /**
+     * Id used to identify the comment.
+     *
+     * @param id used to identify the comment.
+     */
+    void setId(int id) {
+        this.mId = id;
+    }
+
+    /**
+     * Comment creation date.
+     *
+     * @param creationDate date of the creation of the comment.
+     */
+    void setCreationDate(Date creationDate) {
+        this.mCreationDate = creationDate;
+    }
+
+    /**
+     * The track id of the related track.
+     *
+     * @param trackId The track id of the related track.
+     */
+    void setTrackId(int trackId) {
+        this.mTrackId = trackId;
+    }
+
+    /**
+     * Associated position in the track.
+     * <p/>
+     * For instance 10000, user made his comment at 10sec
+     *
+     * @param trackTimeStamp playback milliseconds at which user made the comment.
+     */
+    void setTrackTimeStamp(int trackTimeStamp) {
+        this.mTrackTimeStamp = trackTimeStamp;
+    }
+
+    /**
+     * Content of the comment.
+     *
+     * @param content comment message.
+     */
+    void setContent(String content) {
+        this.mContent = content;
+    }
+
+    /**
+     * User id of the user who made the comment
+     *
+     * @param userId SoundCloud user id.
+     */
+    void setUserId(int userId) {
+        this.mUserId = userId;
+    }
+
+    /**
+     * Name of the user who made the comment.
+     *
+     * @param userName name of the user who made the comment.
+     */
+    void setUserName(String userName) {
+        this.mUserName = userName;
+    }
+
+    /**
      * Url of the user's avatar.
      *
      * @param userAvatarUrl url of the avatar.
      */
-    public void setUserAvatarUrl(String userAvatarUrl) {
+    void setUserAvatarUrl(String userAvatarUrl) {
         this.mUserAvatarUrl = userAvatarUrl;
     }
 }

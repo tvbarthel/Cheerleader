@@ -1,6 +1,6 @@
 package fr.tvbarthel.simplesoundcloud.library.helpers;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 
 /**
  * Used to encapsulate artwork url format.
@@ -57,7 +57,7 @@ public final class SoundCloudArtworkHelper {
     /**
      * Retrieve the artwork url of a track pointing to the requested size.
      * <p/>
-     * By default, {@link fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack#getArtworkUrl()}
+     * By default, {@link fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack#getArtworkUrl()}
      * points to the {@link fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper#LARGE}
      * <p/>
      * Available size are :

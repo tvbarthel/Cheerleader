@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper;
 import fr.tvbarthel.simplesoundcloud.library.media.MediaSessionWrapper;
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 
 /**
  * Service used as SoundCloudPlayer.

@@ -17,7 +17,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.remote.RemoteControlClientCompat;
 import fr.tvbarthel.simplesoundcloud.library.remote.RemoteControlHelper;
 

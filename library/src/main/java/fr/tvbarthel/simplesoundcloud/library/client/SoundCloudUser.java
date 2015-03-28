@@ -1,4 +1,4 @@
-package fr.tvbarthel.simplesoundcloud.library.models;
+package fr.tvbarthel.simplesoundcloud.library.client;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -150,15 +150,6 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * User id.
-     *
-     * @param id user id.
-     */
-    public void setId(int id) {
-        this.mId = id;
-    }
-
-    /**
      * Permalink of the resource.
      *
      * @return Permalink of the resource.
@@ -168,30 +159,12 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * Permalink of the resource.
-     *
-     * @param permaLink Permalink of the resource.
-     */
-    public void setPermaLink(String permaLink) {
-        this.mPermaLink = permaLink;
-    }
-
-    /**
      * Username.
      *
      * @return username.
      */
     public String getUserName() {
         return mUserName;
-    }
-
-    /**
-     * Username.
-     *
-     * @param userName Username.
-     */
-    public void setUserName(String userName) {
-        this.mUserName = userName;
     }
 
     /**
@@ -206,17 +179,6 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * API resource.
-     * <p/>
-     * Example : URL http://api.soundcloud.com/comments/32562
-     *
-     * @param uri API resource.
-     */
-    public void setUri(String uri) {
-        this.mUri = uri;
-    }
-
-    /**
      * URL to the SoundCloud.com page.
      * <p/>
      * Example : "http://soundcloud.com/bryan/sbahn-sounds"
@@ -225,17 +187,6 @@ public class SoundCloudUser implements Parcelable {
      */
     public String getPermaLinkUrl() {
         return mPermaLinkUrl;
-    }
-
-    /**
-     * URL to the SoundCloud.com page.
-     * <p/>
-     * Example : "http://soundcloud.com/bryan/sbahn-sounds"
-     *
-     * @param permaLinkUrl URL to the SoundCloud.com page.
-     */
-    public void setPermaLinkUrl(String permaLinkUrl) {
-        this.mPermaLinkUrl = permaLinkUrl;
     }
 
     /**
@@ -250,32 +201,12 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * URL to a JPEG image.
-     * <p/>
-     * Example : "http://i1.sndcdn.com/avatars-000011353294-n0axp1-large.jpg"
-     *
-     * @param avatarUrl URL to a JPEG image.
-     */
-    public void setAvatarUrl(String avatarUrl) {
-        this.mAvatarUrl = avatarUrl;
-    }
-
-    /**
      * Country.
      *
      * @return country.
      */
     public String getCountry() {
         return mCountry;
-    }
-
-    /**
-     * Country.
-     *
-     * @param country country.
-     */
-    public void setCountry(String country) {
-        this.mCountry = country;
     }
 
     /**
@@ -290,32 +221,12 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * First and last name.
-     * <p/>
-     * Example : "Tom Wilson"
-     *
-     * @param fullName First and last name separate by an empty space.
-     */
-    public void setFullName(String fullName) {
-        this.mFullName = fullName;
-    }
-
-    /**
      * First name.
      *
      * @return first name.
      */
     public String getFirstName() {
         return mFirstName;
-    }
-
-    /**
-     * First name.
-     *
-     * @param firstName first name.
-     */
-    public void setFirstName(String firstName) {
-        this.mFirstName = firstName;
     }
 
     /**
@@ -328,30 +239,12 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * Last name.
-     *
-     * @param lastName last name.
-     */
-    public void setLastName(String lastName) {
-        this.mLastName = lastName;
-    }
-
-    /**
      * City.
      *
      * @return city.
      */
     public String getCity() {
         return mCity;
-    }
-
-    /**
-     * City.
-     *
-     * @param city city.
-     */
-    public void setCity(String city) {
-        this.mCity = city;
     }
 
     /**
@@ -365,16 +258,6 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * Description.
-     * Example : "Buskers playing in the S-Bahn station in Berlin"
-     *
-     * @param description Description.
-     */
-    public void setDescription(String description) {
-        this.mDescription = description;
-    }
-
-    /**
      * Discogs name.
      * Example : "myrandomband"
      *
@@ -382,16 +265,6 @@ public class SoundCloudUser implements Parcelable {
      */
     public String getDiscogsName() {
         return mDiscogsName;
-    }
-
-    /**
-     * Discogs name.
-     * Example : "myrandomband"
-     *
-     * @param discogsName Discogs name.
-     */
-    public void setDiscogsName(String discogsName) {
-        this.mDiscogsName = discogsName;
     }
 
     /**
@@ -406,17 +279,6 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * MySpace name.
-     * <p/>
-     * Example : "myrandomband"
-     *
-     * @param myspaceName MySpace name.
-     */
-    public void setMyspaceName(String myspaceName) {
-        this.mMyspaceName = myspaceName;
-    }
-
-    /**
      * a URL to the website.
      * <p/>
      * Example : "http://facebook.com/myrandomband"
@@ -425,17 +287,6 @@ public class SoundCloudUser implements Parcelable {
      */
     public String getWebsite() {
         return mWebsite;
-    }
-
-    /**
-     * a URL to the website.
-     * <p/>
-     * Example : "http://facebook.com/myrandomband"
-     *
-     * @param website a URL to the website.
-     */
-    public void setWebsite(String website) {
-        this.mWebsite = website;
     }
 
     /**
@@ -449,31 +300,12 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * a custom title for the mWebsite.
-     * Ewample : "myrandomband on Facebook"
-     *
-     * @param websiteTitle a custom title for the mWebsite.
-     */
-    public void setWebsiteTitle(String websiteTitle) {
-        this.mWebsiteTitle = websiteTitle;
-    }
-
-    /**
      * mOnline status.
      *
      * @return true of user is online.
      */
     public boolean isOnline() {
         return mOnline;
-    }
-
-    /**
-     * mOnline status.
-     *
-     * @param online true of user is online.
-     */
-    public void setOnline(boolean online) {
-        this.mOnline = online;
     }
 
     /**
@@ -486,30 +318,12 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * Number of public tracks.
-     *
-     * @param trackCount Number of public tracks.
-     */
-    public void setTrackCount(int trackCount) {
-        this.mTrackCount = trackCount;
-    }
-
-    /**
      * Number of public playlists.
      *
      * @return Number of public playlists.
      */
     public int getPlaylistCount() {
         return mPlaylistCount;
-    }
-
-    /**
-     * Number of public playlists.
-     *
-     * @param playlistCount Number of public playlists.
-     */
-    public void setPlaylistCount(int playlistCount) {
-        this.mPlaylistCount = playlistCount;
     }
 
     /**
@@ -522,30 +336,12 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
-     * Number of followers.
-     *
-     * @param followersCount Number of followers.
-     */
-    public void setFollowersCount(int followersCount) {
-        this.mFollowersCount = followersCount;
-    }
-
-    /**
      * Number of followed users.
      *
      * @return Number of followed users.
      */
     public int getFollowingsCount() {
         return mFollowingsCount;
-    }
-
-    /**
-     * Number of followed users.
-     *
-     * @param followingsCount Number of followed users.
-     */
-    public void setFollowingsCount(int followingsCount) {
-        this.mFollowingsCount = followingsCount;
     }
 
     /**
@@ -558,11 +354,215 @@ public class SoundCloudUser implements Parcelable {
     }
 
     /**
+     * User id.
+     *
+     * @param id user id.
+     */
+    void setId(int id) {
+        this.mId = id;
+    }
+
+    /**
+     * Permalink of the resource.
+     *
+     * @param permaLink Permalink of the resource.
+     */
+    void setPermaLink(String permaLink) {
+        this.mPermaLink = permaLink;
+    }
+
+    /**
+     * API resource.
+     * <p/>
+     * Example : URL http://api.soundcloud.com/comments/32562
+     *
+     * @param uri API resource.
+     */
+    void setUri(String uri) {
+        this.mUri = uri;
+    }
+
+    /**
+     * Username.
+     *
+     * @param userName Username.
+     */
+    void setUserName(String userName) {
+        this.mUserName = userName;
+    }
+
+    /**
+     * URL to the SoundCloud.com page.
+     * <p/>
+     * Example : "http://soundcloud.com/bryan/sbahn-sounds"
+     *
+     * @param permaLinkUrl URL to the SoundCloud.com page.
+     */
+    void setPermaLinkUrl(String permaLinkUrl) {
+        this.mPermaLinkUrl = permaLinkUrl;
+    }
+
+    /**
+     * URL to a JPEG image.
+     * <p/>
+     * Example : "http://i1.sndcdn.com/avatars-000011353294-n0axp1-large.jpg"
+     *
+     * @param avatarUrl URL to a JPEG image.
+     */
+    void setAvatarUrl(String avatarUrl) {
+        this.mAvatarUrl = avatarUrl;
+    }
+
+    /**
+     * Country.
+     *
+     * @param country country.
+     */
+    void setCountry(String country) {
+        this.mCountry = country;
+    }
+
+    /**
+     * First and last name.
+     * <p/>
+     * Example : "Tom Wilson"
+     *
+     * @param fullName First and last name separate by an empty space.
+     */
+    void setFullName(String fullName) {
+        this.mFullName = fullName;
+    }
+
+    /**
+     * First name.
+     *
+     * @param firstName first name.
+     */
+    void setFirstName(String firstName) {
+        this.mFirstName = firstName;
+    }
+
+    /**
+     * Last name.
+     *
+     * @param lastName last name.
+     */
+    void setLastName(String lastName) {
+        this.mLastName = lastName;
+    }
+
+    /**
+     * City.
+     *
+     * @param city city.
+     */
+    void setCity(String city) {
+        this.mCity = city;
+    }
+
+    /**
+     * Description.
+     * Example : "Buskers playing in the S-Bahn station in Berlin"
+     *
+     * @param description Description.
+     */
+    void setDescription(String description) {
+        this.mDescription = description;
+    }
+
+    /**
+     * Discogs name.
+     * Example : "myrandomband"
+     *
+     * @param discogsName Discogs name.
+     */
+    void setDiscogsName(String discogsName) {
+        this.mDiscogsName = discogsName;
+    }
+
+    /**
+     * MySpace name.
+     * <p/>
+     * Example : "myrandomband"
+     *
+     * @param myspaceName MySpace name.
+     */
+    void setMyspaceName(String myspaceName) {
+        this.mMyspaceName = myspaceName;
+    }
+
+    /**
+     * a URL to the website.
+     * <p/>
+     * Example : "http://facebook.com/myrandomband"
+     *
+     * @param website a URL to the website.
+     */
+    void setWebsite(String website) {
+        this.mWebsite = website;
+    }
+
+    /**
+     * a custom title for the mWebsite.
+     * Ewample : "myrandomband on Facebook"
+     *
+     * @param websiteTitle a custom title for the mWebsite.
+     */
+    void setWebsiteTitle(String websiteTitle) {
+        this.mWebsiteTitle = websiteTitle;
+    }
+
+    /**
+     * mOnline status.
+     *
+     * @param online true of user is online.
+     */
+    void setOnline(boolean online) {
+        this.mOnline = online;
+    }
+
+    /**
+     * Number of public tracks.
+     *
+     * @param trackCount Number of public tracks.
+     */
+    void setTrackCount(int trackCount) {
+        this.mTrackCount = trackCount;
+    }
+
+    /**
+     * Number of public playlists.
+     *
+     * @param playlistCount Number of public playlists.
+     */
+    void setPlaylistCount(int playlistCount) {
+        this.mPlaylistCount = playlistCount;
+    }
+
+    /**
+     * Number of followers.
+     *
+     * @param followersCount Number of followers.
+     */
+    void setFollowersCount(int followersCount) {
+        this.mFollowersCount = followersCount;
+    }
+
+    /**
+     * Number of followed users.
+     *
+     * @param followingsCount Number of followed users.
+     */
+    void setFollowingsCount(int followingsCount) {
+        this.mFollowingsCount = followingsCount;
+    }
+
+    /**
      * number of favorited public tracks
      *
      * @param publicFavoritedCount number of favorited public tracks
      */
-    public void setPublicFavoritedCount(int publicFavoritedCount) {
+    void setPublicFavoritedCount(int publicFavoritedCount) {
         this.mPublicFavoritedCount = publicFavoritedCount;
     }
 
