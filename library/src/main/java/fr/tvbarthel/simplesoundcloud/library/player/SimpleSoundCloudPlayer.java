@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -429,6 +431,22 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
                 super.onSeekTo(milli);
                 for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
                     listener.onPlayerSeekTo(milli);
+                }
+            }
+
+            @Override
+            protected void onBufferingStarted() {
+                super.onBufferingStarted();
+                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                    listener.onBufferingStarted();
+                }
+            }
+
+            @Override
+            protected void onBufferingEnded() {
+                super.onBufferingEnded();
+                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                    listener.onBufferingEnded();
                 }
             }
         };

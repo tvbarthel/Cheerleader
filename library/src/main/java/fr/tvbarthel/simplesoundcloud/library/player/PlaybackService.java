@@ -25,16 +25,16 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper;
 import fr.tvbarthel.simplesoundcloud.library.media.MediaSessionWrapper;
-import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 
 /**
  * Service used as SoundCloudPlayer.
  */
 public class PlaybackService extends Service implements MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener,
-        AudioManager.OnAudioFocusChangeListener {
+        AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnInfoListener {
 
     /**
      * Action used for toggle playback event
@@ -344,6 +344,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         filter.addAction(PlaybackListener.ACTION_ON_PLAYER_PAUSED);
         filter.addAction(PlaybackListener.ACTION_ON_SEEK_COMPLETE);
         filter.addAction(PlaybackListener.ACTION_ON_PLAYER_DESTROYED);
+        filter.addAction(PlaybackListener.ACTION_ON_BUFFERING_STARTED);
+        filter.addAction(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
 
         LocalBroadcastManager.getInstance(context.getApplicationContext())
                 .registerReceiver(listener, filter);
@@ -536,6 +538,25 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         }
     }
 
+    @Override
+    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+        Intent i;
+        switch (what) {
+            case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+                // broadcast event
+                i = new Intent(PlaybackListener.ACTION_ON_BUFFERING_STARTED);
+                mLocalBroadcastManager.sendBroadcast(i);
+                return true;
+            case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+                // broadcast event
+                i = new Intent(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
+                mLocalBroadcastManager.sendBroadcast(i);
+                return true;
+            default:
+                return false;
+        }
+    }
+
 
     /**
      * Pause the playback.
@@ -598,6 +619,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setOnCompletionListener(this);
         mMediaPlayer.setOnSeekCompleteListener(this);
+        mMediaPlayer.setOnInfoListener(this);
     }
 
     /**
@@ -684,7 +706,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             }
         });
     }
-
 
     /**
      * Looper used process player request.

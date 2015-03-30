@@ -31,4 +31,14 @@ public interface SimpleSoundCloudPlayerListener {
      */
     public void onPlayerDestroyed();
 
+    /**
+     * Called when the player paused due to buffering more data.
+     */
+    public void onBufferingStarted();
+
+    /**
+     * Called when the player resumed due after having buffered enough data.
+     */
+    public void onBufferingEnded();
+
 }

@@ -34,6 +34,18 @@ class PlaybackListener extends BroadcastReceiver {
     static final String ACTION_ON_PLAYER_DESTROYED = "simple_sc_listener_action_on_player_destroyed";
 
     /**
+     * package private, action used when the player paused due to buffering.
+     * See also : {@link android.media.MediaPlayer#MEDIA_INFO_BUFFERING_START}
+     */
+    static final String ACTION_ON_BUFFERING_STARTED = "simple_sc_listener_action_on_buffering_start";
+
+    /**
+     * package private, action used when the player resumed due to buffering end.
+     * See also : {@link android.media.MediaPlayer#MEDIA_INFO_BUFFERING_END}
+     */
+    static final String ACTION_ON_BUFFERING_ENDED = "simple_sc_listener_action_on_buffering_end";
+
+    /**
      * package private, extra key for passing a track.
      */
     static final String EXTRA_KEY_TRACK = "simple_sc_listener_extra_track";
@@ -63,6 +75,12 @@ class PlaybackListener extends BroadcastReceiver {
                     break;
                 case ACTION_ON_PLAYER_DESTROYED:
                     onPlayerDestroyed();
+                    break;
+                case ACTION_ON_BUFFERING_STARTED:
+                    onBufferingStarted();
+                    break;
+                case ACTION_ON_BUFFERING_ENDED:
+                    onBufferingEnded();
                     break;
                 default:
                     Log.e(TAG, "unknown action : " + intent.getAction());
@@ -100,6 +118,20 @@ class PlaybackListener extends BroadcastReceiver {
      * Called when the player has been destroyed.
      */
     protected void onPlayerDestroyed() {
+
+    }
+
+    /**
+     * Called when the player paused due to buffering more data.
+     */
+    protected void onBufferingStarted() {
+
+    }
+
+    /**
+     * Called when the player resumed due after having buffered enough data.
+     */
+    protected void onBufferingEnded() {
 
     }
 }
