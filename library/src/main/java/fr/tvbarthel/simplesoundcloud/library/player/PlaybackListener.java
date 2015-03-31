@@ -46,14 +46,19 @@ class PlaybackListener extends BroadcastReceiver {
     static final String ACTION_ON_BUFFERING_ENDED = "simple_sc_listener_action_on_buffering_end";
 
     /**
+     * package private, action used when the progress changed.
+     */
+    static final String ACTION_ON_PROGRESS_CHANGED = "simple_sc_listener_action_on_progress_changed";
+
+    /**
      * package private, extra key for passing a track.
      */
     static final String EXTRA_KEY_TRACK = "simple_sc_listener_extra_track";
 
     /**
-     * package private, extra key for passing seek time
+     * package private, extra key for passing current time in milli
      */
-    static final String EXTRA_KEY_SEEK = "simple_sc_listener_extra_seek";
+    static final String EXTRA_KEY_CURRENT_TIME = "simple_sc_listener_extra_current_time";
 
     /**
      * Log cat.
@@ -71,7 +76,7 @@ class PlaybackListener extends BroadcastReceiver {
                     onPause();
                     break;
                 case ACTION_ON_SEEK_COMPLETE:
-                    onSeekTo(intent.getIntExtra(EXTRA_KEY_SEEK, 0));
+                    onSeekTo(intent.getIntExtra(EXTRA_KEY_CURRENT_TIME, 0));
                     break;
                 case ACTION_ON_PLAYER_DESTROYED:
                     onPlayerDestroyed();
@@ -81,6 +86,9 @@ class PlaybackListener extends BroadcastReceiver {
                     break;
                 case ACTION_ON_BUFFERING_ENDED:
                     onBufferingEnded();
+                    break;
+                case ACTION_ON_PROGRESS_CHANGED:
+                    onProgressChanged(intent.getIntExtra(EXTRA_KEY_CURRENT_TIME, 0));
                     break;
                 default:
                     Log.e(TAG, "unknown action : " + intent.getAction());
@@ -132,6 +140,15 @@ class PlaybackListener extends BroadcastReceiver {
      * Called when the player resumed due after having buffered enough data.
      */
     protected void onBufferingEnded() {
+
+    }
+
+    /**
+     * Called when the current playback position changed.
+     *
+     * @param milli current time in milli.
+     */
+    protected void onProgressChanged(int milli) {
 
     }
 }

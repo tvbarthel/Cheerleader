@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -74,7 +72,6 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      * Used to know if the current client instance has been closed.
      */
     private boolean mIsClosed;
-
 
     /**
      * Private default constructor.
@@ -447,6 +444,14 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
                 super.onBufferingEnded();
                 for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
                     listener.onBufferingEnded();
+                }
+            }
+
+            @Override
+            protected void onProgressChanged(int milli) {
+                super.onProgressChanged(milli);
+                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                    listener.onProgressChanged(milli);
                 }
             }
         };

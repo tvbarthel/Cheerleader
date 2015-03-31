@@ -41,4 +41,11 @@ public interface SimpleSoundCloudPlayerListener {
      */
     public void onBufferingEnded();
 
+    /**
+     * Called when current position time changed.
+     *
+     * @param milli current time in milli seconds.
+     */
+    public void onProgressChanged(int milli);
+
 }

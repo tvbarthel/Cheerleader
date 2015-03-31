@@ -10,6 +10,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -256,6 +257,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      */
     private Handler mMainThreadHandler;
 
+    /**
+     * Progress used to update current track progress.
+     */
+    private CountDownTimer mCountDown;
+
 
     /**
      * Start the playback.
@@ -346,6 +352,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         filter.addAction(PlaybackListener.ACTION_ON_PLAYER_DESTROYED);
         filter.addAction(PlaybackListener.ACTION_ON_BUFFERING_STARTED);
         filter.addAction(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
+        filter.addAction(PlaybackListener.ACTION_ON_PROGRESS_CHANGED);
 
         LocalBroadcastManager.getInstance(context.getApplicationContext())
                 .registerReceiver(listener, filter);
@@ -409,6 +416,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     @Override
     public void onDestroy() {
 
+        stopTimer();
         mAudioManager.abandonAudioFocus(this);
         mMediaSession.onDestroy();
 
@@ -505,8 +513,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     public void onSeekComplete(MediaPlayer mp) {
         // broadcast event
         Intent intent = new Intent(PlaybackListener.ACTION_ON_SEEK_COMPLETE);
-        intent.putExtra(PlaybackListener.EXTRA_KEY_SEEK, mp.getCurrentPosition());
+        intent.putExtra(PlaybackListener.EXTRA_KEY_CURRENT_TIME, mp.getCurrentPosition());
         mLocalBroadcastManager.sendBroadcast(intent);
+        if (!mIsPaused) {
+            resumeTimer();
+        }
     }
 
     @Override
@@ -573,6 +584,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             updateNotification();
 
             mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PAUSED);
+            pauseTimer();
         }
     }
 
@@ -591,6 +603,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
             updateNotification();
             mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
+            resumeTimer();
         }
     }
 
@@ -631,6 +644,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      * @param track track url.
      */
     private void playTrack(SoundCloudTrack track) {
+        pauseTimer();
         try {
             // acquire lock on wifi.
             mWifiLock.acquire();
@@ -664,6 +678,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             mMediaPlayer.prepare();
             // start the playback.
             mMediaPlayer.start();
+            startTimer(mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
 
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
@@ -705,6 +720,66 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
                         .into(mArtworkTarget);
             }
         });
+    }
+
+    /**
+     * Start internal timer used to propagate the playback position.
+     *
+     * @param duration duration for which the timer should be started.
+     */
+    private void startTimer(long duration) {
+        if (mCountDown != null) {
+            mCountDown.cancel();
+            mCountDown = null;
+        }
+
+        // refresh progress every seconds.
+        mCountDown = new CountDownTimer(duration, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Intent i = new Intent(PlaybackListener.ACTION_ON_PROGRESS_CHANGED);
+                i.putExtra(PlaybackListener.EXTRA_KEY_CURRENT_TIME, mMediaPlayer.getCurrentPosition());
+                mLocalBroadcastManager.sendBroadcast(i);
+            }
+
+            @Override
+            public void onFinish() {
+                Intent i = new Intent(PlaybackListener.ACTION_ON_PROGRESS_CHANGED);
+                i.putExtra(PlaybackListener.EXTRA_KEY_CURRENT_TIME
+                        , mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
+                mLocalBroadcastManager.sendBroadcast(i);
+            }
+        };
+        mCountDown.start();
+    }
+
+    /**
+     * Pause the internal timer used to propagate the playback position.
+     */
+    private void pauseTimer() {
+        if (mCountDown != null) {
+            mCountDown.cancel();
+            mCountDown = null;
+        }
+    }
+
+    /**
+     * Resume the internal timer used to propagate the playback position.
+     */
+    private void resumeTimer() {
+        // restart timer for the remaining time amount.
+        startTimer(mPlayerPlaylist.getCurrentTrack().getDurationInMilli()
+                - mMediaPlayer.getCurrentPosition());
+    }
+
+    /**
+     * Pause the internal timer used to propagate the playback position.
+     */
+    private void stopTimer() {
+        if (mCountDown != null) {
+            mCountDown.cancel();
+            mCountDown = null;
+        }
     }
 
     /**
