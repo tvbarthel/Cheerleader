@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.tvbarthel.simplesoundcloud.library.R;
-import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudPlaylist;
 import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 import rx.functions.Action1;
 
@@ -328,13 +327,24 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
 
 
     /**
-     * Retrieve the current playlist.
+     * Retrieve the current tracks added to the playlist.
      *
-     * @return current playlist.
+     * @return current tracks loaded into the player.
      */
-    public SoundCloudPlaylist getPlaylist() {
+    public ArrayList<SoundCloudTrack> getTracks() {
         checkState();
-        return mPlayerPlaylist.getPlaylist();
+        // copy the playlist to avoid reordering, addition, deletion directly on the list.
+        return new ArrayList<>(mPlayerPlaylist.getPlaylist().getTracks());
+    }
+
+    /**
+     * Retrieve the current played track.
+     *
+     * @return current track.
+     */
+    public SoundCloudTrack getCurrentTrack() {
+        checkState();
+        return mPlayerPlaylist.getCurrentTrack();
     }
 
     /**
