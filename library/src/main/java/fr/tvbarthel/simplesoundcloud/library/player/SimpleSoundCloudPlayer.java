@@ -3,6 +3,7 @@ package fr.tvbarthel.simplesoundcloud.library.player;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBarActivity;
 
 import java.lang.ref.WeakReference;
@@ -520,13 +521,28 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
          * Api key with which SoundCloud call will be performed.
          *
          * @param apiKey sound cloud api key.
-         * @return {@link fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer.Builder}
+         * @return {@link SimpleSoundCloudPlayer.Builder}
          */
         public Builder with(String apiKey) {
             if (apiKey == null) {
                 throw new IllegalArgumentException("SoundCloud api can't be null");
             }
             this.apiKey = apiKey;
+            return this;
+        }
+
+        /**
+         * Api key with which SoundCloud call will be performed.
+         *
+         * @param resId res id of sound cloud api key.
+         * @return {@link SimpleSoundCloudPlayer.Builder}
+         */
+        public Builder with(@StringRes int resId) {
+            if (context == null) {
+                throw new IllegalStateException("Context should be set first.");
+            }
+
+            this.apiKey = context.getString(resId);
             return this;
         }
 

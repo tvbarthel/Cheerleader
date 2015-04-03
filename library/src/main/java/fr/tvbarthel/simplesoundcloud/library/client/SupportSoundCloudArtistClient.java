@@ -1,6 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.library.client;
 
 import android.content.Context;
+import android.support.annotation.StringRes;
 import android.util.SparseArray;
 
 import java.io.Closeable;
@@ -393,6 +394,21 @@ public final class SupportSoundCloudArtistClient implements Closeable {
                 throw new IllegalArgumentException("SoundCloud api can't be null");
             }
             this.apiKey = apiKey;
+            return this;
+        }
+
+        /**
+         * Api key with which SoundCloud call will be performed.
+         *
+         * @param resId res id of sound cloud api key.
+         * @return {@link SupportSoundCloudArtistClient.Builder}
+         */
+        public Builder with(@StringRes int resId) {
+            if (context == null) {
+                throw new IllegalStateException("Context should be set first.");
+            }
+
+            this.apiKey = context.getString(resId);
             return this;
         }
 
