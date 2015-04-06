@@ -5,4 +5,14 @@
     <string name="id">id : %1$d</string>
     <string name="action_settings">Settings</string>
 
+    <!-- search view !-->
+    <string name="search_view">SoundCloud user name</string>
+
+    <!-- search result !-->
+    <string name="search_results_not_found">No tracks found :(</string>
+
+    <!-- activity pick !-->
+    <string name="activity_pick_search_hint">Artist name</string>
+    <string name="activity_pick_search">Search</string>
+
 </resources>

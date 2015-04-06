@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="grey">#606060</color>
+    <color name="grey_dark">#494949</color>
+    <color name="red">#a30000</color>
+
     <color name="notification_title">#202020</color>
     <color name="notification_subtitle">#737373</color>
+    <color name="grey_color">#ededed</color>
+    <color name="dark_grey">#ff212121</color>
+    <color name="black_translucent">#aa000000</color>
+
+    <!-- theme !-->
+    <color name="primary">@color/grey</color>
+    <color name="primary_dark">@color/grey_dark</color>
+    <color name="accent">@color/red</color>
+    <color name="windowBackground">@color/grey_dark</color>
 </resources>

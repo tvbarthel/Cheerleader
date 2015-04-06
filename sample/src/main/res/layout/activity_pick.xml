@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/AppTheme.MainContainer">
+
+    <include
+        android:id="@+id/activity_pick_toolbar"
+        layout="@layout/toolbar_action_bar" />
+
+    <ImageView
+        android:id="@+id/activity_pick_hearth_1"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_above="@+id/activity_pick_search_card"
+        android:layout_marginLeft="25dp"
+        android:layout_alignLeft="@+id/activity_pick_search_card"
+        android:layout_marginBottom="8dp"
+        android:rotation="25"
+        android:src="@drawable/ic_hearth" />
+
+    <ImageView
+        android:id="@+id/activity_pick_hearth_2"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_above="@+id/activity_pick_hearth_1"
+        android:layout_alignLeft="@+id/activity_pick_hearth_1"
+        android:layout_marginLeft="-25dp"
+        android:rotation="-25"
+        android:src="@drawable/ic_hearth" />
+
+    <ImageView
+        android:id="@+id/activity_pick_hearth_3"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_above="@+id/activity_pick_hearth_2"
+        android:layout_marginLeft="35dp"
+        android:layout_alignLeft="@+id/activity_pick_hearth_2"
+        android:rotation="25"
+        android:src="@drawable/ic_hearth" />
+
+    <!-- A CardView that contains a TextView -->
+    <android.support.v7.widget.CardView
+        android:id="@+id/activity_pick_search_card"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin"
+        card_view:cardCornerRadius="4dp">
+
+        <TextView
+            android:id="@+id/activity_pick_extra_hint"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="@string/activity_pick_search_hint"
+            android:textColor="@color/grey"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_vertical_margin"
+            android:paddingRight="@dimen/activity_vertical_margin" />
+
+        <fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText
+            android:id="@+id/activity_pick_artist_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionSearch"
+            android:inputType="textPersonName"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="50dp"
+            android:textColorHint="@color/grey"
+            android:textColor="@color/grey"
+            android:layout_below="@+id/activity_pick_extra_hint"
+            android:hint="@string/activity_pick_search_hint"
+            android:padding="@dimen/activity_vertical_margin" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="@string/activity_pick_search"
+            android:layout_gravity="bottom|end"
+            android:padding="@dimen/activity_vertical_margin"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:textColor="@color/accent" />
+    </android.support.v7.widget.CardView>
+
+
+    <View
+        android:id="@+id/toolbar_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_size"
+        android:layout_below="@id/activity_pick_toolbar"
+        android:background="@drawable/shadow_bottom" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_sound_cloud"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
+
+</RelativeLayout>
