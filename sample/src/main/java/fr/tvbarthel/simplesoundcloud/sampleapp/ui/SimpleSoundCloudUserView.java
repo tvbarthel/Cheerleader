@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import fr.tvbarthel.simplesoundcloud.library.models.SoundCloudUser;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.sampleapp.R;
 
 /**
@@ -20,7 +20,7 @@ public class SimpleSoundCloudUserView extends LinearLayout {
     private LayoutParams mLayoutParams;
 
     /**
-     * {@link fr.tvbarthel.simplesoundcloud.library.SimpleSoundCloud} which act as model for this view.
+     * {@link fr.tvbarthel.simplesoundcloud.library.client.SupportSoundCloudArtistClient} which act as model for this view.
      */
     private SoundCloudUser mSoundCloudUser;
 

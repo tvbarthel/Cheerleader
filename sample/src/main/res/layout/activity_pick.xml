@@ -76,6 +76,7 @@
             android:padding="@dimen/activity_vertical_margin" />
 
         <TextView
+            android:id="@+id/activity_pick_search_btn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:text="@string/activity_pick_search"

@@ -4,4 +4,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="shadow_size">10dp</dimen>
+
+    <!-- playback view !-->
+    <dimen name="playback_view_height">70dp</dimen>
+
 </resources>

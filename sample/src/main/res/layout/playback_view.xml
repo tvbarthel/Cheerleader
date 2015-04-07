@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/playback_view_height">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/shadow_top" />
+
+    <ImageView
+        android:id="@+id/playback_view_artwork"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/black_translucent"
+        android:scaleType="centerCrop"
+        android:layout_gravity="start" />
+
+    <TextView
+        android:id="@+id/playback_view_track"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:padding="@dimen/activity_vertical_margin"
+        android:textSize="16sp"
+        android:layout_marginTop="5dp"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:gravity="center_vertical"
+        android:textColor="@android:color/white"
+        android:layout_marginRight="144dp"
+        android:background="@color/black_translucent"
+        tools:text="Story writing" />
+
+    <ImageView
+        android:id="@+id/playback_view_previous"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/ic_previous_white"
+        android:layout_marginRight="96dp"
+        android:scaleType="centerCrop"
+        android:background="@color/black_translucent"
+        android:layout_gravity="end" />
+
+    <ImageView
+        android:id="@+id/playback_view_toggle_play"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:src="@drawable/ic_play_white"
+        android:layout_marginRight="48dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/black_translucent"
+        android:scaleType="centerCrop"
+        android:layout_gravity="end" />
+
+    <ImageView
+        android:id="@+id/playback_view_next"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/ic_next_white"
+        android:scaleType="centerCrop"
+        android:background="@color/black_translucent"
+        android:layout_gravity="end" />
+
+</FrameLayout>

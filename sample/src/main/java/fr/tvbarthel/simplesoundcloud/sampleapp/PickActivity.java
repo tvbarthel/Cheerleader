@@ -18,7 +18,8 @@ import fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText;
 /**
  * Simple activity used to pick an artist in order to load it into the sample activity.
  */
-public class PickActivity extends ActionBarActivity implements TextView.OnEditorActionListener {
+public class PickActivity extends ActionBarActivity implements
+    TextView.OnEditorActionListener, View.OnClickListener {
 
     private ExtraHintEditText mArtistName;
     private Animation mWiggle;
@@ -38,6 +39,7 @@ public class PickActivity extends ActionBarActivity implements TextView.OnEditor
 
         mWiggle = AnimationUtils.loadAnimation(this, R.anim.wiggle);
 
+        findViewById(R.id.activity_pick_search_btn).setOnClickListener(this);
     }
 
     @Override
@@ -46,7 +48,7 @@ public class PickActivity extends ActionBarActivity implements TextView.OnEditor
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
             if (checkField(mArtistName)) {
                 handle = true;
-                Log.d("LARGONNE", "load sample for artist : " + mArtistName.getText().toString());
+                ArtistActivity.startActivity(this, mArtistName.getText().toString());
             }
         }
         return handle;
@@ -66,5 +68,18 @@ public class PickActivity extends ActionBarActivity implements TextView.OnEditor
             valid = false;
         }
         return valid;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.activity_pick_search_btn:
+                if (checkField(mArtistName)) {
+                    ArtistActivity.startActivity(this, mArtistName.getText().toString());
+                }
+                break;
+            default:
+                throw new IllegalStateException("Click not handled on " + v);
+        }
     }
 }
