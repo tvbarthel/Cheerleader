@@ -136,8 +136,6 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
     @Override
     public void onPlayerDestroyed() {
         mPlayPause.setImageResource(R.drawable.ic_play_white);
-        mArtwork.setImageDrawable(null);
-        mTitle.setText("");
     }
 
     @Override
