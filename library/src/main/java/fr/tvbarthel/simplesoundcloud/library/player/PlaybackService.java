@@ -746,7 +746,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             public void onFinish() {
                 Intent i = new Intent(PlaybackListener.ACTION_ON_PROGRESS_CHANGED);
                 i.putExtra(PlaybackListener.EXTRA_KEY_CURRENT_TIME
-                        , mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
+                        , (int) mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
                 mLocalBroadcastManager.sendBroadcast(i);
             }
         };

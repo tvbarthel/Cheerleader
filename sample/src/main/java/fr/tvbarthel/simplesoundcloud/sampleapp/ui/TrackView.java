@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper;
 import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper;
 import fr.tvbarthel.simplesoundcloud.sampleapp.R;
 
 /**
@@ -71,8 +71,8 @@ public class TrackView extends FrameLayout {
         mModel = track;
         if (mModel != null) {
             Picasso.with(getContext())
-                    .load(SoundCloudArtworkHelper.getArtworkUrl(mModel, SoundCloudArtworkHelper.LARGE))
-                    .into(mArtwork);
+                .load(SoundCloudArtworkHelper.getArtworkUrl(mModel, SoundCloudArtworkHelper.LARGE))
+                .into(mArtwork);
             mTitle.setText(mModel.getArtist() + " - " + mModel.getTitle());
         }
     }
@@ -83,6 +83,6 @@ public class TrackView extends FrameLayout {
         mArtwork = ((ImageView) findViewById(R.id.track_view_artwork));
         mTitle = ((TextView) findViewById(R.id.track_view_title));
 
-        setBackgroundColor(getResources().getColor(R.color.grey_color));
+        setBackgroundResource(R.drawable.selectable_background_white);
     }
 }
