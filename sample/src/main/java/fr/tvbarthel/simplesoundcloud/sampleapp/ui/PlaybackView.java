@@ -1,6 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.sampleapp.ui;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -183,6 +184,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
         mPlayPause.setOnClickListener(this);
 
         mArtwork = ((ImageView) findViewById(R.id.playback_view_artwork));
+        mArtwork.setColorFilter(getResources().getColor(R.color.black_translucent), PorterDuff.Mode.SRC_ATOP);
         mTitle = ((TextView) findViewById(R.id.playback_view_track));
     }
 

@@ -15,7 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_marginTop="5dp"
-        android:background="@color/black_translucent"
         android:scaleType="centerCrop"
         android:layout_gravity="start" />
 
@@ -31,7 +30,6 @@
         android:gravity="center_vertical"
         android:textColor="@android:color/white"
         android:layout_marginRight="144dp"
-        android:background="@color/black_translucent"
         tools:text="Story writing" />
 
     <ImageView
@@ -42,8 +40,8 @@
         android:src="@drawable/ic_previous_white"
         android:layout_marginRight="96dp"
         android:scaleType="centerCrop"
-        android:background="@color/black_translucent"
-        android:layout_gravity="end" />
+        android:layout_gravity="end"
+        android:background="?attr/selectableItemBackground" />
 
     <ImageView
         android:id="@+id/playback_view_toggle_play"
@@ -52,9 +50,9 @@
         android:src="@drawable/ic_play_white"
         android:layout_marginRight="48dp"
         android:layout_marginTop="5dp"
-        android:background="@color/black_translucent"
         android:scaleType="centerCrop"
-        android:layout_gravity="end" />
+        android:layout_gravity="end"
+        android:background="?attr/selectableItemBackground" />
 
     <ImageView
         android:id="@+id/playback_view_next"
@@ -63,7 +61,7 @@
         android:layout_marginTop="5dp"
         android:src="@drawable/ic_next_white"
         android:scaleType="centerCrop"
-        android:background="@color/black_translucent"
-        android:layout_gravity="end" />
+        android:layout_gravity="end"
+        android:background="?attr/selectableItemBackground" />
 
 </FrameLayout>
