@@ -30,6 +30,7 @@
         android:id="@+id/activity_artist_playlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:overScrollMode="never"
         android:divider="@null"/>
 
 </FrameLayout>
