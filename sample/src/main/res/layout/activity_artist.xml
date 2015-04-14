@@ -2,12 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    style="@style/AppTheme.MainContainer">
 
     <ListView
         android:id="@+id/activity_artist_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize" />
 
     <ProgressBar
         android:id="@+id/activity_artist_progress"
@@ -31,6 +33,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="never"
-        android:divider="@null"/>
+        android:divider="@null" />
+
+
+    <include
+        android:id="@+id/activity_artist_toolbar"
+        layout="@layout/toolbar_action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="top" />
+
+    <View
+        android:id="@+id/activity_artist_toolbar_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_size"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@drawable/shadow_bottom" />
 
 </FrameLayout>
