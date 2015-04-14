@@ -74,6 +74,12 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     private boolean mIsClosed;
 
     /**
+     * Used to know if the player destroy should be delayed. Is delayed, destroy will be done
+     * once the {@link PlaybackService} stop self.
+     */
+    private boolean mDestroyDelayed;
+
+    /**
      * Private default constructor.
      */
     private SimpleSoundCloudPlayer() {
@@ -91,6 +97,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
 
         mClientKey = clientId;
         mIsClosed = false;
+        mDestroyDelayed = false;
         mState = STATE_STOPPED;
         mSimpleSoundCloudPlayerListeners = new ArrayList<>();
         mSimpleSoundCloudPlaylistListeners = new ArrayList<>();
@@ -119,6 +126,8 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         } else {
             sInstance.mClientKey = clientId;
         }
+        // reset destroy request each time an instance is requested.
+        sInstance.mDestroyDelayed = false;
         return sInstance;
     }
 
@@ -132,6 +141,10 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      */
     public void destroy() {
         if (mIsClosed) {
+            return;
+        }
+        if (mState != STATE_STOPPED) {
+            mDestroyDelayed = true;
             return;
         }
         mIsClosed = true;
@@ -432,6 +445,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
                 mState = STATE_STOPPED;
                 for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
                     listener.onPlayerDestroyed();
+                }
+                if (mDestroyDelayed) {
+                    SimpleSoundCloudPlayer.this.destroy();
                 }
             }
 
