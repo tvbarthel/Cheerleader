@@ -177,6 +177,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         ArrayList<SoundCloudTrack> tracks = mPlayerPlaylist.getPlaylist().getTracks();
         if (position >= 0 && position < tracks.size()) {
             SoundCloudTrack trackToPlay = tracks.get(position);
+            mPlayerPlaylist.setPlayingTrack(position);
             PlaybackService.play(getContext(), mClientKey, trackToPlay);
         }
 

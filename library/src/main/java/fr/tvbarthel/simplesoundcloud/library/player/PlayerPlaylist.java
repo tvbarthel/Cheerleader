@@ -179,4 +179,18 @@ final class PlayerPlaylist {
     public boolean isEmpty() {
         return mSoundCloudPlaylist.getTracks().size() == 0;
     }
+
+
+    /**
+     * Allow to set the current playing song index.
+     * private package.
+     *
+     * @param playingTrackPosition current playing song index.
+     */
+    void setPlayingTrack(int playingTrackPosition) {
+        if (playingTrackPosition < 0 || playingTrackPosition >= mSoundCloudPlaylist.getTracks().size()) {
+            throw new IllegalArgumentException("No tracks a the position " + playingTrackPosition);
+        }
+        mCurrentTrackIndex = playingTrackPosition;
+    }
 }
