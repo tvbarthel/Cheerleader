@@ -109,6 +109,7 @@ public class ArtistActivity extends ActionBarActivity implements
             mTracks.addAll(currentsTracks);
         }
         mPlaybackView.setTrack(mSimpleSoundCloudPlayer.getCurrentTrack());
+        mPlaybackView.setPlaying(mSimpleSoundCloudPlayer.isPlaying());
 
         getArtistTracks();
     }

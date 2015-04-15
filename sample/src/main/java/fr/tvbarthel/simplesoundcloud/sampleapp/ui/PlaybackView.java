@@ -14,6 +14,7 @@ import com.squareup.picasso.Picasso;
 
 import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.helpers.SoundCloudArtworkHelper;
+import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayerListener;
 import fr.tvbarthel.simplesoundcloud.sampleapp.R;
 
@@ -173,6 +174,22 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
             if (getTranslationY() != 0) {
                 this.animate().translationY(0);
             }
+        }
+    }
+
+    /**
+     * Used to update the play/pause button.
+     * <p/>
+     * Should be synchronize with the player playing state.
+     * See also : {@link SimpleSoundCloudPlayer#isPlaying()}.
+     *
+     * @param isPlaying true if a track is currently played.
+     */
+    public void setPlaying(boolean isPlaying) {
+        if (isPlaying) {
+            mPlayPause.setImageResource(R.drawable.ic_pause_white);
+        } else {
+            mPlayPause.setImageResource(R.drawable.ic_play_white);
         }
     }
 
