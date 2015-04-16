@@ -108,8 +108,9 @@ public class ArtistActivity extends ActionBarActivity implements
         if (currentsTracks != null) {
             mTracks.addAll(currentsTracks);
         }
-        mPlaybackView.setTrack(mSimpleSoundCloudPlayer.getCurrentTrack());
-        mPlaybackView.setPlaying(mSimpleSoundCloudPlayer.isPlaying());
+
+        // synchronize the player view with the current player (loaded track, playing state, etc.)
+        mPlaybackView.synchronize(mSimpleSoundCloudPlayer);
 
         getArtistTracks();
     }

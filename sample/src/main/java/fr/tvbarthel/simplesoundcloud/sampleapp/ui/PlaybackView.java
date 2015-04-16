@@ -156,11 +156,23 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
     }
 
     /**
+     * Synchronize the player view with the current player state.
+     * <p/>
+     * Basically, check if a track is loaded as well as the playing state.
+     *
+     * @param player player currently used.
+     */
+    public void synchronize(SimpleSoundCloudPlayer player) {
+        setTrack(player.getCurrentTrack());
+        setPlaying(player.isPlaying());
+    }
+
+    /**
      * Set the current played track.
      *
      * @param track track which is played.
      */
-    public void setTrack(SoundCloudTrack track) {
+    private void setTrack(SoundCloudTrack track) {
         if (track == null) {
             mTitle.setText("");
             mArtwork.setImageDrawable(null);
@@ -185,7 +197,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
      *
      * @param isPlaying true if a track is currently played.
      */
-    public void setPlaying(boolean isPlaying) {
+    private void setPlaying(boolean isPlaying) {
         if (isPlaying) {
             mPlayPause.setImageResource(R.drawable.ic_pause_white);
         } else {
