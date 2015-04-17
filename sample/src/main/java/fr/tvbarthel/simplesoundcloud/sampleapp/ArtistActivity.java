@@ -119,6 +119,7 @@ public class ArtistActivity extends ActionBarActivity implements
     protected void onResume() {
         super.onResume();
         mSimpleSoundCloudPlayer.registerPlayerListener(mPlaybackView);
+        mSimpleSoundCloudPlayer.registerPlayerListener(mPlaylistAdapter);
         mSimpleSoundCloudPlayer.registerPlaylistListener(this);
     }
 
@@ -126,6 +127,7 @@ public class ArtistActivity extends ActionBarActivity implements
     protected void onPause() {
         super.onPause();
         mSimpleSoundCloudPlayer.unregisterPlayerListener(mPlaybackView);
+        mSimpleSoundCloudPlayer.unregisterPlayerListener(mPlaylistAdapter);
         mSimpleSoundCloudPlayer.unregisterPlaylistListener(this);
     }
 
