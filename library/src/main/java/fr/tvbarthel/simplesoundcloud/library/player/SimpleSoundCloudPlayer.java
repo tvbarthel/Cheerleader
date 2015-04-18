@@ -370,6 +370,11 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     public void registerPlayerListener(SimpleSoundCloudPlayerListener listener) {
         checkState();
         mSimpleSoundCloudPlayerListeners.add(listener);
+        if (mState == STATE_PLAYING) {
+            listener.onPlayerPlay(mPlayerPlaylist.getCurrentTrack());
+        } else if (mState == STATE_PAUSED) {
+            listener.onPlayerPause();
+        }
     }
 
     /**
