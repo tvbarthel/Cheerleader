@@ -21,9 +21,9 @@ public class TracksAdapter extends ArrayAdapter<SoundCloudTrack> implements Simp
 
 
     /**
-     * Current played track used to display an indicator.
+     * Current played track playlist position used to display an indicator.
      */
-    private SoundCloudTrack mPlayedTrack;
+    private int mPlayedTrackPosition;
 
     /**
      * Simple adapter used to display tracks in a list.
@@ -33,6 +33,7 @@ public class TracksAdapter extends ArrayAdapter<SoundCloudTrack> implements Simp
      */
     public TracksAdapter(Context context, List<SoundCloudTrack> tracks) {
         super(context, R.layout.track_view, tracks);
+        mPlayedTrackPosition = -1;
     }
 
     @Override
@@ -50,7 +51,7 @@ public class TracksAdapter extends ArrayAdapter<SoundCloudTrack> implements Simp
         Holder viewHolder = ((Holder) convertView.getTag());
         viewHolder.mTrackView.setModel(track);
 
-        if (track.equals(mPlayedTrack)) {
+        if (position == mPlayedTrackPosition) {
             viewHolder.mTrackView.setBackgroundResource(R.drawable.selectable_background_grey);
         } else {
             viewHolder.mTrackView.setBackgroundResource(R.drawable.selectable_background_white);
@@ -65,8 +66,8 @@ public class TracksAdapter extends ArrayAdapter<SoundCloudTrack> implements Simp
     ////////////////////////////////////////////////////////////
 
     @Override
-    public void onPlayerPlay(SoundCloudTrack track) {
-        mPlayedTrack = track;
+    public void onPlayerPlay(SoundCloudTrack track, int position) {
+        mPlayedTrackPosition = position;
         notifyDataSetChanged();
     }
 

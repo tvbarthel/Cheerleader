@@ -121,7 +121,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
     }
 
     @Override
-    public void onPlayerPlay(SoundCloudTrack track) {
+    public void onPlayerPlay(SoundCloudTrack track, int position) {
         setTrack(track);
     }
 

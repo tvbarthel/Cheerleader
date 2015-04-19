@@ -371,7 +371,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         checkState();
         mSimpleSoundCloudPlayerListeners.add(listener);
         if (mState == STATE_PLAYING) {
-            listener.onPlayerPlay(mPlayerPlaylist.getCurrentTrack());
+            listener.onPlayerPlay(mPlayerPlaylist.getCurrentTrack(), mPlayerPlaylist.getCurrentTrackIndex());
         } else if (mState == STATE_PAUSED) {
             listener.onPlayerPause();
         }
@@ -431,7 +431,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
                 super.onPlay(track);
                 mState = STATE_PLAYING;
                 for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
-                    listener.onPlayerPlay(track);
+                    listener.onPlayerPlay(track, mPlayerPlaylist.getCurrentTrackIndex());
                 }
             }
 

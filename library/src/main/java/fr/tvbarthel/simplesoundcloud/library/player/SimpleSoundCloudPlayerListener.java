@@ -10,42 +10,43 @@ public interface SimpleSoundCloudPlayerListener {
     /**
      * Called when a track starts to be played.
      *
-     * @param track played track.
+     * @param track    played track.
+     * @param position position of the played track in the playlist.
      */
-    public void onPlayerPlay(SoundCloudTrack track);
+    void onPlayerPlay(SoundCloudTrack track, int position);
 
     /**
      * Called when a the player has been paused.
      */
-    public void onPlayerPause();
+    void onPlayerPause();
 
     /**
      * Called when the player complete a seek action.
      *
      * @param milli time in milli of the seek.
      */
-    public void onPlayerSeekTo(int milli);
+    void onPlayerSeekTo(int milli);
 
     /**
      * Called when the player has been destroyed.
      */
-    public void onPlayerDestroyed();
+    void onPlayerDestroyed();
 
     /**
      * Called when the player paused due to buffering more data.
      */
-    public void onBufferingStarted();
+    void onBufferingStarted();
 
     /**
      * Called when the player resumed due after having buffered enough data.
      */
-    public void onBufferingEnded();
+    void onBufferingEnded();
 
     /**
      * Called when current position time changed.
      *
      * @param milli current time in milli seconds.
      */
-    public void onProgressChanged(int milli);
+    void onProgressChanged(int milli);
 
 }
