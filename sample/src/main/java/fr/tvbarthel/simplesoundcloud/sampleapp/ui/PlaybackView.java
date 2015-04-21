@@ -179,7 +179,10 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
             mPlayPause.setImageResource(R.drawable.ic_play_white);
         } else {
             Picasso.with(getContext())
-                .load(SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.LARGE))
+                .load(SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XLARGE))
+                .fit()
+                .centerCrop()
+                .placeholder(R.color.grey)
                 .into(mArtwork);
             mTitle.setText(track.getArtist() + " - " + track.getTitle());
             mPlayPause.setImageResource(R.drawable.ic_pause_white);
@@ -211,6 +214,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
         findViewById(R.id.playback_view_previous).setOnClickListener(this);
         mPlayPause = ((ImageView) findViewById(R.id.playback_view_toggle_play));
         mPlayPause.setOnClickListener(this);
+
 
         mArtwork = ((ImageView) findViewById(R.id.playback_view_artwork));
         mArtwork.setColorFilter(getResources().getColor(R.color.black_translucent), PorterDuff.Mode.SRC_ATOP);

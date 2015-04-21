@@ -20,6 +20,8 @@ public class TrackView extends FrameLayout {
 
     private ImageView mArtwork;
     private TextView mTitle;
+    private TextView mArtist;
+    private TextView mDuration;
 
     private SoundCloudTrack mModel;
 
@@ -71,9 +73,15 @@ public class TrackView extends FrameLayout {
         mModel = track;
         if (mModel != null) {
             Picasso.with(getContext())
-                .load(SoundCloudArtworkHelper.getArtworkUrl(mModel, SoundCloudArtworkHelper.LARGE))
+                .load(SoundCloudArtworkHelper.getArtworkUrl(mModel, SoundCloudArtworkHelper.XLARGE))
+                .fit()
+                .centerCrop()
                 .into(mArtwork);
-            mTitle.setText(mModel.getArtist() + " - " + mModel.getTitle());
+            mArtist.setText(mModel.getArtist());
+            mTitle.setText(mModel.getTitle());
+            long min = mModel.getDurationInMilli() / 60000;
+            long sec = (mModel.getDurationInMilli() % 60000) / 1000;
+            mDuration.setText(String.format(getResources().getString(R.string.duration), min, sec));
         }
     }
 
@@ -82,7 +90,11 @@ public class TrackView extends FrameLayout {
 
         mArtwork = ((ImageView) findViewById(R.id.track_view_artwork));
         mTitle = ((TextView) findViewById(R.id.track_view_title));
+        mArtist = ((TextView) findViewById(R.id.track_view_artist));
+        mDuration = ((TextView) findViewById(R.id.track_view_duration));
 
         setBackgroundResource(R.drawable.selectable_background_white);
+        int padding = getResources().getDimensionPixelOffset(R.dimen.default_padding);
+        setPadding(padding, padding, padding, padding);
     }
 }

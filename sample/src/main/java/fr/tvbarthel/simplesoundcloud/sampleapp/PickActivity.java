@@ -29,9 +29,6 @@ public class PickActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pick);
 
-        Toolbar toolbar = ((Toolbar) findViewById(R.id.activity_pick_toolbar));
-        setSupportActionBar(toolbar);
-
         mArtistName = ((ExtraHintEditText) findViewById(R.id.activity_pick_artist_edit));
         View extraHintView = findViewById(R.id.activity_pick_extra_hint);
         mArtistName.setExtraHintView(extraHintView);

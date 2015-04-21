@@ -65,9 +65,6 @@ public class ArtistActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist);
 
-        Toolbar toolbar = ((Toolbar) findViewById(R.id.activity_artist_toolbar));
-        setSupportActionBar(toolbar);
-
         String artistName = getExtraArtistName();
 
         mSupportSoundCloudArtistClient = new SupportSoundCloudArtistClient.Builder()
@@ -80,6 +77,7 @@ public class ArtistActivity extends ActionBarActivity implements
             .from(this)
             .with(R.string.sound_cloud_client_id)
             .notificationActivity(this)
+            .notificationIcon(R.drawable.ic_notification)
             .build();
 
 

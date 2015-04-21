@@ -26,7 +26,7 @@
         android:textSize="16sp"
         android:layout_marginTop="5dp"
         android:singleLine="true"
-        android:ellipsize="marquee"
+        android:ellipsize="end"
         android:gravity="center_vertical"
         android:textColor="@android:color/white"
         android:layout_marginRight="144dp"

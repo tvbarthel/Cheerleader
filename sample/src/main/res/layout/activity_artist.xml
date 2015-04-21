@@ -9,7 +9,9 @@
         android:id="@+id/activity_artist_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize" />
+        android:layout_marginTop="?attr/actionBarSize"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/playback_view_height" />
 
     <ProgressBar
         android:id="@+id/activity_artist_progress"
@@ -33,6 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="never"
+        android:scrollbars="none"
         android:divider="@null" />
 
 

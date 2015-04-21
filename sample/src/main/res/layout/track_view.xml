@@ -1,24 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/track_view_artwork"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_gravity="start|top"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        app:border_width="2dp"
+        app:border_color="#FFFFFFFF" />
+
+    <TextView
+        android:id="@+id/track_view_artist"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:gravity="bottom"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="64dp"
+        tools:text="IvanB" />
 
     <TextView
         android:id="@+id/track_view_title"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="32dp"
         android:singleLine="true"
         android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:layout_marginLeft="64dp" />
+        android:fontFamily="sans-serif-light"
+        android:gravity="top"
+        android:layout_marginTop="32dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="64dp"
+        tools:text="Start Again (prod. Tido Vegas)" />
+
+    <TextView
+        android:id="@+id/track_view_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:fontFamily="sans-serif-light"
+        android:ellipsize="end"
+        android:layout_gravity="end|top"
+        android:gravity="end"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        tools:text="3:20" />
 
 </merge>
