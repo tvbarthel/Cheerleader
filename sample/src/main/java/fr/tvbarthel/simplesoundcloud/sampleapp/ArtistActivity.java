@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
@@ -15,11 +14,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
+import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.client.SupportSoundCloudArtistClient;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlaylistListener;
 import fr.tvbarthel.simplesoundcloud.sampleapp.adapter.TracksAdapter;
+import fr.tvbarthel.simplesoundcloud.sampleapp.ui.ArtistView;
 import fr.tvbarthel.simplesoundcloud.sampleapp.ui.PlaybackView;
+import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -35,10 +37,11 @@ public class ArtistActivity extends ActionBarActivity implements
     private SimpleSoundCloudPlayer mSimpleSoundCloudPlayer;
     private ArrayList<SoundCloudTrack> mTracks;
 
-    // search widget
+    // tracks widget
     private ProgressBar mProgress;
     private TextView mCallback;
     private ListView mTrackListView;
+    private ArtistView mArtistView;
     private ArrayList<SoundCloudTrack> mRetrievedTracks;
     private TracksAdapter mAdapter;
 
@@ -91,6 +94,8 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrievedTracks = new ArrayList<>();
         mAdapter = new TracksAdapter(this, mRetrievedTracks);
         mTrackListView.setAdapter(mAdapter);
+        mArtistView = new ArtistView(this);
+        mTrackListView.addHeaderView(mArtistView);
 
         mPlaybackView = new PlaybackView(this);
         mPlaybackView.setListener(this);
@@ -110,7 +115,7 @@ public class ArtistActivity extends ActionBarActivity implements
         // synchronize the player view with the current player (loaded track, playing state, etc.)
         mPlaybackView.synchronize(mSimpleSoundCloudPlayer);
 
-        getArtistTracks();
+        getArtistData();
     }
 
     @Override
@@ -204,6 +209,15 @@ public class ArtistActivity extends ActionBarActivity implements
         });
     }
 
+    private Action1<SoundCloudUser> displayArtist() {
+        return new Action1<SoundCloudUser>() {
+            @Override
+            public void call(SoundCloudUser soundCloudUser) {
+                mArtistView.setModel(soundCloudUser);
+            }
+        };
+    }
+
     private Action1<ArrayList<SoundCloudTrack>> displayTracks() {
         return new Action1<ArrayList<SoundCloudTrack>>() {
             @Override
@@ -231,19 +245,26 @@ public class ArtistActivity extends ActionBarActivity implements
     }
 
     /**
-     * Used to retrieved the tracks of the artist.
+     * Used to retrieved the tracks of the artist as well as artist details.
      */
-    private void getArtistTracks() {
+    private void getArtistData() {
         mProgress.setVisibility(View.VISIBLE);
         mCallback.setVisibility(View.INVISIBLE);
         mRetrievedTracks.clear();
         mAdapter.notifyDataSetChanged();
 
-        mSupportSoundCloudArtistClient.getArtistTracks()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnError(displayCallbacks())
+        AndroidObservable.bindActivity(this,
+            mSupportSoundCloudArtistClient.getArtistTracks()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(displayCallbacks()))
             .subscribe(displayTracks());
+
+        AndroidObservable.bindActivity(this,
+            mSupportSoundCloudArtistClient.getArtistProfile()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io()))
+            .subscribe(displayArtist());
     }
 
     /**

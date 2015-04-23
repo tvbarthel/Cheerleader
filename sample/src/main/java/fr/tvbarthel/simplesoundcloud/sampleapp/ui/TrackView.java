@@ -74,8 +74,8 @@ public class TrackView extends FrameLayout {
         if (mModel != null) {
             Picasso.with(getContext())
                 .load(SoundCloudArtworkHelper.getArtworkUrl(mModel, SoundCloudArtworkHelper.XLARGE))
+                .placeholder(R.color.grey_light)
                 .fit()
-                .centerCrop()
                 .into(mArtwork);
             mArtist.setText(mModel.getArtist());
             mTitle.setText(mModel.getTitle());

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_size"
+        android:background="@drawable/shadow_top"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="80dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_gravity="bottom"
+        android:background="@color/grey_lighter" />
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/artist_view_card"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin"
+        card_view:cardCornerRadius="4dp"
+        card_view:contentPadding="@dimen/default_padding"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="20dp">
+
+        <ImageView
+            android:id="@+id/artist_view_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            tools:src="@mipmap/ic_launcher"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/artist_view_name"
+            android:layout_width="match_parent"
+            android:layout_marginTop="100dp"
+            android:layout_height="35dp"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif-light"
+            tools:text="Ivan Breadnwater"
+            android:gravity="center"
+            android:textColor="@color/grey" />
+
+        <TextView
+            android:id="@+id/artist_view_track_number"
+            android:layout_width="match_parent"
+            android:layout_marginTop="140dp"
+            android:layout_height="wrap_content"
+            tools:text="38 Tracks"
+            android:textStyle="italic"
+            android:gravity="center"
+            android:textColor="@color/grey" />
+
+    </android.support.v7.widget.CardView>
+
+</FrameLayout>

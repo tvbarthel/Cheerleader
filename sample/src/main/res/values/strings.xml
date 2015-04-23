@@ -16,5 +16,8 @@
     <string name="activity_pick_search_hint">Artist name</string>
     <string name="activity_pick_search">Search</string>
 
+    <!-- artist view !-->
+    <string name="artist_view_track_count">%1$d Tracks</string>
+
 
 </resources>
