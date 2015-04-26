@@ -142,6 +142,15 @@ public class ArtistActivity extends ActionBarActivity implements
     }
 
     @Override
+    public void onBackPressed() {
+        if (mPlaybackView.getTop() < mPlaylistListView.getHeight() - mPlaybackView.getHeight()) {
+            mPlaylistListView.smoothScrollToPositionFromTop(0, 0);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         if (parent == mTrackListView) {
