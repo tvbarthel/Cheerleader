@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="grey">#606060</color>
-    <color name="grey_dark">#494949</color>
+    <color name="grey">#9E9E9E</color>
+    <color name="grey_dark">#757575</color>
     <color name="red">#a30000</color>
     <color name="grey_light">#ffc9c9c9</color>
 
@@ -16,4 +16,31 @@
     <color name="primary_dark">@color/grey_dark</color>
     <color name="accent">@color/red</color>
     <color name="windowBackground">@color/grey_dark</color>
+
+    <!-- pick activity !-->
+    <color name="pick_activity_extra_hint_text">@color/grey</color>
+    <color name="pick_activity_artist_edit_hint">@color/grey</color>
+    <color name="pick_activity_artist_edit">@color/grey</color>
+    <color name="pick_activity_search">@color/accent</color>
+
+
+    <!-- artist view !-->
+    <color name="artist_view_bottom_bar">@color/grey_lighter</color>
+    <color name="artist_view_artist_name">@color/grey</color>
+    <color name="artist_view_track_number">@color/grey</color>
+
+    <!-- playback view !-->
+    <color name="playback_view_track_name">@android:color/white</color>
+    <color name="playback_view_track_artwork_filter">@color/black_translucent</color>
+
+    <!-- toolbar !-->
+    <color name="toolbar_background">@color/primary</color>
+    <color name="toolbar_title">@android:color/white</color>
+
+    <!-- track view !-->
+    <color name="track_view_artwork_border">@android:color/white</color>
+    <color name="track_view_track">@color/dark_grey</color>
+    <color name="track_view_artist">@color/dark_grey</color>
+    <color name="track_view_duration">@color/dark_grey</color>
+
 </resources>

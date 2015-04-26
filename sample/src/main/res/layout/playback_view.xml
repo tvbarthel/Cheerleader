@@ -28,7 +28,7 @@
         android:singleLine="true"
         android:ellipsize="end"
         android:gravity="center_vertical"
-        android:textColor="@android:color/white"
+        android:textColor="@color/playback_view_track_name"
         android:layout_marginRight="144dp"
         tools:text="Story writing" />
 

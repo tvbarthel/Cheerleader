@@ -217,7 +217,10 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
 
 
         mArtwork = ((ImageView) findViewById(R.id.playback_view_artwork));
-        mArtwork.setColorFilter(getResources().getColor(R.color.black_translucent), PorterDuff.Mode.SRC_ATOP);
+        mArtwork.setColorFilter(
+            getResources().getColor(R.color.playback_view_track_artwork_filter),
+            PorterDuff.Mode.SRC_ATOP
+        );
         mTitle = ((TextView) findViewById(R.id.playback_view_track));
     }
 

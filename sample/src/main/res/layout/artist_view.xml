@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_gravity="bottom"
-        android:background="@color/grey_lighter" />
+        android:background="@color/artist_view_bottom_bar" />
 
     <android.support.v7.widget.CardView
         android:id="@+id/artist_view_card"
@@ -29,7 +29,7 @@
         card_view:cardCornerRadius="4dp"
         card_view:contentPadding="@dimen/default_padding"
         android:layout_marginTop="40dp"
-        android:layout_marginBottom="20dp">
+        android:layout_marginBottom="40dp">
 
         <ImageView
             android:id="@+id/artist_view_avatar"
@@ -47,7 +47,7 @@
             android:fontFamily="sans-serif-light"
             tools:text="Ivan Breadnwater"
             android:gravity="center"
-            android:textColor="@color/grey" />
+            android:textColor="@color/artist_view_artist_name" />
 
         <TextView
             android:id="@+id/artist_view_track_number"
@@ -57,7 +57,7 @@
             tools:text="38 Tracks"
             android:textStyle="italic"
             android:gravity="center"
-            android:textColor="@color/grey" />
+            android:textColor="@color/artist_view_track_number" />
 
     </android.support.v7.widget.CardView>
 
