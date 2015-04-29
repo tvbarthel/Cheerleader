@@ -52,7 +52,7 @@ public class TracksAdapter extends ArrayAdapter<SoundCloudTrack> implements Simp
         viewHolder.mTrackView.setModel(track);
 
         if (position == mPlayedTrackPosition) {
-            viewHolder.mTrackView.setBackgroundResource(R.drawable.selectable_background_grey);
+            viewHolder.mTrackView.setBackgroundResource(R.drawable.selectable_background_red);
         } else {
             viewHolder.mTrackView.setBackgroundResource(R.drawable.selectable_background_white);
         }

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="grey">#9E9E9E</color>
-    <color name="grey_dark">#757575</color>
-    <color name="red">#a30000</color>
-    <color name="grey_light">#ffc9c9c9</color>
+    <color name="grey">#c3c3c3</color>
+    <color name="grey_dark">#606060</color>
+    <color name="red">#f61825</color>
+    <color name="red_light">#fff17f86</color>
+    <color name="red_translucent">#aaf61825</color>
+    <color name="red_dark">#c31119</color>
+    <color name="grey_light">#eeeeee</color>
 
     <color name="notification_title">#202020</color>
     <color name="notification_subtitle">#737373</color>
@@ -12,26 +15,26 @@
     <color name="black_translucent">#aa000000</color>
 
     <!-- theme !-->
-    <color name="primary">@color/grey</color>
-    <color name="primary_dark">@color/grey_dark</color>
-    <color name="accent">@color/red</color>
-    <color name="windowBackground">@color/grey_dark</color>
+    <color name="primary">@color/red</color>
+    <color name="primary_dark">@color/red_dark</color>
+    <color name="accent">@color/grey</color>
+    <color name="windowBackground">@color/red</color>
 
     <!-- pick activity !-->
-    <color name="pick_activity_extra_hint_text">@color/grey</color>
-    <color name="pick_activity_artist_edit_hint">@color/grey</color>
-    <color name="pick_activity_artist_edit">@color/grey</color>
-    <color name="pick_activity_search">@color/accent</color>
+    <color name="pick_activity_extra_hint_text">@color/red</color>
+    <color name="pick_activity_artist_edit_hint">@color/red</color>
+    <color name="pick_activity_artist_edit">@color/red</color>
+    <color name="pick_activity_search">@color/red</color>
 
 
     <!-- artist view !-->
     <color name="artist_view_bottom_bar">@color/grey_lighter</color>
-    <color name="artist_view_artist_name">@color/grey</color>
-    <color name="artist_view_track_number">@color/grey</color>
+    <color name="artist_view_artist_name">@color/red</color>
+    <color name="artist_view_track_number">@color/red_dark</color>
 
     <!-- playback view !-->
     <color name="playback_view_track_name">@android:color/white</color>
-    <color name="playback_view_track_artwork_filter">@color/black_translucent</color>
+    <color name="playback_view_track_artwork_filter">@color/red_translucent</color>
 
     <!-- toolbar !-->
     <color name="toolbar_background">@color/primary</color>
@@ -39,8 +42,8 @@
 
     <!-- track view !-->
     <color name="track_view_artwork_border">@android:color/white</color>
-    <color name="track_view_track">@color/dark_grey</color>
-    <color name="track_view_artist">@color/dark_grey</color>
-    <color name="track_view_duration">@color/dark_grey</color>
+    <color name="track_view_track">@color/grey_dark</color>
+    <color name="track_view_artist">@color/grey_dark</color>
+    <color name="track_view_duration">@color/grey_dark</color>
 
 </resources>
