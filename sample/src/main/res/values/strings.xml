@@ -19,5 +19,9 @@
     <!-- artist view !-->
     <string name="artist_view_track_count">%1$d Tracks</string>
 
+    <!-- cheerleader banner !-->
+    <string name="cheerleader_banner_title">@string/app_name</string>
+    <string name="cheerleader_banner_subtitle">Support your favorite artist</string>
+
 
 </resources>

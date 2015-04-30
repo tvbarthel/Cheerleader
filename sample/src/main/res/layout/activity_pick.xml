@@ -7,108 +7,82 @@
     android:layout_height="match_parent">
 
     <include
-        android:id="@+id/activity_pick_toolbar"
-        layout="@layout/toolbar_action_bar" />
+        android:id="@+id/activity_pick_banner"
+        layout="@layout/cheerleader_banner" />
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/cheerleader_banner_height">
 
-        <ImageView
-            android:id="@+id/activity_pick_hearth_1"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_above="@+id/activity_pick_search_card"
-            android:layout_alignLeft="@+id/activity_pick_search_card"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="25dp"
-            android:rotation="25"
-            android:src="@drawable/ic_hearth" />
-
-        <ImageView
-            android:id="@+id/activity_pick_hearth_2"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_above="@+id/activity_pick_hearth_1"
-            android:layout_alignLeft="@+id/activity_pick_hearth_1"
-            android:layout_marginLeft="-25dp"
-            android:rotation="-25"
-            android:src="@drawable/ic_hearth" />
-
-        <ImageView
-            android:id="@+id/activity_pick_hearth_3"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_above="@+id/activity_pick_hearth_2"
-            android:layout_alignLeft="@+id/activity_pick_hearth_2"
-            android:layout_marginLeft="35dp"
-            android:rotation="25"
-            android:src="@drawable/ic_hearth" />
-
-        <!-- A CardView that contains a TextView -->
-        <android.support.v7.widget.CardView
-            android:id="@+id/activity_pick_search_card"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:layout_marginLeft="@dimen/activity_vertical_margin"
-            android:layout_marginRight="@dimen/activity_vertical_margin"
-            card_view:cardCornerRadius="4dp">
+            android:layout_height="400dp"
+            android:background="@drawable/white_background_shadow_top_offset">
 
-            <TextView
-                android:id="@+id/activity_pick_extra_hint"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="@dimen/activity_vertical_margin"
-                android:paddingRight="@dimen/activity_vertical_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:text="@string/activity_pick_search_hint"
-                android:textColor="@color/pick_activity_extra_hint_text" />
-
-            <fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText
-                android:id="@+id/activity_pick_artist_edit"
+            <!-- A CardView that contains a TextView -->
+            <android.support.v7.widget.CardView
+                android:id="@+id/activity_pick_search_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/activity_pick_extra_hint"
-                android:layout_marginBottom="50dp"
-                android:layout_marginTop="40dp"
-                android:hint="@string/activity_pick_search_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="textPersonName"
-                android:padding="@dimen/activity_vertical_margin"
-                android:textColor="@color/pick_activity_artist_edit"
-                android:textColorHint="@color/pick_activity_artist_edit_hint" />
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:layout_marginTop="50dp"
+                card_view:cardCornerRadius="4dp">
 
-            <TextView
-                android:id="@+id/activity_pick_search_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_gravity="bottom|end"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:padding="@dimen/activity_vertical_margin"
-                android:text="@string/activity_pick_search"
-                android:textColor="@color/pick_activity_search" />
-        </android.support.v7.widget.CardView>
+                <TextView
+                    android:id="@+id/activity_pick_extra_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="@dimen/activity_vertical_margin"
+                    android:paddingRight="@dimen/activity_vertical_margin"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:text="@string/activity_pick_search_hint"
+                    android:textColor="@color/pick_activity_extra_hint_text" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="115dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_sound_cloud_red" />
+                <fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText
+                    android:id="@+id/activity_pick_artist_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/activity_pick_extra_hint"
+                    android:layout_marginBottom="50dp"
+                    android:layout_marginTop="40dp"
+                    android:hint="@string/activity_pick_search_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="textPersonName"
+                    android:padding="@dimen/activity_vertical_margin"
+                    android:textColor="@color/pick_activity_artist_edit"
+                    android:textColorHint="@color/pick_activity_artist_edit_hint" />
 
-    </RelativeLayout>
+                <TextView
+                    android:id="@+id/activity_pick_search_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:padding="@dimen/activity_vertical_margin"
+                    android:text="@string/activity_pick_search"
+                    android:textColor="@color/pick_activity_search" />
+            </android.support.v7.widget.CardView>
 
-    <View
-        android:id="@+id/toolbar_shadow"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_size"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:background="@drawable/shadow_bottom" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/activity_pick_bottom_logo_height"
+                android:layout_alignParentBottom="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_sound_cloud_red" />
+
+            <View
+                android:id="@+id/toolbar_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/shadow_size"
+                android:background="@drawable/shadow_top" />
+
+        </RelativeLayout>
+
+    </ScrollView>
 
 </FrameLayout>
