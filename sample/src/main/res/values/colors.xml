@@ -2,6 +2,7 @@
 <resources>
     <color name="grey">#c3c3c3</color>
     <color name="grey_dark">#606060</color>
+    <color name="grey_darker">#424242</color>
     <color name="red">#f61825</color>
     <color name="red_light">#fff17f86</color>
     <color name="red_translucent">#aaf61825</color>
@@ -22,9 +23,12 @@
 
     <!-- pick activity !-->
     <color name="pick_activity_extra_hint_text">@color/red</color>
-    <color name="pick_activity_artist_edit_hint">@color/red</color>
-    <color name="pick_activity_artist_edit">@color/red</color>
-    <color name="pick_activity_search">@color/red</color>
+    <color name="pick_activity_artist_edit_hint">@color/grey</color>
+    <color name="pick_activity_artist_edit">@color/grey_darker</color>
+    <color name="pick_activity_search">@android:color/white</color>
+    <color name="pick_activity_section_text">@color/grey_darker</color>
+    <color name="pick_activity_section_content_text">@color/grey</color>
+    <color name="pick_activity_credits">@android:color/white</color>
 
 
     <!-- artist view !-->
@@ -45,5 +49,9 @@
     <color name="track_view_track">@color/grey_dark</color>
     <color name="track_view_artist">@color/grey_dark</color>
     <color name="track_view_duration">@color/grey_dark</color>
+
+    <!-- puce !-->
+    <color name="puce_inner_dot">@color/red</color>
+    <color name="puce_ring">@color/grey_darker</color>
 
 </resources>

@@ -15,4 +15,9 @@
     <!-- cheerleader banner !-->
     <dimen name="cheerleader_banner_height">160dp</dimen>
 
+    <!-- puce !-->
+    <dimen name="puce_inner_dot_margin">10dp</dimen>
+    <dimen name="puce_size">25dp</dimen>
+    <dimen name="puce_radius">8dp</dimen>
+    <dimen name="puce_thickness">2dp</dimen>
 </resources>

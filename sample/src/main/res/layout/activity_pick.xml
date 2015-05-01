@@ -21,65 +21,175 @@
             android:layout_height="400dp"
             android:background="@drawable/white_background_shadow_top_offset">
 
-            <!-- A CardView that contains a TextView -->
-            <android.support.v7.widget.CardView
-                android:id="@+id/activity_pick_search_card"
+            <View
+                android:id="@+id/activity_pick_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/shadow_size"
+                android:background="@drawable/shadow_top" />
+
+            <View
+                android:layout_width="@dimen/puce_size"
+                android:layout_height="@dimen/puce_size"
+                android:background="@drawable/puce"
+                android:layout_alignTop="@+id/activity_pick_section_project"
+                android:layout_marginLeft="4dp"/>
+
+            <TextView
+                android:id="@+id/activity_pick_section_project"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/activity_pick_shadow"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/activity_pick_project_section"
+                android:textColor="@color/pick_activity_section_text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/activity_pick_section_project_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/activity_pick_section_project"
+                android:layout_marginLeft="35dp"
+                android:gravity="center_vertical"
+                android:text="@string/activity_pick_project"
+                android:textColor="@color/pick_activity_section_content_text"
+                android:textSize="15sp" />
+
+            <View
+                android:layout_width="@dimen/puce_size"
+                android:layout_height="@dimen/puce_size"
+                android:background="@drawable/puce"
+                android:layout_alignTop="@+id/activity_pick_section_try_it"
+                android:layout_marginLeft="4dp"/>
+
+            <TextView
+                android:id="@+id/activity_pick_section_try_it"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/activity_pick_section_project_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/activity_pick_try_it_section"
+                android:textColor="@color/pick_activity_section_text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/activity_pick_extra_hint"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_below="@+id/activity_pick_section_try_it"
+                android:layout_marginBottom="-20dp"
+                android:layout_marginLeft="35dp"
+                android:text="@string/activity_pick_search_hint"
+                android:textColor="@color/pick_activity_extra_hint_text" />
+
+            <fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText
+                android:id="@+id/activity_pick_artist_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="@dimen/activity_vertical_margin"
-                android:layout_marginRight="@dimen/activity_vertical_margin"
-                android:layout_marginTop="50dp"
-                card_view:cardCornerRadius="4dp">
+                android:layout_below="@+id/activity_pick_extra_hint"
+                android:layout_marginLeft="35dp"
+                android:layout_toLeftOf="@+id/activity_pick_search_btn"
+                android:hint="@string/activity_pick_search_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="textPersonName"
+                android:padding="@dimen/activity_vertical_margin"
+                android:textColor="@color/pick_activity_artist_edit"
+                android:textColorHint="@color/pick_activity_artist_edit_hint" />
 
-                <TextView
-                    android:id="@+id/activity_pick_extra_hint"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:paddingLeft="@dimen/activity_vertical_margin"
-                    android:paddingRight="@dimen/activity_vertical_margin"
-                    android:paddingTop="@dimen/activity_vertical_margin"
-                    android:text="@string/activity_pick_search_hint"
-                    android:textColor="@color/pick_activity_extra_hint_text" />
+            <TextView
+                android:id="@+id/activity_pick_search_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/activity_pick_artist_edit"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="bottom|end"
+                android:layout_marginRight="@dimen/default_padding"
+                android:background="@drawable/selectable_background_red"
+                android:clickable="true"
+                android:gravity="center"
+                android:paddingBottom="@dimen/default_padding"
+                android:paddingLeft="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_vertical_margin"
+                android:paddingTop="@dimen/default_padding"
+                android:text="@string/activity_pick_try_it"
+                android:textColor="@color/pick_activity_search" />
 
-                <fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText
-                    android:id="@+id/activity_pick_artist_edit"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/activity_pick_extra_hint"
-                    android:layout_marginBottom="50dp"
-                    android:layout_marginTop="40dp"
-                    android:hint="@string/activity_pick_search_hint"
-                    android:imeOptions="actionSearch"
-                    android:inputType="textPersonName"
-                    android:padding="@dimen/activity_vertical_margin"
-                    android:textColor="@color/pick_activity_artist_edit"
-                    android:textColorHint="@color/pick_activity_artist_edit_hint" />
+            <View
+                android:layout_width="@dimen/puce_size"
+                android:layout_height="@dimen/puce_size"
+                android:background="@drawable/puce"
+                android:layout_alignTop="@+id/activity_pick_section_links"
+                android:layout_marginLeft="4dp"/>
 
-                <TextView
-                    android:id="@+id/activity_pick_search_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_gravity="bottom|end"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:padding="@dimen/activity_vertical_margin"
-                    android:text="@string/activity_pick_search"
-                    android:textColor="@color/pick_activity_search" />
-            </android.support.v7.widget.CardView>
+            <TextView
+                android:id="@+id/activity_pick_section_links"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/activity_pick_artist_edit"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/activity_pick_links_section"
+                android:textColor="@color/pick_activity_section_text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/activity_pick_section_links_git"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/activity_pick_section_links"
+                android:layout_below="@+id/activity_pick_section_links"
+                android:layout_toLeftOf="@+id/activity_pick_middle"
+                android:gravity="center"
+                android:text="@string/activity_pick_links_git"
+                android:textColor="@color/pick_activity_section_content_text"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/activity_pick_section_links_web"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/activity_pick_section_links"
+                android:layout_marginRight="30dp"
+                android:layout_toRightOf="@+id/activity_pick_middle"
+                android:gravity="center"
+                android:text="@string/activity_pick_links_website"
+                android:textColor="@color/pick_activity_section_content_text"
+                android:textSize="15sp" />
+
+
+            <View
+                android:id="@+id/activity_pick_middle"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_centerInParent="true" />
+
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/activity_pick_bottom_logo_height"
-                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/activity_pick_section_links_web"
+                android:layout_marginTop="60dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_sound_cloud_red" />
 
-            <View
-                android:id="@+id/toolbar_shadow"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/shadow_size"
-                android:background="@drawable/shadow_top" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:paddingBottom="@dimen/default_padding"
+                android:paddingRight="@dimen/default_padding"
+                android:text="@string/sound_cloud_credits"
+                android:textAllCaps="true"
+                android:textColor="@color/pick_activity_credits"
+                android:textSize="8sp"
+                android:textStyle="bold" />
 
         </RelativeLayout>
 

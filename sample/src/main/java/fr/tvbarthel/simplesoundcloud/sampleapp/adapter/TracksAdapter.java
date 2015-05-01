@@ -1,7 +1,6 @@
 package fr.tvbarthel.simplesoundcloud.sampleapp.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -9,7 +8,6 @@ import android.widget.ArrayAdapter;
 import java.util.List;
 
 import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
-import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayerListener;
 import fr.tvbarthel.simplesoundcloud.sampleapp.R;
 import fr.tvbarthel.simplesoundcloud.sampleapp.ui.TrackView;
@@ -52,7 +50,7 @@ public class TracksAdapter extends ArrayAdapter<SoundCloudTrack> implements Simp
         viewHolder.mTrackView.setModel(track);
 
         if (position == mPlayedTrackPosition) {
-            viewHolder.mTrackView.setBackgroundResource(R.drawable.selectable_background_red);
+            viewHolder.mTrackView.setBackgroundResource(R.drawable.selectable_background_red_light);
         } else {
             viewHolder.mTrackView.setBackgroundResource(R.drawable.selectable_background_white);
         }
