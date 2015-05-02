@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sound_cloud_client_id">57c98089f4b03928a0a611f93223a9de</string>
+    <string name="sound_cloud_client_id">YourSoundCloudApiKey</string>
 </resources>

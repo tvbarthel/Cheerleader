@@ -26,8 +26,8 @@
     <string name="activity_pick_project">Cheerleader is an open-source Android library based on RxJava which allow to  easily  integrate the support of an artist through it\'s SoundCloud account.</string>
     <string name="activity_pick_try_it_section">Sample</string>
     <string name="activity_pick_links_section">Links</string>
-    <string name="activity_pick_links_git">Fork us on GitHub</string>
-    <string name="activity_pick_links_website">Find more information</string>
+    <string name="activity_pick_links_git">Fork us\non GitHub</string>
+    <string name="activity_pick_links_website">Find more\ninformation</string>
     <string name="sound_cloud_credits">Powered by soundcloud</string>
 
 

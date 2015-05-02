@@ -7,10 +7,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText;
@@ -19,10 +21,12 @@ import fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText;
  * Simple activity used to pick an artist in order to load it into the sample activity.
  */
 public class PickActivity extends ActionBarActivity implements
-    TextView.OnEditorActionListener, View.OnClickListener {
+    TextView.OnEditorActionListener, View.OnClickListener, ViewTreeObserver.OnScrollChangedListener {
 
     private ExtraHintEditText mArtistName;
     private Animation mWiggle;
+    private View mBanner;
+    private ScrollView mScrollView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,10 @@ public class PickActivity extends ActionBarActivity implements
         View extraHintView = findViewById(R.id.activity_pick_extra_hint);
         mArtistName.setExtraHintView(extraHintView);
         mArtistName.setOnEditorActionListener(this);
+
+        mScrollView = ((ScrollView) findViewById(R.id.activity_pick_scrollview));
+        mScrollView.getViewTreeObserver().addOnScrollChangedListener(this);
+        mBanner = findViewById(R.id.activity_pick_banner);
 
         mWiggle = AnimationUtils.loadAnimation(this, R.anim.wiggle);
 
@@ -78,5 +86,10 @@ public class PickActivity extends ActionBarActivity implements
             default:
                 throw new IllegalStateException("Click not handled on " + v);
         }
+    }
+
+    @Override
+    public void onScrollChanged() {
+        mBanner.setTranslationY(-mScrollView.getScrollY() / 2f);
     }
 }

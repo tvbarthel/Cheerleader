@@ -28,13 +28,14 @@
     <color name="pick_activity_search">@android:color/white</color>
     <color name="pick_activity_section_text">@color/grey_darker</color>
     <color name="pick_activity_section_content_text">@color/grey</color>
+    <color name="pick_activity_section_links_text">@android:color/white</color>
     <color name="pick_activity_credits">@android:color/white</color>
 
 
     <!-- artist view !-->
     <color name="artist_view_bottom_bar">@color/grey_lighter</color>
-    <color name="artist_view_artist_name">@color/red</color>
-    <color name="artist_view_track_number">@color/red_dark</color>
+    <color name="artist_view_artist_name">@color/grey_darker</color>
+    <color name="artist_view_track_number">@color/grey_dark</color>
 
     <!-- playback view !-->
     <color name="playback_view_track_name">@android:color/white</color>
@@ -47,11 +48,16 @@
     <!-- track view !-->
     <color name="track_view_artwork_border">@android:color/white</color>
     <color name="track_view_track">@color/grey_dark</color>
-    <color name="track_view_artist">@color/grey_dark</color>
+    <color name="track_view_artist">@color/grey_darker</color>
     <color name="track_view_duration">@color/grey_dark</color>
 
     <!-- puce !-->
     <color name="puce_inner_dot">@color/red</color>
     <color name="puce_ring">@color/grey_darker</color>
+
+    <!-- cheerleader banner !-->
+    <color name="banner_title">@android:color/white</color>
+    <color name="banner_subtitle">@android:color/white</color>
+    <color name="banner_line">@android:color/white</color>
 
 </resources>

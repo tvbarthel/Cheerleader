@@ -1,9 +1,13 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout style="@style/AppTheme.MainContainer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    style="@style/AppTheme.MainContainer">
+    tools:context=".MainActivity">
+
+    <include
+        android:id="@+id/activity_artist_banner"
+        layout="@layout/cheerleader_banner" />
 
     <ListView
         android:id="@+id/activity_artist_list"
@@ -11,14 +15,15 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:divider="@null"
-        android:paddingBottom="@dimen/playback_view_height" />
+        android:paddingBottom="@dimen/playback_view_height"
+        android:paddingTop="130dp" />
 
     <ProgressBar
         android:id="@+id/activity_artist_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
         android:layout_gravity="center"
+        android:indeterminate="true"
         android:visibility="invisible" />
 
     <TextView
@@ -26,15 +31,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="invisible"
-        android:text="@string/search_results_not_found" />
+        android:text="@string/search_results_not_found"
+        android:visibility="invisible" />
 
     <fr.tvbarthel.simplesoundcloud.sampleapp.ui.BottomListView
-        android:clipToPadding="false"
         android:id="@+id/activity_artist_playlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:divider="@null"
         android:overScrollMode="never"
-        android:scrollbars="none"
-        android:divider="@null" />
+        android:scrollbars="none" />
 </FrameLayout>

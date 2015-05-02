@@ -10,7 +10,7 @@
     <dimen name="playback_view_height">70dp</dimen>
 
     <!-- activity pick !-->
-    <dimen name="activity_pick_bottom_logo_height">115dp</dimen>
+    <dimen name="activity_pick_bottom_logo_height">120dp</dimen>
 
     <!-- cheerleader banner !-->
     <dimen name="cheerleader_banner_height">160dp</dimen>

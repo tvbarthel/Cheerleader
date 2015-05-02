@@ -1,6 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.sampleapp.ui;
 
 import android.content.Context;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
@@ -20,6 +21,7 @@ public class ArtistView extends FrameLayout {
     private ImageView mAvatar;
     private TextView mArtistName;
     private TextView mTracks;
+    private TextView mDescription;
     private SoundCloudUser mModel;
 
     /**
@@ -77,6 +79,7 @@ public class ArtistView extends FrameLayout {
                     mModel.getTrackCount()
                 )
             );
+            mDescription.setText(Html.fromHtml(mModel.getDescription()));
             this.setVisibility(VISIBLE);
         }
     }
@@ -92,5 +95,6 @@ public class ArtistView extends FrameLayout {
         mAvatar = ((ImageView) findViewById(R.id.artist_view_avatar));
         mArtistName = ((TextView) findViewById(R.id.artist_view_name));
         mTracks = ((TextView) findViewById(R.id.artist_view_track_number));
+        mDescription = ((TextView) findViewById(R.id.artist_view_description));
     }
 }

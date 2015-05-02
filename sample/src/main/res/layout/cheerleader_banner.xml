@@ -12,7 +12,7 @@
         android:layout_marginTop="-18dp"
         android:fontFamily="sans-serif-thin"
         android:text="@string/cheerleader_banner_title"
-        android:textColor="@android:color/white"
+        android:textColor="@color/banner_title"
         android:textSize="30sp" />
 
     <View
@@ -21,7 +21,7 @@
         android:layout_gravity="center"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:background="@android:color/white" />
+        android:background="@color/banner_line" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,7 +30,7 @@
         android:layout_marginTop="12dp"
         android:fontFamily="sans-serif-thin"
         android:text="@string/cheerleader_banner_subtitle"
-        android:textColor="@android:color/white"
+        android:textColor="@color/banner_subtitle"
         android:textSize="15sp" />
 
 </FrameLayout>

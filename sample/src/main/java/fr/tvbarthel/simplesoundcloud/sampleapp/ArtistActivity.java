@@ -155,13 +155,14 @@ public class ArtistActivity extends ActionBarActivity implements
 
         if (parent == mTrackListView) {
             int adapterPosition = position - mTrackListView.getHeaderViewsCount();
-            mSimpleSoundCloudPlayer.addTrack(mAdapter.getItem(adapterPosition));
-            mPlaylistAdapter.notifyDataSetChanged();
+            if (adapterPosition >= 0) {
+                mSimpleSoundCloudPlayer.addTrack(mAdapter.getItem(adapterPosition));
+                mPlaylistAdapter.notifyDataSetChanged();
 
-            if (mSimpleSoundCloudPlayer.getTracks().size() == 1) {
-                mSimpleSoundCloudPlayer.play();
+                if (mSimpleSoundCloudPlayer.getTracks().size() == 1) {
+                    mSimpleSoundCloudPlayer.play();
+                }
             }
-
         } else if (parent == mPlaylistListView) {
             int trackPosition = position - mPlaylistListView.getHeaderViewsCount();
             mSimpleSoundCloudPlayer.play(trackPosition);

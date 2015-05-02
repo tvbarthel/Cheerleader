@@ -54,6 +54,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:singleLine="true"
+        android:textStyle="italic"
         android:textColor="@color/track_view_duration"
         tools:text="3:20" />
 
