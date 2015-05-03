@@ -45,6 +45,8 @@ public class ArtistActivity extends ActionBarActivity implements
     private ArrayList<SoundCloudTrack> mRetrievedTracks;
     private TracksAdapter mAdapter;
     private ArtistView mArtistView;
+    private RecyclerView.OnScrollListener mRetrieveTracksScrollListener;
+    private int mScrollY;
 
     // player widget
     private RecyclerView mPlaylistRecyclerView;
@@ -52,6 +54,9 @@ public class ArtistActivity extends ActionBarActivity implements
     private TracksAdapter mPlaylistAdapter;
     private ArrayList<SoundCloudTrack> mPlaylistTracks;
     private TrackView.Listener mPlaylistTracksListener;
+
+    // banner
+    private View mBanner;
 
     /**
      * Start an ArtistActivity for a given artist name.
@@ -89,6 +94,7 @@ public class ArtistActivity extends ActionBarActivity implements
 
         mProgress = ((ProgressBar) findViewById(R.id.activity_artist_progress));
         mCallback = ((TextView) findViewById(R.id.activity_artist_callback));
+        mBanner = findViewById(R.id.activity_artist_banner);
 
         mRetrieveTracksRecyclerView = ((RecyclerView) findViewById(R.id.activity_artist_list));
         initRetrieveTracksRecyclerView();
@@ -280,6 +286,17 @@ public class ArtistActivity extends ActionBarActivity implements
         mAdapter = new TracksAdapter(mRetrieveTracksListener, mRetrievedTracks);
         mAdapter.setHeaderView(mArtistView);
         mRetrieveTracksRecyclerView.setAdapter(mAdapter);
+
+        mScrollY = 0;
+        mRetrieveTracksScrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                mScrollY += dy;
+                mBanner.setTranslationY(-mScrollY / 2f);
+            }
+        };
+        mRetrieveTracksRecyclerView.setOnScrollListener(mRetrieveTracksScrollListener);
     }
 
     private void initPlaylistTracksRecyclerView() {
