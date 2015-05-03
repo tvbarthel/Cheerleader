@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -21,13 +21,14 @@ import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlaylistList
 import fr.tvbarthel.simplesoundcloud.sampleapp.adapter.TracksAdapter;
 import fr.tvbarthel.simplesoundcloud.sampleapp.ui.ArtistView;
 import fr.tvbarthel.simplesoundcloud.sampleapp.ui.PlaybackView;
+import fr.tvbarthel.simplesoundcloud.sampleapp.ui.TrackView;
 import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class ArtistActivity extends ActionBarActivity implements
-    AdapterView.OnItemClickListener, PlaybackView.Listener, SimpleSoundCloudPlaylistListener {
+    PlaybackView.Listener, SimpleSoundCloudPlaylistListener {
 
     // bundle keys
     private static final String BUNDLE_KEY_ARTIST_NAME = "artist_activity_bundle_key_artist_name";
@@ -35,20 +36,22 @@ public class ArtistActivity extends ActionBarActivity implements
     // sound cloud
     private SupportSoundCloudArtistClient mSupportSoundCloudArtistClient;
     private SimpleSoundCloudPlayer mSimpleSoundCloudPlayer;
-    private ArrayList<SoundCloudTrack> mTracks;
 
     // tracks widget
     private ProgressBar mProgress;
     private TextView mCallback;
-    private ListView mTrackListView;
-    private ArtistView mArtistView;
+    private RecyclerView mRetrieveTracksRecyclerView;
+    private TrackView.Listener mRetrieveTracksListener;
     private ArrayList<SoundCloudTrack> mRetrievedTracks;
     private TracksAdapter mAdapter;
+    private ArtistView mArtistView;
 
     // player widget
-    private ListView mPlaylistListView;
+    private RecyclerView mPlaylistRecyclerView;
     private PlaybackView mPlaybackView;
     private TracksAdapter mPlaylistAdapter;
+    private ArrayList<SoundCloudTrack> mPlaylistTracks;
+    private TrackView.Listener mPlaylistTracksListener;
 
     /**
      * Start an ArtistActivity for a given artist name.
@@ -84,32 +87,20 @@ public class ArtistActivity extends ActionBarActivity implements
             .build();
 
 
-        mTrackListView = ((ListView) findViewById(R.id.activity_artist_list));
         mProgress = ((ProgressBar) findViewById(R.id.activity_artist_progress));
         mCallback = ((TextView) findViewById(R.id.activity_artist_callback));
-        mPlaylistListView = ((ListView) findViewById(R.id.activity_artist_playlist));
 
-        mTrackListView.setOnItemClickListener(this);
+        mRetrieveTracksRecyclerView = ((RecyclerView) findViewById(R.id.activity_artist_list));
+        initRetrieveTracksRecyclerView();
 
-        mRetrievedTracks = new ArrayList<>();
-        mAdapter = new TracksAdapter(this, mRetrievedTracks);
-        mTrackListView.setAdapter(mAdapter);
-        mArtistView = new ArtistView(this);
-        mTrackListView.addHeaderView(mArtistView);
-
-        mPlaybackView = new PlaybackView(this);
-        mPlaybackView.setListener(this);
-        mPlaylistListView.addHeaderView(mPlaybackView);
-
-        mTracks = new ArrayList<>();
-        mPlaylistAdapter = new TracksAdapter(this, mTracks);
-
+        mPlaylistRecyclerView = ((RecyclerView) findViewById(R.id.activity_artist_playlist));
+        initPlaylistTracksRecyclerView();
         setTrackListPadding();
 
         // check if tracks are already loaded into the player.
         ArrayList<SoundCloudTrack> currentsTracks = mSimpleSoundCloudPlayer.getTracks();
         if (currentsTracks != null) {
-            mTracks.addAll(currentsTracks);
+            mPlaylistTracks.addAll(currentsTracks);
         }
 
         // synchronize the player view with the current player (loaded track, playing state, etc.)
@@ -143,29 +134,10 @@ public class ArtistActivity extends ActionBarActivity implements
 
     @Override
     public void onBackPressed() {
-        if (mPlaybackView.getTop() < mPlaylistListView.getHeight() - mPlaybackView.getHeight()) {
-            mPlaylistListView.smoothScrollToPositionFromTop(0, 0);
+        if (mPlaybackView.getTop() < mPlaylistRecyclerView.getHeight() - mPlaybackView.getHeight()) {
+            mPlaylistRecyclerView.getLayoutManager().scrollToPosition(0);
         } else {
             super.onBackPressed();
-        }
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        if (parent == mTrackListView) {
-            int adapterPosition = position - mTrackListView.getHeaderViewsCount();
-            if (adapterPosition >= 0) {
-                mSimpleSoundCloudPlayer.addTrack(mAdapter.getItem(adapterPosition));
-                mPlaylistAdapter.notifyDataSetChanged();
-
-                if (mSimpleSoundCloudPlayer.getTracks().size() == 1) {
-                    mSimpleSoundCloudPlayer.play();
-                }
-            }
-        } else if (parent == mPlaylistListView) {
-            int trackPosition = position - mPlaylistListView.getHeaderViewsCount();
-            mSimpleSoundCloudPlayer.play(trackPosition);
         }
     }
 
@@ -186,13 +158,13 @@ public class ArtistActivity extends ActionBarActivity implements
 
     @Override
     public void onTrackAdded(SoundCloudTrack track) {
-        mTracks.add(track);
+        mPlaylistTracks.add(track);
         mPlaylistAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onTrackRemoved(SoundCloudTrack track, boolean isEmpty) {
-        mTracks.remove(track);
+        mPlaylistTracks.remove(track);
         mPlaylistAdapter.notifyDataSetChanged();
         if (isEmpty) {
             mPlaybackView.animate().translationY(mPlaybackView.getHeight());
@@ -203,15 +175,14 @@ public class ArtistActivity extends ActionBarActivity implements
      * Used to position the track list at the bottom of the screen.
      */
     private void setTrackListPadding() {
-        mPlaylistListView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+        mPlaylistRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                mPlaylistListView.getViewTreeObserver().removeOnPreDrawListener(this);
+                mPlaylistRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
                 int headerListHeight = getResources().getDimensionPixelOffset(R.dimen.playback_view_height);
-                mPlaylistListView.setPadding(0, mPlaylistListView.getHeight() - headerListHeight, 0, 0);
-                mPlaylistListView.setAdapter(mPlaylistAdapter);
-                mPlaylistListView.setOnItemClickListener(ArtistActivity.this);
-                if (mTracks.isEmpty()) {
+                mPlaylistRecyclerView.setPadding(0, mPlaylistRecyclerView.getHeight() - headerListHeight, 0, 0);
+                mPlaylistRecyclerView.setAdapter(mPlaylistAdapter);
+                if (mPlaylistTracks.isEmpty()) {
                     mPlaybackView.setTranslationY(headerListHeight);
                 }
                 return true;
@@ -288,5 +259,46 @@ public class ArtistActivity extends ActionBarActivity implements
             throw new IllegalStateException("No artist name found, please use the startActivity pattern");
         }
         return extras.getString(BUNDLE_KEY_ARTIST_NAME);
+    }
+
+    private void initRetrieveTracksRecyclerView() {
+        mArtistView = new ArtistView(this);
+        mRetrieveTracksListener = new TrackView.Listener() {
+            @Override
+            public void onTrackClicked(SoundCloudTrack track) {
+                mSimpleSoundCloudPlayer.addTrack(track);
+                mPlaylistAdapter.notifyDataSetChanged();
+
+                if (mSimpleSoundCloudPlayer.getTracks().size() == 1) {
+                    mSimpleSoundCloudPlayer.play();
+                }
+            }
+        };
+
+        mRetrievedTracks = new ArrayList<>();
+        mRetrieveTracksRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mAdapter = new TracksAdapter(mRetrieveTracksListener, mRetrievedTracks);
+        mAdapter.setHeaderView(mArtistView);
+        mRetrieveTracksRecyclerView.setAdapter(mAdapter);
+    }
+
+    private void initPlaylistTracksRecyclerView() {
+
+        mPlaylistTracksListener = new TrackView.Listener() {
+            @Override
+            public void onTrackClicked(SoundCloudTrack track) {
+                int playlistPosition = mSimpleSoundCloudPlayer.getTracks().indexOf(track);
+                mSimpleSoundCloudPlayer.play(playlistPosition);
+            }
+        };
+
+        mPlaybackView = new PlaybackView(this);
+        mPlaybackView.setListener(this);
+
+        mPlaylistTracks = new ArrayList<>();
+        mPlaylistAdapter = new TracksAdapter(mPlaylistTracksListener, mPlaylistTracks);
+        mPlaylistAdapter.setHeaderView(mPlaybackView);
+
+        mPlaylistRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     }
 }

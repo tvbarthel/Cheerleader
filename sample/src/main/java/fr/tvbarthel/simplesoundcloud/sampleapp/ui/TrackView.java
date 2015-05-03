@@ -3,6 +3,7 @@ package fr.tvbarthel.simplesoundcloud.sampleapp.ui;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,7 +17,7 @@ import fr.tvbarthel.simplesoundcloud.sampleapp.R;
 /**
  * Simple View used to render a track.
  */
-public class TrackView extends FrameLayout {
+public class TrackView extends FrameLayout implements View.OnClickListener {
 
     private ImageView mArtwork;
     private TextView mTitle;
@@ -24,6 +25,7 @@ public class TrackView extends FrameLayout {
     private TextView mDuration;
 
     private SoundCloudTrack mModel;
+    private Listener mListener;
 
     /**
      * Simple View used to render a track.
@@ -85,6 +87,15 @@ public class TrackView extends FrameLayout {
         }
     }
 
+    /**
+     * Set a listener to catch the view events.
+     *
+     * @param listener listener to register.
+     */
+    public void setListener(Listener listener) {
+        mListener = listener;
+    }
+
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.track_view, this);
 
@@ -96,5 +107,27 @@ public class TrackView extends FrameLayout {
         setBackgroundResource(R.drawable.selectable_background_white);
         int padding = getResources().getDimensionPixelOffset(R.dimen.default_padding);
         setPadding(padding, padding, padding, padding);
+
+        this.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (mListener != null) {
+            mListener.onTrackClicked(mModel);
+        }
+    }
+
+    /**
+     * Interface used to catch view events.
+     */
+    public interface Listener {
+
+        /**
+         * Called when the user clicked on the track view.
+         *
+         * @param track model of the view.
+         */
+        void onTrackClicked(SoundCloudTrack track);
     }
 }

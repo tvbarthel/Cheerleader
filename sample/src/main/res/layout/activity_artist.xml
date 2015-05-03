@@ -9,7 +9,7 @@
         android:id="@+id/activity_artist_banner"
         layout="@layout/cheerleader_banner" />
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/activity_artist_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,7 +34,7 @@
         android:text="@string/search_results_not_found"
         android:visibility="invisible" />
 
-    <fr.tvbarthel.simplesoundcloud.sampleapp.ui.BottomListView
+    <fr.tvbarthel.simplesoundcloud.sampleapp.ui.BottomRecyclerListView
         android:id="@+id/activity_artist_playlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

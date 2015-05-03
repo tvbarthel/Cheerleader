@@ -1,25 +1,25 @@
 package fr.tvbarthel.simplesoundcloud.sampleapp.ui;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ListView;
 
 /**
- * Simple LIstView on which top padding could be assigned and enable touch on view under.
+ * Simple RecyclerView on which top padding could be assigned and enable touch on view under.
  */
-public class BottomListView extends ListView {
+public class BottomRecyclerListView extends RecyclerView {
 
-    public BottomListView(Context context) {
+    public BottomRecyclerListView(Context context) {
         super(context);
     }
 
-    public BottomListView(Context context, AttributeSet attrs) {
+    public BottomRecyclerListView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public BottomListView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BottomRecyclerListView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
