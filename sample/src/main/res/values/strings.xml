@@ -30,5 +30,8 @@
     <string name="activity_pick_links_website">Find more\ninformation</string>
     <string name="sound_cloud_credits">Powered by soundcloud</string>
 
+    <!-- toast !-->
+    <string name="toast_track_added">Track added to the playlist.</string>
+
 
 </resources>

@@ -60,4 +60,8 @@
     <color name="banner_subtitle">@android:color/white</color>
     <color name="banner_line">@android:color/white</color>
 
+    <!-- crouton view !-->
+    <color name="crouton_view_background">@color/red</color>
+    <color name="crouton_view_text">@android:color/white</color>
+
 </resources>

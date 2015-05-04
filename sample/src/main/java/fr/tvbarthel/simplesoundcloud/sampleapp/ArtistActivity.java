@@ -3,6 +3,7 @@ package fr.tvbarthel.simplesoundcloud.sampleapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack;
 import fr.tvbarthel.simplesoundcloud.library.client.SoundCloudUser;
 import fr.tvbarthel.simplesoundcloud.library.client.SupportSoundCloudArtistClient;
@@ -20,6 +22,7 @@ import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlayer;
 import fr.tvbarthel.simplesoundcloud.library.player.SimpleSoundCloudPlaylistListener;
 import fr.tvbarthel.simplesoundcloud.sampleapp.adapter.TracksAdapter;
 import fr.tvbarthel.simplesoundcloud.sampleapp.ui.ArtistView;
+import fr.tvbarthel.simplesoundcloud.sampleapp.ui.CroutonView;
 import fr.tvbarthel.simplesoundcloud.sampleapp.ui.PlaybackView;
 import fr.tvbarthel.simplesoundcloud.sampleapp.ui.TrackView;
 import rx.android.observables.AndroidObservable;
@@ -57,6 +60,10 @@ public class ArtistActivity extends ActionBarActivity implements
 
     // banner
     private View mBanner;
+
+    //Crouton, contextual toast.
+    private Crouton mCrouton;
+    private CroutonView mCroutonView;
 
     /**
      * Start an ArtistActivity for a given artist name.
@@ -272,8 +279,14 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrieveTracksListener = new TrackView.Listener() {
             @Override
             public void onTrackClicked(SoundCloudTrack track) {
-                mSimpleSoundCloudPlayer.addTrack(track, !mSimpleSoundCloudPlayer.isPlaying());
+                boolean playNow = !mSimpleSoundCloudPlayer.isPlaying();
+
+                mSimpleSoundCloudPlayer.addTrack(track, playNow);
                 mPlaylistAdapter.notifyDataSetChanged();
+
+                if (!playNow) {
+                    toast(R.string.toast_track_added);
+                }
             }
         };
 
@@ -312,5 +325,21 @@ public class ArtistActivity extends ActionBarActivity implements
         mPlaylistAdapter.setHeaderView(mPlaybackView);
 
         mPlaylistRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+    }
+
+    /**
+     * Used to display crouton toast.
+     *
+     * @param message text to be displayed.
+     */
+    private void toast(@StringRes int message) {
+        if (mCrouton != null) {
+            mCrouton.cancel();
+            mCrouton = null;
+        }
+        mCroutonView = new CroutonView(this, getString(message));
+
+        mCrouton = Crouton.make(this, mCroutonView, R.id.activity_artist_main_container);
+        mCrouton.show();
     }
 }
