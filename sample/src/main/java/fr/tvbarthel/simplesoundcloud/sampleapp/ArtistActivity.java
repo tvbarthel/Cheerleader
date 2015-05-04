@@ -141,7 +141,7 @@ public class ArtistActivity extends ActionBarActivity implements
     @Override
     public void onBackPressed() {
         if (mPlaybackView.getTop() < mPlaylistRecyclerView.getHeight() - mPlaybackView.getHeight()) {
-            mPlaylistRecyclerView.getLayoutManager().scrollToPosition(0);
+            mPlaylistRecyclerView.getLayoutManager().smoothScrollToPosition(mPlaylistRecyclerView, null, 0);
         } else {
             super.onBackPressed();
         }
@@ -262,7 +262,7 @@ public class ArtistActivity extends ActionBarActivity implements
     private String getExtraArtistName() {
         Bundle extras = getIntent().getExtras();
         if (extras == null || !extras.containsKey(BUNDLE_KEY_ARTIST_NAME)) {
-            throw new IllegalStateException("No artist name found, please use the startActivity pattern");
+            return ""; // activity started through the notification pending intent
         }
         return extras.getString(BUNDLE_KEY_ARTIST_NAME);
     }
