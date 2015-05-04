@@ -272,12 +272,8 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrieveTracksListener = new TrackView.Listener() {
             @Override
             public void onTrackClicked(SoundCloudTrack track) {
-                mSimpleSoundCloudPlayer.addTrack(track);
+                mSimpleSoundCloudPlayer.addTrack(track, !mSimpleSoundCloudPlayer.isPlaying());
                 mPlaylistAdapter.notifyDataSetChanged();
-
-                if (mSimpleSoundCloudPlayer.getTracks().size() == 1) {
-                    mSimpleSoundCloudPlayer.play();
-                }
             }
         };
 
@@ -304,8 +300,7 @@ public class ArtistActivity extends ActionBarActivity implements
         mPlaylistTracksListener = new TrackView.Listener() {
             @Override
             public void onTrackClicked(SoundCloudTrack track) {
-                int playlistPosition = mSimpleSoundCloudPlayer.getTracks().indexOf(track);
-                mSimpleSoundCloudPlayer.play(playlistPosition);
+                mSimpleSoundCloudPlayer.play(track);
             }
         };
 
