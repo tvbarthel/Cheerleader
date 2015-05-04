@@ -197,6 +197,24 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     }
 
     /**
+     * Play a track which have been added to the player playlist.
+     * <p/>
+     * See also {@link SimpleSoundCloudPlayer#addTrack(SoundCloudTrack)}
+     * {@link SimpleSoundCloudPlayer#addTracks(List)}
+     *
+     * @param track the track to play.
+     */
+    public void play(SoundCloudTrack track) {
+        checkState();
+        ArrayList<SoundCloudTrack> tracks = mPlayerPlaylist.getPlaylist().getTracks();
+        int position = tracks.indexOf(track);
+        if (position > -1) {
+            mPlayerPlaylist.setPlayingTrack(position);
+            PlaybackService.play(getContext(), mClientKey, track);
+        }
+    }
+
+    /**
      * Pause the playback.
      */
     public void pause() {
@@ -277,14 +295,30 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Add a track to the current SoundCloud player playlist.
      *
+     * See also {@link SimpleSoundCloudPlayer#addTrack(SoundCloudTrack, boolean)}
+     *
      * @param track {@link fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack} to be
      *              added to the player.
      */
     public void addTrack(SoundCloudTrack track) {
+        addTrack(track, false);
+    }
+
+    /**
+     * Add a track to the current SoundCloud player playlist.
+     *
+     * @param track   {@link fr.tvbarthel.simplesoundcloud.library.client.SoundCloudTrack} to be
+     *                added to the player.
+     * @param playNow true to play the track immediately.
+     */
+    public void addTrack(SoundCloudTrack track, boolean playNow) {
         checkState();
         mPlayerPlaylist.add(track);
         for (SimpleSoundCloudPlaylistListener listener : mSimpleSoundCloudPlaylistListeners) {
             listener.onTrackAdded(track);
+        }
+        if (playNow) {
+            play(mPlayerPlaylist.size() - 1);
         }
     }
 
