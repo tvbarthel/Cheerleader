@@ -1,6 +1,7 @@
 package fr.tvbarthel.simplesoundcloud.sampleapp.ui;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,13 @@ public class TrackView extends FrameLayout implements View.OnClickListener {
 
     private SoundCloudTrack mModel;
     private Listener mListener;
+
+    private int mTrackColor;
+    private int mArtistColor;
+    private int mDurationColor;
+    private int mTrackColorSelected;
+    private int mArtistColorSelected;
+    private int mDurationColorSelected;
 
     /**
      * Simple View used to render a track.
@@ -63,6 +71,20 @@ public class TrackView extends FrameLayout implements View.OnClickListener {
         super(context, attrs, defStyleAttr);
         if (!isInEditMode()) {
             init(context);
+        }
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        super.setSelected(selected);
+        if (selected) {
+            mDuration.setTextColor(mDurationColorSelected);
+            mArtist.setTextColor(mArtistColorSelected);
+            mTitle.setTextColor(mTrackColorSelected);
+        } else {
+            mDuration.setTextColor(mDurationColor);
+            mArtist.setTextColor(mArtistColor);
+            mTitle.setTextColor(mTrackColor);
         }
     }
 
@@ -109,6 +131,14 @@ public class TrackView extends FrameLayout implements View.OnClickListener {
         setPadding(padding, padding, padding, padding);
 
         this.setOnClickListener(this);
+
+        Resources res = getResources();
+        mTrackColor = res.getColor(R.color.track_view_track);
+        mArtistColor = res.getColor(R.color.track_view_artist);
+        mDurationColor = res.getColor(R.color.track_view_duration);
+        mArtistColorSelected = res.getColor(R.color.track_view_artist_selected);
+        mTrackColorSelected = res.getColor(R.color.track_view_track_selected);
+        mDurationColorSelected = res.getColor(R.color.track_view_duration_selected);
     }
 
     @Override

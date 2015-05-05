@@ -87,9 +87,11 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder> im
                 if (i == mPlayedTrackPosition) {
                     ((TrackHolder) holder).trackView
                         .setBackgroundResource(R.drawable.selectable_background_red_light);
+                    ((TrackHolder) holder).trackView.setSelected(true);
                 } else {
                     ((TrackHolder) holder).trackView
                         .setBackgroundResource(R.drawable.selectable_background_white);
+                    ((TrackHolder) holder).trackView.setSelected(false);
                 }
                 break;
             case VIEW_TYPE_HEADER:

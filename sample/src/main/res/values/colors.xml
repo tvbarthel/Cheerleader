@@ -50,6 +50,9 @@
     <color name="track_view_track">@color/grey_dark</color>
     <color name="track_view_artist">@color/grey_darker</color>
     <color name="track_view_duration">@color/grey_dark</color>
+    <color name="track_view_track_selected">@android:color/white</color>
+    <color name="track_view_artist_selected">@color/grey_lighter</color>
+    <color name="track_view_duration_selected">@android:color/white</color>
 
     <!-- puce !-->
     <color name="puce_inner_dot">@color/red</color>
