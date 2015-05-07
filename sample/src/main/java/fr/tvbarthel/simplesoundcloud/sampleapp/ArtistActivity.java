@@ -242,8 +242,6 @@ public class ArtistActivity extends ActionBarActivity implements
      * Used to retrieved the tracks of the artist as well as artist details.
      */
     private void getArtistData() {
-        mProgress.setVisibility(View.VISIBLE);
-        mCallback.setVisibility(View.INVISIBLE);
         mRetrievedTracks.clear();
         mAdapter.notifyDataSetChanged();
 

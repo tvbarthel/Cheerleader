@@ -31,6 +31,9 @@
     <color name="pick_activity_section_links_text">@android:color/white</color>
     <color name="pick_activity_credits">@android:color/white</color>
 
+    <!-- artist activity !-->
+    <color name="artist_activity_callback_text">@color/grey_light</color>
+
 
     <!-- artist view !-->
     <color name="artist_view_bottom_bar">@color/grey_lighter</color>
@@ -66,5 +69,8 @@
     <!-- crouton view !-->
     <color name="crouton_view_background">@color/red</color>
     <color name="crouton_view_text">@android:color/white</color>
+
+    <!-- progress !-->
+    <color name="progress_color">@color/grey_light</color>
 
 </resources>
