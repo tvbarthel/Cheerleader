@@ -88,7 +88,7 @@
                 android:text="@string/activity_pick_search_hint"
                 android:textColor="@color/pick_activity_extra_hint_text" />
 
-            <fr.tvbarthel.simplesoundcloud.sampleapp.ui.ExtraHintEditText
+            <fr.tvbarthel.cheerleader.sampleapp.ui.ExtraHintEditText
                 android:id="@+id/activity_pick_artist_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -20,7 +20,7 @@
         android:paddingBottom="@dimen/playback_view_height"
         android:paddingTop="130dp" />
 
-    <fr.tvbarthel.simplesoundcloud.sampleapp.ui.ProgressBarCompat
+    <fr.tvbarthel.cheerleader.sampleapp.ui.ProgressBarCompat
         android:id="@+id/activity_artist_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
         android:textColor="@color/artist_activity_callback_text"
         android:visibility="invisible" />
 
-    <fr.tvbarthel.simplesoundcloud.sampleapp.ui.BottomRecyclerListView
+    <fr.tvbarthel.cheerleader.sampleapp.ui.BottomRecyclerListView
         android:id="@+id/activity_artist_playlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

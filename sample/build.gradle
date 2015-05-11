@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.1"
 
     defaultConfig {
-        applicationId "fr.tvbarthel.simplesoundcloud.sampleapp"
+        applicationId "fr.tvbarthel.cheerleader.sampleapp"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1

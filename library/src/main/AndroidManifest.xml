@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fr.tvbarthel.simplesoundcloud.library">
+    package="fr.tvbarthel.cheerleader.library">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
@@ -10,7 +10,7 @@
         <!-- Content Provider used to access offline storage !-->
         <provider
             android:name=".offline.OfflinerProvider"
-            android:authorities="fr.tvbarthel.simplesoundcloud.library.SoundCloud.OfflineProvider"
+            android:authorities="fr.tvbarthel.cheerleader.library.Cheerleader.OfflineProvider"
             android:exported="false" />
 
         <!-- Service used for music playback !-->
