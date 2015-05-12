@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/playback_view_height">
+    android:layout_height="@dimen/playback_view_height"
+    android:orientation="horizontal">
 
     <View
         android:layout_width="match_parent"
@@ -14,54 +14,57 @@
         android:id="@+id/playback_view_artwork"
         android:layout_width="match_parent"
         android:layout_height="65dp"
+        android:layout_gravity="start"
         android:layout_marginTop="5dp"
-        android:scaleType="centerCrop"
-        android:layout_gravity="start" />
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/playback_view_track"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:padding="@dimen/activity_vertical_margin"
-        android:textSize="16sp"
+        android:layout_marginRight="144dp"
         android:layout_marginTop="5dp"
-        android:singleLine="true"
         android:ellipsize="end"
         android:gravity="center_vertical"
+        android:padding="@dimen/activity_vertical_margin"
+        android:singleLine="true"
         android:textColor="@color/playback_view_track_name"
-        android:layout_marginRight="144dp"
+        android:textSize="16sp"
         tools:text="Story writing" />
 
     <ImageView
         android:id="@+id/playback_view_previous"
         android:layout_width="48dp"
         android:layout_height="65dp"
-        android:layout_marginTop="5dp"
-        android:src="@drawable/ic_previous_white"
-        android:layout_marginRight="96dp"
-        android:scaleType="centerCrop"
         android:layout_gravity="end"
-        android:background="?attr/selectableItemBackground" />
+        android:layout_marginRight="96dp"
+        android:layout_marginTop="5dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/default_padding"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_previous_white" />
 
     <ImageView
         android:id="@+id/playback_view_toggle_play"
         android:layout_width="48dp"
         android:layout_height="65dp"
-        android:src="@drawable/ic_play_white"
+        android:layout_gravity="end"
         android:layout_marginRight="48dp"
         android:layout_marginTop="5dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/default_padding"
         android:scaleType="centerCrop"
-        android:layout_gravity="end"
-        android:background="?attr/selectableItemBackground" />
+        android:src="@drawable/ic_play_white" />
 
     <ImageView
         android:id="@+id/playback_view_next"
         android:layout_width="48dp"
         android:layout_height="65dp"
-        android:layout_marginTop="5dp"
-        android:src="@drawable/ic_next_white"
-        android:scaleType="centerCrop"
         android:layout_gravity="end"
-        android:background="?attr/selectableItemBackground" />
+        android:layout_marginTop="5dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/default_padding"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_next_white" />
 
 </FrameLayout>
