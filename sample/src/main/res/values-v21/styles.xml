@@ -11,6 +11,8 @@
         <item name="colorControlNormal">@color/primary</item>
         <item name="colorControlActivated">@color/primary</item>
         <item name="colorControlHighlight">@color/primary</item>
+
+        <item name="android:seekBarStyle">@style/SeekBarAppTheme</item>
     </style>
 
     <!-- Style for the main container of an activity, handle top offset !-->

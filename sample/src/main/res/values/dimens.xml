@@ -7,7 +7,7 @@
     <dimen name="shadow_size">10dp</dimen>
 
     <!-- playback view !-->
-    <dimen name="playback_view_height">70dp</dimen>
+    <dimen name="playback_view_height">100dp</dimen>
 
     <!-- activity pick !-->
     <dimen name="activity_pick_bottom_logo_height">120dp</dimen>

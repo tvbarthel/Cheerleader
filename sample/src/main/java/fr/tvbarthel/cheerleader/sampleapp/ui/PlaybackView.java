@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -21,11 +22,12 @@ import fr.tvbarthel.cheerleader.sampleapp.R;
 /**
  * Simple view used to display basic player button : play/pause, next and previous.
  */
-public class PlaybackView extends FrameLayout implements View.OnClickListener, SimpleSoundCloudPlayerListener {
+public class PlaybackView extends FrameLayout implements View.OnClickListener, SimpleSoundCloudPlayerListener, SeekBar.OnSeekBarChangeListener {
 
     private ImageView mArtwork;
     private TextView mTitle;
     private ImageView mPlayPause;
+    private SeekBar mSeekBar;
 
     /**
      * Dummy listener.
@@ -43,6 +45,11 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
 
         @Override
         public void onNextPressed() {
+
+        }
+
+        @Override
+        public void onSeekToRequested(int milli) {
 
         }
     };
@@ -120,6 +127,10 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////// Player callback ///////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
     @Override
     public void onPlayerPlay(SoundCloudTrack track, int position) {
         setTrack(track);
@@ -132,7 +143,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
 
     @Override
     public void onPlayerSeekTo(int milli) {
-
+        mSeekBar.setProgress(milli);
     }
 
     @Override
@@ -152,7 +163,28 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
 
     @Override
     public void onProgressChanged(int milli) {
+        mSeekBar.setProgress(milli);
         Log.d("LARGONNE", " " + milli / 1000);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////// SeekBar listener /////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        mListener.onSeekToRequested(seekBar.getProgress());
     }
 
     /**
@@ -177,6 +209,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
             mTitle.setText("");
             mArtwork.setImageDrawable(null);
             mPlayPause.setImageResource(R.drawable.ic_play_white);
+            mSeekBar.setProgress(0);
         } else {
             Picasso.with(getContext())
                 .load(SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XLARGE))
@@ -189,6 +222,8 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
             if (getTranslationY() != 0) {
                 this.animate().translationY(0);
             }
+            mSeekBar.setProgress(0);
+            mSeekBar.setMax(((int) track.getDurationInMilli()));
         }
     }
 
@@ -222,6 +257,8 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
             PorterDuff.Mode.SRC_ATOP
         );
         mTitle = ((TextView) findViewById(R.id.playback_view_track));
+        mSeekBar = ((SeekBar) findViewById(R.id.playback_view_seekbar));
+        mSeekBar.setOnSeekBarChangeListener(this);
     }
 
     /**
@@ -231,16 +268,25 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
         /**
          * Called when user pressed the toggle play/pause button.
          */
-        public void onTogglePlayPressed();
+        void onTogglePlayPressed();
 
         /**
          * Called when user pressed the previous button.
          */
-        public void onPreviousPressed();
+        void onPreviousPressed();
 
         /**
          * Called when user pressed the next button.
          */
-        public void onNextPressed();
+        void onNextPressed();
+
+        /**
+         * Called when user touch the seek bar to request a seek to action.
+         *
+         * @param milli milli second to which  the player should seek to.
+         */
+        void onSeekToRequested(int milli);
+
+
     }
 }

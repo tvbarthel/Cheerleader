@@ -170,6 +170,11 @@ public class ArtistActivity extends ActionBarActivity implements
     }
 
     @Override
+    public void onSeekToRequested(int milli) {
+        mSimpleSoundCloudPlayer.seekTo(milli);
+    }
+
+    @Override
     public void onTrackAdded(SoundCloudTrack track) {
         mPlaylistTracks.add(track);
         mPlaylistAdapter.notifyDataSetChanged();

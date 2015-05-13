@@ -13,7 +13,7 @@
     <ImageView
         android:id="@+id/playback_view_artwork"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="match_parent"
         android:layout_gravity="start"
         android:layout_marginTop="5dp"
         android:scaleType="centerCrop" />
@@ -66,5 +66,13 @@
         android:padding="@dimen/default_padding"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_next_white" />
+
+    <SeekBar
+        android:id="@+id/playback_view_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom"
+        android:max="100"
+        android:progress="50" />
 
 </FrameLayout>
