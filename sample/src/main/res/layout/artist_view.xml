@@ -19,98 +19,112 @@
         android:layout_marginTop="30dp"
         android:background="@color/artist_view_bottom_bar" />
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/artist_view_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="40dp"
-        android:layout_marginLeft="@dimen/activity_vertical_margin"
-        android:layout_marginRight="@dimen/activity_vertical_margin"
-        card_view:cardCornerRadius="4dp"
-        card_view:contentPadding="@dimen/default_padding">
+    <!--<android.support.v7.widget.CardView-->
+    <!--android:id="@+id/artist_view_card"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:layout_marginBottom="40dp"-->
+    <!--android:layout_marginLeft="@dimen/activity_vertical_margin"-->
+    <!--android:layout_marginRight="@dimen/activity_vertical_margin"-->
+    <!--card_view:cardCornerRadius="4dp"-->
+    <!--card_view:contentPadding="@dimen/default_padding">-->
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/artist_view_avatar_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="40dp"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            card_view:cardCornerRadius="4dp"
+            card_view:contentPadding="@dimen/default_padding">
 
             <ImageView
                 android:id="@+id/artist_view_avatar"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
-                android:layout_alignParentRight="true"
                 tools:src="@mipmap/ic_launcher" />
 
-            <TextView
-                android:id="@+id/artist_view_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/artist_view_track_number"
-                android:layout_marginLeft="30dp"
-                android:layout_toLeftOf="@+id/artist_view_avatar"
-                android:fontFamily="sans-serif-light"
-                android:textColor="@color/artist_view_artist_name"
-                android:textSize="22sp"
-                tools:text="Ivan Breadnwater" />
+        </android.support.v7.widget.CardView>
 
-            <TextView
-                android:id="@+id/artist_view_track_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/artist_view_avatar"
-                android:layout_marginLeft="30dp"
-                android:layout_toLeftOf="@+id/artist_view_avatar"
-                android:singleLine="true"
-                android:textColor="@color/artist_view_track_number"
-                android:textStyle="italic"
-                tools:text="38 Tracks" />
+        <TextView
+            android:id="@+id/artist_view_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/artist_view_track_number"
+            android:layout_marginLeft="30dp"
+            android:layout_toLeftOf="@+id/artist_view_avatar_container"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/artist_view_artist_name"
+            android:textSize="22sp"
+            tools:text="Ivan Breadnwater" />
 
-            <TextView
-                android:id="@+id/artist_view_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/artist_view_track_number"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="10dp"
-                android:autoLink="all"
-                android:fontFamily="sans-serif-thin"
-                android:textColor="@color/artist_view_track_number"
-                android:textSize="15sp"
-                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt consectetur nunc, quis posuere purus blandit sed. Vestibulum eleifend eget nibh ut faucibus. Curabitur dapibus ac ex ac volutpat. Mauris tincidunt, turpis sit amet laoreet laoreet, felis dolor venenatis lacus, in scelerisque mauris elit nec dui. Ut sed iaculis ligula. Fusce tempus mauris eros, ac imperdiet leo volutpat sit amet" />
+        <TextView
+            android:id="@+id/artist_view_track_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/artist_view_avatar_container"
+            android:layout_marginLeft="30dp"
+            android:layout_toLeftOf="@+id/artist_view_avatar_container"
+            android:singleLine="true"
+            android:textColor="@color/artist_view_track_number"
+            android:textStyle="italic"
+            tools:text="38 Tracks" />
 
-            <View
-                android:id="@+id/artist_view_puce_name"
-                android:layout_width="@dimen/puce_size"
-                android:layout_height="@dimen/puce_size"
-                android:layout_alignTop="@+id/artist_view_name"
-                android:layout_marginLeft="4dp"
-                android:background="@drawable/puce" />
+        <TextView
+            android:id="@+id/artist_view_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/artist_view_track_number"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_alignRight="@+id/artist_view_avatar_container"
+            android:autoLink="all"
+            android:fontFamily="sans-serif-thin"
+            android:textColor="@color/artist_view_track_number"
+            android:textSize="15sp"
+            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt consectetur nunc, quis posuere purus blandit sed. Vestibulum eleifend eget nibh ut faucibus. Curabitur dapibus ac ex ac volutpat. Mauris tincidunt, turpis sit amet laoreet laoreet, felis dolor venenatis lacus, in scelerisque mauris elit nec dui. Ut sed iaculis ligula. Fusce tempus mauris eros, ac imperdiet leo volutpat sit amet" />
 
-            <View
-                android:id="@+id/artist_view_puce_description"
-                android:layout_width="@dimen/puce_size"
-                android:layout_height="@dimen/puce_size"
-                android:layout_alignTop="@+id/artist_view_description"
-                android:layout_marginLeft="4dp"
-                android:background="@drawable/puce" />
+        <View
+            android:id="@+id/artist_view_puce_name"
+            android:layout_width="@dimen/puce_size"
+            android:layout_height="@dimen/puce_size"
+            android:layout_alignTop="@+id/artist_view_name"
+            android:layout_marginLeft="4dp"
+            android:background="@drawable/puce" />
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_above="@id/artist_view_puce_description"
-                android:layout_below="@id/artist_view_puce_name"
-                android:layout_marginLeft="16dp"
-                android:background="@drawable/line_vertical_grey" />
+        <View
+            android:id="@+id/artist_view_puce_description"
+            android:layout_width="@dimen/puce_size"
+            android:layout_height="@dimen/puce_size"
+            android:layout_alignTop="@+id/artist_view_description"
+            android:layout_marginLeft="4dp"
+            android:background="@drawable/puce" />
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_alignBottom="@+id/artist_view_description"
-                android:layout_below="@id/artist_view_puce_description"
-                android:layout_marginLeft="16dp"
-                android:background="@drawable/line_vertical_grey" />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_above="@id/artist_view_puce_description"
+            android:layout_below="@id/artist_view_puce_name"
+            android:layout_marginLeft="16dp"
+            android:background="@drawable/line_vertical_grey" />
 
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/artist_view_description"
+            android:layout_below="@id/artist_view_puce_description"
+            android:layout_marginLeft="16dp"
+            android:background="@drawable/line_vertical_grey" />
+
+    </RelativeLayout>
+    <!--</android.support.v7.widget.CardView>-->
 
 </FrameLayout>

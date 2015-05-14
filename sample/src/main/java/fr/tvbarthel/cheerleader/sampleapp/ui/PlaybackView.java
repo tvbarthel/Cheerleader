@@ -3,7 +3,6 @@ package fr.tvbarthel.cheerleader.sampleapp.ui;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -164,7 +163,6 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
     @Override
     public void onProgressChanged(int milli) {
         mSeekBar.setProgress(milli);
-        Log.d("LARGONNE", " " + milli / 1000);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,7 +220,6 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
             if (getTranslationY() != 0) {
                 this.animate().translationY(0);
             }
-            mSeekBar.setProgress(0);
             mSeekBar.setMax(((int) track.getDurationInMilli()));
         }
     }
