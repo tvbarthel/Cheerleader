@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
 import fr.tvbarthel.cheerleader.library.client.SoundCloudUser;
-import fr.tvbarthel.cheerleader.library.client.SupportSoundCloudArtistClient;
-import fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer;
-import fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlaylistListener;
+import fr.tvbarthel.cheerleader.library.client.CheerleaderClient;
+import fr.tvbarthel.cheerleader.library.player.CheerleaderPlayer;
+import fr.tvbarthel.cheerleader.library.player.CheerleaderPlaylistListener;
 import fr.tvbarthel.cheerleader.sampleapp.adapter.TracksAdapter;
 import fr.tvbarthel.cheerleader.sampleapp.ui.ArtistView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.CroutonView;
@@ -31,14 +31,14 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class ArtistActivity extends ActionBarActivity implements
-    PlaybackView.Listener, SimpleSoundCloudPlaylistListener {
+    PlaybackView.Listener, CheerleaderPlaylistListener {
 
     // bundle keys
     private static final String BUNDLE_KEY_ARTIST_NAME = "artist_activity_bundle_key_artist_name";
 
     // sound cloud
-    private SupportSoundCloudArtistClient mSupportSoundCloudArtistClient;
-    private SimpleSoundCloudPlayer mSimpleSoundCloudPlayer;
+    private CheerleaderClient mCheerleaderClient;
+    private CheerleaderPlayer mCheerleaderPlayer;
 
     // tracks widget
     private ProgressBar mProgress;
@@ -85,13 +85,13 @@ public class ArtistActivity extends ActionBarActivity implements
 
         String artistName = getExtraArtistName();
 
-        mSupportSoundCloudArtistClient = new SupportSoundCloudArtistClient.Builder()
+        mCheerleaderClient = new CheerleaderClient.Builder()
             .from(this)
             .with(R.string.sound_cloud_client_id)
             .supports(artistName)
             .build();
 
-        mSimpleSoundCloudPlayer = new SimpleSoundCloudPlayer.Builder()
+        mCheerleaderPlayer = new CheerleaderPlayer.Builder()
             .from(this)
             .with(R.string.sound_cloud_client_id)
             .notificationActivity(this)
@@ -111,13 +111,13 @@ public class ArtistActivity extends ActionBarActivity implements
         setTrackListPadding();
 
         // check if tracks are already loaded into the player.
-        ArrayList<SoundCloudTrack> currentsTracks = mSimpleSoundCloudPlayer.getTracks();
+        ArrayList<SoundCloudTrack> currentsTracks = mCheerleaderPlayer.getTracks();
         if (currentsTracks != null) {
             mPlaylistTracks.addAll(currentsTracks);
         }
 
         // synchronize the player view with the current player (loaded track, playing state, etc.)
-        mPlaybackView.synchronize(mSimpleSoundCloudPlayer);
+        mPlaybackView.synchronize(mCheerleaderPlayer);
 
         getArtistData();
     }
@@ -125,24 +125,24 @@ public class ArtistActivity extends ActionBarActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        mSimpleSoundCloudPlayer.registerPlayerListener(mPlaybackView);
-        mSimpleSoundCloudPlayer.registerPlayerListener(mPlaylistAdapter);
-        mSimpleSoundCloudPlayer.registerPlaylistListener(this);
+        mCheerleaderPlayer.registerPlayerListener(mPlaybackView);
+        mCheerleaderPlayer.registerPlayerListener(mPlaylistAdapter);
+        mCheerleaderPlayer.registerPlaylistListener(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mSimpleSoundCloudPlayer.unregisterPlayerListener(mPlaybackView);
-        mSimpleSoundCloudPlayer.unregisterPlayerListener(mPlaylistAdapter);
-        mSimpleSoundCloudPlayer.unregisterPlaylistListener(this);
+        mCheerleaderPlayer.unregisterPlayerListener(mPlaybackView);
+        mCheerleaderPlayer.unregisterPlayerListener(mPlaylistAdapter);
+        mCheerleaderPlayer.unregisterPlaylistListener(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mSupportSoundCloudArtistClient.close();
-        mSimpleSoundCloudPlayer.destroy();
+        mCheerleaderClient.close();
+        mCheerleaderPlayer.destroy();
     }
 
     @Override
@@ -156,22 +156,22 @@ public class ArtistActivity extends ActionBarActivity implements
 
     @Override
     public void onTogglePlayPressed() {
-        mSimpleSoundCloudPlayer.togglePlayback();
+        mCheerleaderPlayer.togglePlayback();
     }
 
     @Override
     public void onPreviousPressed() {
-        mSimpleSoundCloudPlayer.previous();
+        mCheerleaderPlayer.previous();
     }
 
     @Override
     public void onNextPressed() {
-        mSimpleSoundCloudPlayer.next();
+        mCheerleaderPlayer.next();
     }
 
     @Override
     public void onSeekToRequested(int milli) {
-        mSimpleSoundCloudPlayer.seekTo(milli);
+        mCheerleaderPlayer.seekTo(milli);
     }
 
     @Override
@@ -251,14 +251,14 @@ public class ArtistActivity extends ActionBarActivity implements
         mAdapter.notifyDataSetChanged();
 
         AndroidObservable.bindActivity(this,
-            mSupportSoundCloudArtistClient.getArtistTracks()
+            mCheerleaderClient.getArtistTracks()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(displayCallbacks()))
             .subscribe(displayTracks());
 
         AndroidObservable.bindActivity(this,
-            mSupportSoundCloudArtistClient.getArtistProfile()
+            mCheerleaderClient.getArtistProfile()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io()))
             .subscribe(displayArtist());
@@ -282,9 +282,9 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrieveTracksListener = new TrackView.Listener() {
             @Override
             public void onTrackClicked(SoundCloudTrack track) {
-                boolean playNow = !mSimpleSoundCloudPlayer.isPlaying();
+                boolean playNow = !mCheerleaderPlayer.isPlaying();
 
-                mSimpleSoundCloudPlayer.addTrack(track, playNow);
+                mCheerleaderPlayer.addTrack(track, playNow);
                 mPlaylistAdapter.notifyDataSetChanged();
 
                 if (!playNow) {
@@ -316,7 +316,7 @@ public class ArtistActivity extends ActionBarActivity implements
         mPlaylistTracksListener = new TrackView.Listener() {
             @Override
             public void onTrackClicked(SoundCloudTrack track) {
-                mSimpleSoundCloudPlayer.play(track);
+                mCheerleaderPlayer.play(track);
             }
         };
 

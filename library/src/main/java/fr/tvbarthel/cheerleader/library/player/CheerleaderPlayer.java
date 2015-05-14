@@ -17,7 +17,7 @@ import rx.functions.Action1;
 /**
  * Encapsulate network and player features to work with sound cloud.
  */
-public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundCloudTrack>> {
+public final class CheerleaderPlayer implements Action1<ArrayList<SoundCloudTrack>> {
 
     private static final int STATE_STOPPED = 0x00000000;
     private static final int STATE_PAUSED = 0x00000001;
@@ -26,7 +26,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Instance, singleton pattern.
      */
-    private static SimpleSoundCloudPlayer sInstance;
+    private static CheerleaderPlayer sInstance;
 
     /**
      * WeakReference on the application context.
@@ -46,12 +46,12 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Listener which should be notified of playback events.
      */
-    private ArrayList<SimpleSoundCloudPlayerListener> mSimpleSoundCloudPlayerListeners;
+    private ArrayList<CheerleaderPlayerListener> mCheerleaderPlayerListeners;
 
     /**
      * Listener which should be notified of playlist events.
      */
-    private ArrayList<SimpleSoundCloudPlaylistListener> mSimpleSoundCloudPlaylistListeners;
+    private ArrayList<CheerleaderPlaylistListener> mCheerleaderPlaylistListeners;
 
     /**
      * Manage the playlist used by the player.
@@ -82,7 +82,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Private default constructor.
      */
-    private SimpleSoundCloudPlayer() {
+    private CheerleaderPlayer() {
 
     }
 
@@ -93,14 +93,14 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      *                           {@link fr.tvbarthel.cheerleader.library.offline.Offliner}
      * @param clientId           SoundCloud api client key.
      */
-    private SimpleSoundCloudPlayer(Context applicationContext, String clientId) {
+    private CheerleaderPlayer(Context applicationContext, String clientId) {
 
         mClientKey = clientId;
         mIsClosed = false;
         mDestroyDelayed = false;
         mState = STATE_STOPPED;
-        mSimpleSoundCloudPlayerListeners = new ArrayList<>();
-        mSimpleSoundCloudPlaylistListeners = new ArrayList<>();
+        mCheerleaderPlayerListeners = new ArrayList<>();
+        mCheerleaderPlaylistListeners = new ArrayList<>();
 
         mApplicationContext = new WeakReference<>(applicationContext);
 
@@ -115,14 +115,14 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      *
      * @param context  context used to instantiate internal components, no hard reference will be kept.
      * @param clientId sound cloud client id.
-     * @return instance of {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer}
+     * @return instance of {@link CheerleaderPlayer}
      */
-    private static SimpleSoundCloudPlayer getInstance(Context context, String clientId) {
+    private static CheerleaderPlayer getInstance(Context context, String clientId) {
         if (clientId == null) {
             throw new IllegalArgumentException("Sound cloud client id can't be null.");
         }
         if (sInstance == null || sInstance.mIsClosed) {
-            sInstance = new SimpleSoundCloudPlayer(context.getApplicationContext(), clientId);
+            sInstance = new CheerleaderPlayer(context.getApplicationContext(), clientId);
         } else {
             sInstance.mClientKey = clientId;
         }
@@ -157,7 +157,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
 
         mClientKey = null;
         mPlayerPlaylist = null;
-        mSimpleSoundCloudPlayerListeners.clear();
+        mCheerleaderPlayerListeners.clear();
     }
 
     /**
@@ -199,8 +199,8 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Play a track which have been added to the player playlist.
      * <p/>
-     * See also {@link SimpleSoundCloudPlayer#addTrack(SoundCloudTrack)}
-     * {@link SimpleSoundCloudPlayer#addTracks(List)}
+     * See also {@link CheerleaderPlayer#addTrack(SoundCloudTrack)}
+     * {@link CheerleaderPlayer#addTracks(List)}
      *
      * @param track the track to play.
      */
@@ -295,7 +295,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     /**
      * Add a track to the current SoundCloud player playlist.
      *
-     * See also {@link SimpleSoundCloudPlayer#addTrack(SoundCloudTrack, boolean)}
+     * See also {@link CheerleaderPlayer#addTrack(SoundCloudTrack, boolean)}
      *
      * @param track {@link fr.tvbarthel.cheerleader.library.client.SoundCloudTrack} to be
      *              added to the player.
@@ -314,7 +314,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     public void addTrack(SoundCloudTrack track, boolean playNow) {
         checkState();
         mPlayerPlaylist.add(track);
-        for (SimpleSoundCloudPlaylistListener listener : mSimpleSoundCloudPlaylistListeners) {
+        for (CheerleaderPlaylistListener listener : mCheerleaderPlaylistListeners) {
             listener.onTrackAdded(track);
         }
         if (playNow) {
@@ -360,7 +360,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             play(mPlayerPlaylist.getCurrentTrackIndex());
         }
 
-        for (SimpleSoundCloudPlaylistListener listener : mSimpleSoundCloudPlaylistListeners) {
+        for (CheerleaderPlaylistListener listener : mCheerleaderPlaylistListeners) {
             listener.onTrackRemoved(removedTrack, mPlayerPlaylist.isEmpty());
         }
     }
@@ -401,9 +401,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      *
      * @param listener listener to register.
      */
-    public void registerPlayerListener(SimpleSoundCloudPlayerListener listener) {
+    public void registerPlayerListener(CheerleaderPlayerListener listener) {
         checkState();
-        mSimpleSoundCloudPlayerListeners.add(listener);
+        mCheerleaderPlayerListeners.add(listener);
         if (mState == STATE_PLAYING) {
             listener.onPlayerPlay(mPlayerPlaylist.getCurrentTrack(), mPlayerPlaylist.getCurrentTrackIndex());
         } else if (mState == STATE_PAUSED) {
@@ -416,9 +416,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      *
      * @param listener listener to unregister.
      */
-    public void unregisterPlayerListener(SimpleSoundCloudPlayerListener listener) {
+    public void unregisterPlayerListener(CheerleaderPlayerListener listener) {
         checkState();
-        mSimpleSoundCloudPlayerListeners.remove(listener);
+        mCheerleaderPlayerListeners.remove(listener);
     }
 
     /**
@@ -426,9 +426,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      *
      * @param listener listener to register.
      */
-    public void registerPlaylistListener(SimpleSoundCloudPlaylistListener listener) {
+    public void registerPlaylistListener(CheerleaderPlaylistListener listener) {
         checkState();
-        mSimpleSoundCloudPlaylistListeners.add(listener);
+        mCheerleaderPlaylistListeners.add(listener);
     }
 
     /**
@@ -436,9 +436,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
      *
      * @param listener listener to unregister.
      */
-    public void unregisterPlaylistListener(SimpleSoundCloudPlaylistListener listener) {
+    public void unregisterPlaylistListener(CheerleaderPlaylistListener listener) {
         checkState();
-        mSimpleSoundCloudPlaylistListeners.remove(listener);
+        mCheerleaderPlaylistListeners.remove(listener);
     }
 
     /**
@@ -464,7 +464,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             protected void onPlay(SoundCloudTrack track) {
                 super.onPlay(track);
                 mState = STATE_PLAYING;
-                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                for (CheerleaderPlayerListener listener : mCheerleaderPlayerListeners) {
                     listener.onPlayerPlay(track, mPlayerPlaylist.getCurrentTrackIndex());
                 }
             }
@@ -473,7 +473,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             protected void onPause() {
                 super.onPause();
                 mState = STATE_PAUSED;
-                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                for (CheerleaderPlayerListener listener : mCheerleaderPlayerListeners) {
                     listener.onPlayerPause();
                 }
             }
@@ -482,18 +482,18 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             protected void onPlayerDestroyed() {
                 super.onPlayerDestroyed();
                 mState = STATE_STOPPED;
-                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                for (CheerleaderPlayerListener listener : mCheerleaderPlayerListeners) {
                     listener.onPlayerDestroyed();
                 }
                 if (mDestroyDelayed) {
-                    SimpleSoundCloudPlayer.this.destroy();
+                    CheerleaderPlayer.this.destroy();
                 }
             }
 
             @Override
             protected void onSeekTo(int milli) {
                 super.onSeekTo(milli);
-                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                for (CheerleaderPlayerListener listener : mCheerleaderPlayerListeners) {
                     listener.onPlayerSeekTo(milli);
                 }
             }
@@ -501,7 +501,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             @Override
             protected void onBufferingStarted() {
                 super.onBufferingStarted();
-                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                for (CheerleaderPlayerListener listener : mCheerleaderPlayerListeners) {
                     listener.onBufferingStarted();
                 }
             }
@@ -509,7 +509,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             @Override
             protected void onBufferingEnded() {
                 super.onBufferingEnded();
-                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                for (CheerleaderPlayerListener listener : mCheerleaderPlayerListeners) {
                     listener.onBufferingEnded();
                 }
             }
@@ -517,7 +517,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
             @Override
             protected void onProgressChanged(int milli) {
                 super.onProgressChanged(milli);
-                for (SimpleSoundCloudPlayerListener listener : mSimpleSoundCloudPlayerListeners) {
+                for (CheerleaderPlayerListener listener : mCheerleaderPlayerListeners) {
                     listener.onProgressChanged(milli);
                 }
             }
@@ -545,7 +545,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
     }
 
     /**
-     * Builder used to build a {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer}
+     * Builder used to build a {@link CheerleaderPlayer}
      */
     public static class Builder {
 
@@ -566,7 +566,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
          * Context from which the client will be build.
          *
          * @param context context used to instantiate internal components.
-         * @return {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer.Builder}
+         * @return {@link CheerleaderPlayer.Builder}
          */
         public Builder from(Context context) {
             this.context = context;
@@ -577,7 +577,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
          * Api key with which SoundCloud call will be performed.
          *
          * @param apiKey sound cloud api key.
-         * @return {@link SimpleSoundCloudPlayer.Builder}
+         * @return {@link CheerleaderPlayer.Builder}
          */
         public Builder with(String apiKey) {
             if (apiKey == null) {
@@ -591,7 +591,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
          * Api key with which SoundCloud call will be performed.
          *
          * @param resId res id of sound cloud api key.
-         * @return {@link SimpleSoundCloudPlayer.Builder}
+         * @return {@link CheerleaderPlayer.Builder}
          */
         public Builder with(@StringRes int resId) {
             if (context == null) {
@@ -606,7 +606,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
          * Define the drawable used as icon in the notification displayed while playing.
          *
          * @param resId icon res id.
-         * @return {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer.Builder}
+         * @return {@link CheerleaderPlayer.Builder}
          */
         public Builder notificationIcon(@DrawableRes int resId) {
             notificationConfig.setNotificationIcon(resId);
@@ -619,7 +619,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
          * Only for Lollipop device.
          *
          * @param resId notification icon background.
-         * @return {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer.Builder}
+         * @return {@link CheerleaderPlayer.Builder}
          */
         public Builder notificationIconBackground(@DrawableRes int resId) {
             notificationConfig.setNotificationIconBackground(resId);
@@ -632,7 +632,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
          * This activity should display a media controller.
          *
          * @param activity started activity.
-         * @return {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer.Builder}
+         * @return {@link CheerleaderPlayer.Builder}
          */
         public Builder notificationActivity(ActionBarActivity activity) {
             notificationConfig.setNotificationActivity(activity);
@@ -645,7 +645,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
          * This activity should display a media controller.
          *
          * @param activity started activity.
-         * @return {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer.Builder}
+         * @return {@link CheerleaderPlayer.Builder}
          */
         public Builder notificationActivity(Activity activity) {
             notificationConfig.setNotificationActivity(activity);
@@ -656,9 +656,9 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
         /**
          * Build the client.
          *
-         * @return {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer}
+         * @return {@link CheerleaderPlayer}
          */
-        public SimpleSoundCloudPlayer build() {
+        public CheerleaderPlayer build() {
             if (this.context == null) {
                 throw new IllegalStateException("Context should be passed using 'Builder.from' to build the client.");
             }
@@ -667,7 +667,7 @@ public final class SimpleSoundCloudPlayer implements Action1<ArrayList<SoundClou
                 throw new IllegalStateException("Api key should be passed using 'Builder.with' to build the client.");
             }
 
-            SimpleSoundCloudPlayer instance = getInstance(this.context, this.apiKey);
+            CheerleaderPlayer instance = getInstance(this.context, this.apiKey);
             if (!this.apiKey.equals(instance.mClientKey)) {
                 throw new IllegalStateException("Only one api key can be used at the same time.");
             }

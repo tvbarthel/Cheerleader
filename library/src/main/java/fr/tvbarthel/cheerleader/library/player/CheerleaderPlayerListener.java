@@ -3,10 +3,10 @@ package fr.tvbarthel.cheerleader.library.player;
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
 
 /**
- * Listener interface used to catch {@link fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer}
+ * Listener interface used to catch {@link CheerleaderPlayer}
  * events.
  */
-public interface SimpleSoundCloudPlayerListener {
+public interface CheerleaderPlayerListener {
     /**
      * Called when a track starts to be played.
      *

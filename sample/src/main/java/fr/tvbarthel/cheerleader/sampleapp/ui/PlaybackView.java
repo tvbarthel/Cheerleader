@@ -14,14 +14,15 @@ import com.squareup.picasso.Picasso;
 
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
 import fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper;
-import fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayer;
-import fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayerListener;
+import fr.tvbarthel.cheerleader.library.player.CheerleaderPlayer;
+import fr.tvbarthel.cheerleader.library.player.CheerleaderPlayerListener;
 import fr.tvbarthel.cheerleader.sampleapp.R;
 
 /**
  * Simple view used to display basic player button : play/pause, next and previous.
  */
-public class PlaybackView extends FrameLayout implements View.OnClickListener, SimpleSoundCloudPlayerListener, SeekBar.OnSeekBarChangeListener {
+public class PlaybackView extends FrameLayout implements View.OnClickListener,
+    CheerleaderPlayerListener, SeekBar.OnSeekBarChangeListener {
 
     private ImageView mArtwork;
     private TextView mTitle;
@@ -192,7 +193,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
      *
      * @param player player currently used.
      */
-    public void synchronize(SimpleSoundCloudPlayer player) {
+    public void synchronize(CheerleaderPlayer player) {
         setTrack(player.getCurrentTrack());
         setPlaying(player.isPlaying());
     }
@@ -228,7 +229,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener, S
      * Used to update the play/pause button.
      * <p/>
      * Should be synchronize with the player playing state.
-     * See also : {@link SimpleSoundCloudPlayer#isPlaying()}.
+     * See also : {@link CheerleaderPlayer#isPlaying()}.
      *
      * @param isPlaying true if a track is currently played.
      */

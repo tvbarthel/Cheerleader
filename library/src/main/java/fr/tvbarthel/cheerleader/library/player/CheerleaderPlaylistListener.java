@@ -5,7 +5,7 @@ import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
 /**
  * Listener used to catch events performed on the play playlist.
  */
-public interface SimpleSoundCloudPlaylistListener {
+public interface CheerleaderPlaylistListener {
 
     /**
      * Called when a tracks has been added to the player playlist.

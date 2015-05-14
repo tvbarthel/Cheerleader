@@ -7,14 +7,14 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
-import fr.tvbarthel.cheerleader.library.player.SimpleSoundCloudPlayerListener;
+import fr.tvbarthel.cheerleader.library.player.CheerleaderPlayerListener;
 import fr.tvbarthel.cheerleader.sampleapp.R;
 import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
 
 /**
  * Simple adapter used to display artist tracks in a list with an optional header.
  */
-public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder> implements SimpleSoundCloudPlayerListener {
+public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder> implements CheerleaderPlayerListener {
 
     /**
      * View types.

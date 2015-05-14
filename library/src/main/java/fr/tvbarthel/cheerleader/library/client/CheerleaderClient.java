@@ -17,7 +17,7 @@ import rx.functions.Func1;
 /**
  * Encapsulate network features used to support an artist on SoundCloud.
  */
-public final class SupportSoundCloudArtistClient implements Closeable {
+public final class CheerleaderClient implements Closeable {
 
     /**
      * Disable all logs.
@@ -49,7 +49,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
     /**
      * Instance, singleton pattern.
      */
-    private static SupportSoundCloudArtistClient sInstance;
+    private static CheerleaderClient sInstance;
 
     /**
      * Rest adapter used to create {@link RetrofitService}
@@ -88,14 +88,14 @@ public final class SupportSoundCloudArtistClient implements Closeable {
 
     /**
      * Object used as cache RAM in order to avoid spamming API with multiple
-     * call of {@link SupportSoundCloudArtistClient#getArtistProfile()}
+     * call of {@link CheerleaderClient#getArtistProfile()}
      */
     private CacheRam mCacheRam;
 
     /**
      * Private default constructor.
      */
-    private SupportSoundCloudArtistClient() {
+    private CheerleaderClient() {
 
     }
 
@@ -107,7 +107,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
      * @param clientId           SoundCloud api client key.
      * @param artistName         sound cloud artiste name.
      */
-    private SupportSoundCloudArtistClient(Context applicationContext, String clientId, String artistName) {
+    private CheerleaderClient(Context applicationContext, String clientId, String artistName) {
 
         mArtistName = artistName;
         mClientKey = clientId;
@@ -141,9 +141,9 @@ public final class SupportSoundCloudArtistClient implements Closeable {
      * @param context    context used to instantiate internal components, no hard reference will be kept.
      * @param clientId   sound cloud client id.
      * @param artistName sound cloud artiste name.
-     * @return instance of {@link SupportSoundCloudArtistClient}
+     * @return instance of {@link CheerleaderClient}
      */
-    private static SupportSoundCloudArtistClient getInstance(Context context, String clientId, String artistName) {
+    private static CheerleaderClient getInstance(Context context, String clientId, String artistName) {
         if (clientId == null) {
             throw new IllegalArgumentException("Sound cloud client id can't be null.");
         }
@@ -151,7 +151,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
             throw new IllegalArgumentException("Sound cloud artistName can't be null.");
         }
         if (sInstance == null || sInstance.mIsClosed) {
-            sInstance = new SupportSoundCloudArtistClient(context.getApplicationContext(), clientId, artistName);
+            sInstance = new CheerleaderClient(context.getApplicationContext(), clientId, artistName);
         } else {
             sInstance.mRequestSignator.setClientId(clientId);
             sInstance.mClientKey = clientId;
@@ -259,9 +259,9 @@ public final class SupportSoundCloudArtistClient implements Closeable {
      * Note : some log configuration can increase memory foot print and/or reduce the performance.
      * Use them with caution.
      * <p/>
-     * {@link SupportSoundCloudArtistClient#LOG_NONE}
-     * {@link SupportSoundCloudArtistClient#LOG_RETROFIT}
-     * {@link SupportSoundCloudArtistClient#LOG_OFFLINER}
+     * {@link CheerleaderClient#LOG_NONE}
+     * {@link CheerleaderClient#LOG_RETROFIT}
+     * {@link CheerleaderClient#LOG_OFFLINER}
      * <p/>
      * Different log policies can be combine :
      * <pre>
@@ -356,7 +356,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
 
 
     /**
-     * Builder used to build a {@link SupportSoundCloudArtistClient}
+     * Builder used to build a {@link CheerleaderClient}
      */
     public static class Builder {
 
@@ -376,7 +376,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
          * Context from which the client will be build.
          *
          * @param context context used to instantiate internal components.
-         * @return {@link SupportSoundCloudArtistClient.Builder}
+         * @return {@link CheerleaderClient.Builder}
          */
         public Builder from(Context context) {
             this.context = context;
@@ -387,7 +387,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
          * Api key with which SoundCloud call will be performed.
          *
          * @param apiKey sound cloud api key.
-         * @return {@link SupportSoundCloudArtistClient.Builder}
+         * @return {@link CheerleaderClient.Builder}
          */
         public Builder with(String apiKey) {
             if (apiKey == null) {
@@ -401,7 +401,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
          * Api key with which SoundCloud call will be performed.
          *
          * @param resId res id of sound cloud api key.
-         * @return {@link SupportSoundCloudArtistClient.Builder}
+         * @return {@link CheerleaderClient.Builder}
          */
         public Builder with(@StringRes int resId) {
             if (context == null) {
@@ -416,7 +416,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
          * Set the SoundCloud name of the artist you would like to supports.
          *
          * @param artistName sound cloud artiste name.
-         * @return {@link SupportSoundCloudArtistClient.Builder}
+         * @return {@link CheerleaderClient.Builder}
          */
         public Builder supports(String artistName) {
             if (artistName == null) {
@@ -432,9 +432,9 @@ public final class SupportSoundCloudArtistClient implements Closeable {
          * Note : some log configuration can increase memory foot print and/or reduce the performance.
          * Use them with caution.
          * <p/>
-         * {@link SupportSoundCloudArtistClient#LOG_NONE}
-         * {@link SupportSoundCloudArtistClient#LOG_RETROFIT}
-         * {@link SupportSoundCloudArtistClient#LOG_OFFLINER}
+         * {@link CheerleaderClient#LOG_NONE}
+         * {@link CheerleaderClient#LOG_RETROFIT}
+         * {@link CheerleaderClient#LOG_OFFLINER}
          * <p/>
          * Different log policies can be combine :
          * <pre>
@@ -442,7 +442,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
          * </pre>
          *
          * @param logLevel log policy.
-         * @return {@link SupportSoundCloudArtistClient.Builder}
+         * @return {@link CheerleaderClient.Builder}
          */
         public Builder log(int logLevel) {
             this.logLevel = logLevel;
@@ -452,9 +452,9 @@ public final class SupportSoundCloudArtistClient implements Closeable {
         /**
          * Build the client.
          *
-         * @return {@link SupportSoundCloudArtistClient}
+         * @return {@link CheerleaderClient}
          */
-        public SupportSoundCloudArtistClient build() {
+        public CheerleaderClient build() {
             if (this.context == null) {
                 throw new IllegalStateException("Context should be passed using "
                         + "'Builder.from' to build the client.");
@@ -470,7 +470,7 @@ public final class SupportSoundCloudArtistClient implements Closeable {
                         + "'Builder.supports' to build the client.");
             }
 
-            SupportSoundCloudArtistClient instance
+            CheerleaderClient instance
                     = getInstance(this.context, this.apiKey, this.artistName);
             if (!this.apiKey.equals(instance.mClientKey)) {
                 throw new IllegalStateException("Only one api key can be used at the same time.");
