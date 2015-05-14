@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="@dimen/playback_view_height"
         android:text="@string/search_results_not_found"
         android:textColor="@color/artist_activity_callback_text"
         android:visibility="invisible" />

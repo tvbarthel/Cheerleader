@@ -25,35 +25,37 @@ final class RxParser {
         @Override
         public SoundCloudUser call(String json) {
             SoundCloudUser simpleSoundCloudUser = new SoundCloudUser();
-
-            try {
-                JSONObject jsonObject = new JSONObject(json);
-                simpleSoundCloudUser.setId(jsonObject.optInt(ID));
-                simpleSoundCloudUser.setPermaLink(jsonObject.optString(PERMALINK));
-                simpleSoundCloudUser.setPermaLinkUrl(jsonObject.optString(PERMALINK_URL));
-                simpleSoundCloudUser.setUserName(jsonObject.optString(USERNAME));
-                simpleSoundCloudUser.setUri(jsonObject.optString(URI));
-                simpleSoundCloudUser.setAvatarUrl(jsonObject.optString(AVATAR_URL));
-                simpleSoundCloudUser.setCountry(jsonObject.optString(COUNTRY));
-                simpleSoundCloudUser.setFullName(jsonObject.optString(FULL_NAME));
-                simpleSoundCloudUser.setFirstName(jsonObject.optString(FIRST_NAME));
-                simpleSoundCloudUser.setLastName(jsonObject.optString(LAST_NAME));
-                simpleSoundCloudUser.setCity(jsonObject.optString(CITY));
-                simpleSoundCloudUser.setDescription(jsonObject.optString(DESCRIPTION));
-                simpleSoundCloudUser.setDiscogsName(jsonObject.optString(DISCOGS_NAME));
-                simpleSoundCloudUser.setMyspaceName(jsonObject.optString(MYSPACE_NAME));
-                simpleSoundCloudUser.setWebsite(jsonObject.optString(WEBSITE));
-                simpleSoundCloudUser.setWebsiteTitle(jsonObject.optString(WEBSITE_TITLE));
-                simpleSoundCloudUser.setOnline(jsonObject.optBoolean(ONLINE));
-                simpleSoundCloudUser.setTrackCount(jsonObject.optInt(TRACK_COUNT));
-                simpleSoundCloudUser.setPlaylistCount(jsonObject.optInt(PLAYLIST_COUNT));
-                simpleSoundCloudUser.setPublicFavoritedCount(jsonObject.optInt(PUBLIC_FAVORITE_COUNT));
-                simpleSoundCloudUser.setFollowersCount(jsonObject.optInt(FOLLOWERS_COUNT));
-                simpleSoundCloudUser.setFollowingsCount(jsonObject.optInt(FOLLOWINGS_COUNT));
-            } catch (JSONException e) {
-                Log.e(TAG, "FAILED TO PARSE_USER : " + json);
+            if (json != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    simpleSoundCloudUser.setId(jsonObject.optInt(ID));
+                    simpleSoundCloudUser.setPermaLink(jsonObject.optString(PERMALINK));
+                    simpleSoundCloudUser.setPermaLinkUrl(jsonObject.optString(PERMALINK_URL));
+                    simpleSoundCloudUser.setUserName(jsonObject.optString(USERNAME));
+                    simpleSoundCloudUser.setUri(jsonObject.optString(URI));
+                    simpleSoundCloudUser.setAvatarUrl(jsonObject.optString(AVATAR_URL));
+                    simpleSoundCloudUser.setCountry(jsonObject.optString(COUNTRY));
+                    simpleSoundCloudUser.setFullName(jsonObject.optString(FULL_NAME));
+                    simpleSoundCloudUser.setFirstName(jsonObject.optString(FIRST_NAME));
+                    simpleSoundCloudUser.setLastName(jsonObject.optString(LAST_NAME));
+                    simpleSoundCloudUser.setCity(jsonObject.optString(CITY));
+                    simpleSoundCloudUser.setDescription(jsonObject.optString(DESCRIPTION));
+                    simpleSoundCloudUser.setDiscogsName(jsonObject.optString(DISCOGS_NAME));
+                    simpleSoundCloudUser.setMyspaceName(jsonObject.optString(MYSPACE_NAME));
+                    simpleSoundCloudUser.setWebsite(jsonObject.optString(WEBSITE));
+                    simpleSoundCloudUser.setWebsiteTitle(jsonObject.optString(WEBSITE_TITLE));
+                    simpleSoundCloudUser.setOnline(jsonObject.optBoolean(ONLINE));
+                    simpleSoundCloudUser.setTrackCount(jsonObject.optInt(TRACK_COUNT));
+                    simpleSoundCloudUser.setPlaylistCount(jsonObject.optInt(PLAYLIST_COUNT));
+                    simpleSoundCloudUser.setPublicFavoritedCount(jsonObject.optInt(PUBLIC_FAVORITE_COUNT));
+                    simpleSoundCloudUser.setFollowersCount(jsonObject.optInt(FOLLOWERS_COUNT));
+                    simpleSoundCloudUser.setFollowingsCount(jsonObject.optInt(FOLLOWINGS_COUNT));
+                } catch (JSONException e) {
+                    Log.e(TAG, "FAILED TO PARSE_USER : " + json);
+                }
+            } else {
+                throw new RuntimeException("No user data found.");
             }
-
             return simpleSoundCloudUser;
         }
     };
@@ -63,18 +65,22 @@ final class RxParser {
      * of a user.
      */
     public static final Func1<String, ArrayList<SoundCloudTrack>> PARSE_USER_TRACKS
-            = new Func1<String, ArrayList<SoundCloudTrack>>() {
+        = new Func1<String, ArrayList<SoundCloudTrack>>() {
         @Override
         public ArrayList<SoundCloudTrack> call(String s) {
             ArrayList<SoundCloudTrack> tracks = new ArrayList<>();
-            try {
-                JSONArray jsonArray = new JSONArray(s);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    tracks.add(PARSE_TRACK.call(jsonArray.getJSONObject(i).toString()));
-                }
+            if (s != null) {
+                try {
+                    JSONArray jsonArray = new JSONArray(s);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        tracks.add(PARSE_TRACK.call(jsonArray.getJSONObject(i).toString()));
+                    }
 
-            } catch (JSONException e) {
-                Log.e(TAG, "FAILED TO PARSE USER TRACKS : " + s);
+                } catch (JSONException e) {
+                    Log.e(TAG, "FAILED TO PARSE USER TRACKS : " + s);
+                }
+            } else {
+                throw new RuntimeException("No user tracks found.");
             }
             return tracks;
         }
@@ -157,7 +163,7 @@ final class RxParser {
      * retrieved from SoundCloud API.
      */
     public static final Func1<String, ArrayList<SoundCloudComment>> PARSE_COMMENTS
-            = new Func1<String, ArrayList<SoundCloudComment>>() {
+        = new Func1<String, ArrayList<SoundCloudComment>>() {
         @Override
         public ArrayList<SoundCloudComment> call(String s) {
             ArrayList<SoundCloudComment> comments = new ArrayList<>();

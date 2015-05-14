@@ -25,6 +25,7 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.ArtistView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.CroutonView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.PlaybackView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
+import rx.Subscriber;
 import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -208,41 +209,6 @@ public class ArtistActivity extends ActionBarActivity implements
         });
     }
 
-    private Action1<SoundCloudUser> displayArtist() {
-        return new Action1<SoundCloudUser>() {
-            @Override
-            public void call(SoundCloudUser soundCloudUser) {
-                mArtistView.setModel(soundCloudUser);
-            }
-        };
-    }
-
-    private Action1<ArrayList<SoundCloudTrack>> displayTracks() {
-        return new Action1<ArrayList<SoundCloudTrack>>() {
-            @Override
-            public void call(ArrayList<SoundCloudTrack> soundCloudTracks) {
-                mProgress.setVisibility(View.INVISIBLE);
-                if (soundCloudTracks.size() == 0) {
-                    mCallback.setVisibility(View.VISIBLE);
-                } else {
-                    mRetrievedTracks.clear();
-                    mRetrievedTracks.addAll(soundCloudTracks);
-                    mAdapter.notifyDataSetChanged();
-                }
-            }
-        };
-    }
-
-    private Action1<Throwable> displayCallbacks() {
-        return new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                mProgress.setVisibility(View.INVISIBLE);
-                mCallback.setVisibility(View.VISIBLE);
-            }
-        };
-    }
-
     /**
      * Used to retrieved the tracks of the artist as well as artist details.
      */
@@ -253,8 +219,7 @@ public class ArtistActivity extends ActionBarActivity implements
         AndroidObservable.bindActivity(this,
             mCheerleaderClient.getArtistTracks()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(displayCallbacks()))
+                .observeOn(AndroidSchedulers.mainThread()))
             .subscribe(displayTracks());
 
         AndroidObservable.bindActivity(this,
@@ -275,6 +240,48 @@ public class ArtistActivity extends ActionBarActivity implements
             return ""; // activity started through the notification pending intent
         }
         return extras.getString(BUNDLE_KEY_ARTIST_NAME);
+    }
+
+    private Subscriber<SoundCloudUser> displayArtist() {
+        return new Subscriber<SoundCloudUser>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(SoundCloudUser soundCloudUser) {
+                mArtistView.setModel(soundCloudUser);
+            }
+        };
+    }
+
+    private Subscriber<ArrayList<SoundCloudTrack>> displayTracks() {
+        return new Subscriber<ArrayList<SoundCloudTrack>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mProgress.setVisibility(View.INVISIBLE);
+                mCallback.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onNext(ArrayList<SoundCloudTrack> soundCloudTracks) {
+                mProgress.setVisibility(View.INVISIBLE);
+                mRetrievedTracks.clear();
+                mRetrievedTracks.addAll(soundCloudTracks);
+                mAdapter.notifyDataSetChanged();
+            }
+        };
     }
 
     private void initRetrieveTracksRecyclerView() {

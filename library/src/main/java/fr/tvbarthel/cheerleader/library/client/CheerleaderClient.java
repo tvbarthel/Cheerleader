@@ -121,10 +121,9 @@ public final class CheerleaderClient implements Closeable {
          * Initialize the Retrofit adapter for network communication.
          */
         mRestAdapter = new RestAdapter.Builder()
-                .setEndpoint(SOUND_CLOUD_API)
-                .setRequestInterceptor(mRequestSignator)
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .build();
+            .setEndpoint(SOUND_CLOUD_API)
+            .setRequestInterceptor(mRequestSignator)
+            .build();
         mRetrofitService = mRestAdapter.create(RetrofitService.class);
 
         /**
@@ -199,9 +198,9 @@ public final class CheerleaderClient implements Closeable {
             });
         } else {
             return mRetrofitService.getUserTracks(mArtistName)
-                    .compose(Offliner.PREPARE_FOR_OFFLINE)
-                    .map(RxParser.PARSE_USER_TRACKS)
-                    .map(cacheTracks());
+                .compose(Offliner.PREPARE_FOR_OFFLINE)
+                .map(RxParser.PARSE_USER_TRACKS)
+                .map(cacheTracks());
         }
     }
 
@@ -222,9 +221,9 @@ public final class CheerleaderClient implements Closeable {
             });
         } else {
             return mRetrofitService.getUser(mArtistName)
-                    .compose(Offliner.PREPARE_FOR_OFFLINE)
-                    .map(RxParser.PARSE_USER)
-                    .map(cacheArtistProfile());
+                .compose(Offliner.PREPARE_FOR_OFFLINE)
+                .map(RxParser.PARSE_USER)
+                .map(cacheArtistProfile());
         }
     }
 
@@ -247,9 +246,9 @@ public final class CheerleaderClient implements Closeable {
             });
         } else {
             return mRetrofitService.getTrackComments(track.getId())
-                    .compose(Offliner.PREPARE_FOR_OFFLINE)
-                    .map(RxParser.PARSE_COMMENTS)
-                    .map(cacheTrackComments());
+                .compose(Offliner.PREPARE_FOR_OFFLINE)
+                .map(RxParser.PARSE_COMMENTS)
+                .map(cacheTrackComments());
         }
     }
 
@@ -457,21 +456,21 @@ public final class CheerleaderClient implements Closeable {
         public CheerleaderClient build() {
             if (this.context == null) {
                 throw new IllegalStateException("Context should be passed using "
-                        + "'Builder.from' to build the client.");
+                    + "'Builder.from' to build the client.");
             }
 
             if (this.apiKey == null) {
                 throw new IllegalStateException("Api key should be passed using "
-                        + "'Builder.with' to build the client.");
+                    + "'Builder.with' to build the client.");
             }
 
             if (this.artistName == null) {
                 throw new IllegalStateException("Artist name should be passed using "
-                        + "'Builder.supports' to build the client.");
+                    + "'Builder.supports' to build the client.");
             }
 
             CheerleaderClient instance
-                    = getInstance(this.context, this.apiKey, this.artistName);
+                = getInstance(this.context, this.apiKey, this.artistName);
             if (!this.apiKey.equals(instance.mClientKey)) {
                 throw new IllegalStateException("Only one api key can be used at the same time.");
             }
