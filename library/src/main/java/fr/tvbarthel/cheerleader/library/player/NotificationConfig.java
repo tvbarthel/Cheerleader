@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.DrawableRes;
-import android.support.v7.app.ActionBarActivity;
 
 /**
  * Encapsulate notification config.
@@ -15,7 +14,7 @@ final class NotificationConfig implements Parcelable {
      * Parcelable.
      */
     public static final Parcelable.Creator<NotificationConfig> CREATOR
-            = new Parcelable.Creator<NotificationConfig>() {
+        = new Parcelable.Creator<NotificationConfig>() {
         public NotificationConfig createFromParcel(Parcel source) {
             return new NotificationConfig(source);
         }
@@ -38,7 +37,7 @@ final class NotificationConfig implements Parcelable {
     /**
      * Activity which should be launched when user touch the notification.
      */
-    private Class<?> mNotificationActivity;
+    private Class<? extends Activity> mNotificationActivity;
 
     /**
      * Default constructor.
@@ -54,7 +53,7 @@ final class NotificationConfig implements Parcelable {
     private NotificationConfig(Parcel in) {
         mNotificationIcon = in.readInt();
         mNotificationIconBackground = in.readInt();
-        mNotificationActivity = (Class<?>) in.readSerializable();
+        mNotificationActivity = (Class<? extends Activity>) in.readSerializable();
     }
 
     @Override
@@ -119,16 +118,7 @@ final class NotificationConfig implements Parcelable {
      *
      * @param notificationActivity activity which should be started when user touch the notification.
      */
-    public void setNotificationActivity(Activity notificationActivity) {
-        mNotificationActivity = notificationActivity.getClass();
-    }
-
-    /**
-     * Activity which should be launched when user touch the notification.
-     *
-     * @param notificationActivity activity which should be started when user touch the notification.
-     */
-    public void setNotificationActivity(ActionBarActivity notificationActivity) {
-        mNotificationActivity = notificationActivity.getClass();
+    public void setNotificationActivity(Class<? extends Activity> notificationActivity) {
+        mNotificationActivity = notificationActivity;
     }
 }

@@ -129,7 +129,7 @@ By default, no pending intent is attached to the notification.  In order to link
 ```java
   mCheerleaderPlayer = new CheerleaderPlayer.Builder()
             .from(this)
-            .notificationActivity(this)
+            .notificationActivity(PlayerActivity.class)
             .notificationIcon(R.drawable.ic_notification)
             .notificationIconBackground(R.drawable.notification_ic_background)
             .with(R.string.sound_cloud_client_id)

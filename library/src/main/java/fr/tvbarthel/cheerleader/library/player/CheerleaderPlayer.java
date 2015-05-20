@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
-import android.support.v7.app.ActionBarActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -294,7 +293,7 @@ public final class CheerleaderPlayer implements Action1<ArrayList<SoundCloudTrac
 
     /**
      * Add a track to the current SoundCloud player playlist.
-     *
+     * <p/>
      * See also {@link CheerleaderPlayer#addTrack(SoundCloudTrack, boolean)}
      *
      * @param track {@link fr.tvbarthel.cheerleader.library.client.SoundCloudTrack} to be
@@ -634,24 +633,10 @@ public final class CheerleaderPlayer implements Action1<ArrayList<SoundCloudTrac
          * @param activity started activity.
          * @return {@link CheerleaderPlayer.Builder}
          */
-        public Builder notificationActivity(ActionBarActivity activity) {
+        public Builder notificationActivity(Class<? extends Activity> activity) {
             notificationConfig.setNotificationActivity(activity);
             return this;
         }
-
-        /**
-         * Define the activity which will be started when the user touches the player notification.
-         * <p/>
-         * This activity should display a media controller.
-         *
-         * @param activity started activity.
-         * @return {@link CheerleaderPlayer.Builder}
-         */
-        public Builder notificationActivity(Activity activity) {
-            notificationConfig.setNotificationActivity(activity);
-            return this;
-        }
-
 
         /**
          * Build the client.

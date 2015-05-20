@@ -95,7 +95,7 @@ public class ArtistActivity extends ActionBarActivity implements
         mCheerleaderPlayer = new CheerleaderPlayer.Builder()
             .from(this)
             .with(R.string.sound_cloud_client_id)
-            .notificationActivity(this)
+            .notificationActivity(ArtistActivity.class)
             .notificationIcon(R.drawable.ic_notification)
             .build();
 
