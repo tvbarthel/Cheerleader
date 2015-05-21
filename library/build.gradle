@@ -1,5 +1,10 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 apply from: '../config/quality.gradle'
+
+group ='fr.tvbarthel.cheerleader'
+version = '0.1.0'
 
 android {
     compileSdkVersion 21
@@ -8,8 +13,6 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
     }
 
     compileOptions {
@@ -24,6 +27,72 @@ android {
     }
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def bintrayUser = properties.getProperty('bintray.user')
+def bintrayKey = properties.getProperty('bintray.apikey')
+
+bintray {
+    user = bintrayUser
+    key = bintrayKey
+
+
+    configurations = ['archives'] //When uploading configuration files
+
+    dryRun = false //Whether to run this as dry-run, without deploying
+    publish = true //If version should be auto published after an upload
+    //Package configuration. The plugin will use the repo and name properties to check if the package already exists. In that case, there's no need to configure the other package properties (like userOrg, desc, etc).
+    pkg {
+        repo = 'maven'
+        name = 'Cheerleader'
+        desc = 'Cheerleader is an Android open source library implemented during our free time and designed to easily support an artist in an Android application thanks to a SoundCloud account.'
+        websiteUrl = 'https://github.com/tvbarthel/Cheerleader'
+        issueTrackerUrl = 'https://github.com/tvbarthel/Cheerleader/issues'
+        vcsUrl = 'https://github.com/tvbarthel/Cheerleader.git'
+        licenses = ['Apache-2.0']
+        labels = ['android', 'music', 'artist', 'soundcloud', 'sound']
+        publicDownloadNumbers = true
+        version {
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+            }
+        }
+
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name 'Cheerleader'
+                url 'https://github.com/tvbarthel/Cheerleader'
+                description 'Cheerleader is an Android open source library implemented during our free time and designed to easily support an artist in an Android application thanks to a SoundCloud account.'
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'tbarthel'
+                        name 'Thomas Barthelemy'
+                        email 'thomas.barthelemy.utc@gmail.com'
+                    }
+                }
+                scm {
+                    connection 'https://github.com/tvbarthel/Cheerleader.git'
+                    developerConnection 'https://github.com/tvbarthel/Cheerleader.git'
+                    url 'https://github.com/tvbarthel/Cheerleader'
+
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
@@ -31,4 +100,27 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.8.0'
     compile 'io.reactivex:rxandroid:0.22.0'
     compile 'com.squareup.picasso:picasso:2.4.0'
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+task findConventions << {
+    println project.getConvention()
 }
