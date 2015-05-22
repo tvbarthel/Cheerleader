@@ -43,6 +43,7 @@
     <!-- playback view !-->
     <color name="playback_view_track_name">@android:color/white</color>
     <color name="playback_view_track_artwork_filter">@color/red_translucent</color>
+    <color name="playback_view_track_time">@color/grey_light</color>
 
     <!-- toolbar !-->
     <color name="toolbar_background">@color/primary</color>
