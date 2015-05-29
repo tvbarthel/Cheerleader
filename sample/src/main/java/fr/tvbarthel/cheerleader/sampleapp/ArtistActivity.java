@@ -12,12 +12,16 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.netcosports.recyclergesture.library.swipe.SwipeToDismissDirection;
+import com.netcosports.recyclergesture.library.swipe.SwipeToDismissGesture;
+import com.netcosports.recyclergesture.library.swipe.SwipeToDismissStrategy;
+
 import java.util.ArrayList;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
+import fr.tvbarthel.cheerleader.library.client.CheerleaderClient;
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
 import fr.tvbarthel.cheerleader.library.client.SoundCloudUser;
-import fr.tvbarthel.cheerleader.library.client.CheerleaderClient;
 import fr.tvbarthel.cheerleader.library.player.CheerleaderPlayer;
 import fr.tvbarthel.cheerleader.library.player.CheerleaderPlaylistListener;
 import fr.tvbarthel.cheerleader.sampleapp.adapter.TracksAdapter;
@@ -28,11 +32,10 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
 import rx.Subscriber;
 import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class ArtistActivity extends ActionBarActivity implements
-    PlaybackView.Listener, CheerleaderPlaylistListener {
+    PlaybackView.Listener, CheerleaderPlaylistListener, TracksAdapter.Listener {
 
     // bundle keys
     private static final String BUNDLE_KEY_ARTIST_NAME = "artist_activity_bundle_key_artist_name";
@@ -177,17 +180,27 @@ public class ArtistActivity extends ActionBarActivity implements
 
     @Override
     public void onTrackAdded(SoundCloudTrack track) {
+        if (mPlaylistTracks.isEmpty()) {
+            mPlaylistRecyclerView.animate().translationY(0);
+        }
         mPlaylistTracks.add(track);
         mPlaylistAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onTrackRemoved(SoundCloudTrack track, boolean isEmpty) {
-        mPlaylistTracks.remove(track);
-        mPlaylistAdapter.notifyDataSetChanged();
-        if (isEmpty) {
-            mPlaybackView.animate().translationY(mPlaybackView.getHeight());
+        if (mPlaylistTracks.remove(track)) {
+            mPlaylistAdapter.notifyDataSetChanged();
         }
+        if (isEmpty) {
+            mPlaylistRecyclerView.animate().translationY(mPlaybackView.getHeight());
+        }
+    }
+
+    // Adapter callbacks.
+    @Override
+    public void onTrackDismissed(int i) {
+        mCheerleaderPlayer.removeTrack(i);
     }
 
     /**
@@ -201,6 +214,15 @@ public class ArtistActivity extends ActionBarActivity implements
                 int headerListHeight = getResources().getDimensionPixelOffset(R.dimen.playback_view_height);
                 mPlaylistRecyclerView.setPadding(0, mPlaylistRecyclerView.getHeight() - headerListHeight, 0, 0);
                 mPlaylistRecyclerView.setAdapter(mPlaylistAdapter);
+
+                // attach the dismiss gesture.
+                new SwipeToDismissGesture.Builder(SwipeToDismissDirection.HORIZONTAL)
+                    .on(mPlaylistRecyclerView)
+                    .apply(new DismissStrategy())
+                    .backgroundColor(getResources().getColor(R.color.grey))
+                    .build();
+
+                // hide if current play playlist is empty.
                 if (mPlaylistTracks.isEmpty()) {
                     mPlaybackView.setTranslationY(headerListHeight);
                 }
@@ -335,6 +357,8 @@ public class ArtistActivity extends ActionBarActivity implements
         mPlaylistAdapter.setHeaderView(mPlaybackView);
 
         mPlaylistRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mPlaylistAdapter.setAdapterListener(this);
+
     }
 
     /**
@@ -351,5 +375,19 @@ public class ArtistActivity extends ActionBarActivity implements
 
         mCrouton = Crouton.make(this, mCroutonView, R.id.activity_artist_main_container);
         mCrouton.show();
+    }
+
+    /**
+     * Swipe to dismiss strategy used to disable swipe to dismiss on the header.
+     */
+    private static class DismissStrategy extends SwipeToDismissStrategy {
+        @Override
+        public SwipeToDismissDirection getDismissDirection(int position) {
+            if (position == 0) {
+                return SwipeToDismissDirection.NONE;
+            } else {
+                return SwipeToDismissDirection.HORIZONTAL;
+            }
+        }
     }
 }

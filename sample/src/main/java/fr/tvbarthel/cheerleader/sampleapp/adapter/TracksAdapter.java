@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.netcosports.recyclergesture.library.swipe.SwipeToDismissGesture;
+
 import java.util.List;
 
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
@@ -14,7 +16,8 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
 /**
  * Simple adapter used to display artist tracks in a list with an optional header.
  */
-public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder> implements CheerleaderPlayerListener {
+public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder>
+    implements CheerleaderPlayerListener, SwipeToDismissGesture.Dismisser {
 
     /**
      * View types.
@@ -41,6 +44,11 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder> im
      * listener used to catch event on the raw view.
      */
     private TrackView.Listener mListener;
+
+    /**
+     * Listener used to catch event performed on the list.
+     */
+    private Listener mAdapterListener;
 
     /**
      * Simple adapter used to display tracks in a list.
@@ -158,6 +166,21 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder> im
 
     }
 
+    ////////////////////////////////////////////////////////////
+    //////////////////////// Dismisser /////////////////////////
+    ////////////////////////////////////////////////////////////
+
+    @Override
+    public void dismiss(int i) {
+        if (mAdapterListener != null) {
+            if (mHeaderView != null) {
+                i--;
+            }
+            mTracks.remove(i);
+            mAdapterListener.onTrackDismissed(i);
+        }
+    }
+
     /**
      * Set the header view.
      *
@@ -165,6 +188,15 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder> im
      */
     public void setHeaderView(View v) {
         mHeaderView = v;
+    }
+
+    /**
+     * Set a listener used to catch events performed on the list.
+     *
+     * @param listener listener which will be notified of events performed on the list.
+     */
+    public void setAdapterListener(Listener listener) {
+        mAdapterListener = listener;
     }
 
     /**
@@ -199,5 +231,17 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder> im
         public HeaderHolder(View v) {
             super(v, VIEW_TYPE_HEADER);
         }
+    }
+
+    /**
+     * Interface used to catch event performed on the list.
+     */
+    public interface Listener {
+        /**
+         * Called when the user performed a swipe to dismiss gesture on the list.
+         *
+         * @param i adapter position of the item which should be removed
+         */
+        void onTrackDismissed(int i);
     }
 }

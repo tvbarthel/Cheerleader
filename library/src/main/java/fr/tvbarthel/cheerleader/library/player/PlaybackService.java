@@ -34,8 +34,8 @@ import fr.tvbarthel.cheerleader.library.media.MediaSessionWrapper;
  * Service used as SoundCloudPlayer.
  */
 public class PlaybackService extends Service implements MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener,
-        AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnInfoListener {
+    MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener,
+    AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnInfoListener {
 
     /**
      * Action used for toggle playback event
@@ -355,7 +355,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         filter.addAction(PlaybackListener.ACTION_ON_PROGRESS_CHANGED);
 
         LocalBroadcastManager.getInstance(context.getApplicationContext())
-                .registerReceiver(listener, filter);
+            .registerReceiver(listener, filter);
     }
 
     /**
@@ -366,7 +366,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      */
     public static void unregisterListener(Context context, PlaybackListener listener) {
         LocalBroadcastManager.getInstance(context.getApplicationContext())
-                .unregisterReceiver(listener);
+            .unregisterReceiver(listener);
     }
 
 
@@ -390,7 +390,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mMainThreadHandler = new Handler(getApplicationContext().getMainLooper());
 
         mWifiLock = ((WifiManager) getBaseContext().getSystemService(Context.WIFI_SERVICE))
-                .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
+            .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
 
@@ -504,7 +504,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     @Override
     public void onCompletion(MediaPlayer mp) {
         // release lock on wifi.
-        mWifiLock.release();
+        if (mWifiLock.isHeld()) {
+            mWifiLock.release();
+        }
         nextTrack();
         gotoIdleState();
     }
@@ -598,7 +600,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
             Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK,
-                    mPlayerPlaylist.getCurrentTrack());
+                mPlayerPlaylist.getCurrentTrack());
             mLocalBroadcastManager.sendBroadcast(intent);
 
             updateNotification();
@@ -654,7 +656,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
             // set new data source
             mMediaPlayer.setDataSource(track.getStreamUrl() + SOUND_CLOUD_CLIENT_ID_PARAM
-                    + mSoundCloundClientId);
+                + mSoundCloundClientId);
 
             mIsPaused = false;
             mHasAlreadyPlayed = true;
@@ -666,7 +668,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
             // start loading of the artwork.
             loadArtwork(this,
-                    SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XXXLARGE));
+                SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XXXLARGE));
             // broadcast event
             Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK, track);
@@ -678,7 +680,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             mMediaPlayer.prepare();
             // start the playback.
             mMediaPlayer.start();
-            startTimer(mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
+            SoundCloudTrack currentTrack = mPlayerPlaylist.getCurrentTrack();
+            if (currentTrack == null) {
+                mMediaPlayer.stop();
+            } else {
+                startTimer(currentTrack.getDurationInMilli());
+            }
 
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
@@ -690,7 +697,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      */
     private void updateNotification() {
         mNotificationManager.notify(
-                this, mPlayerPlaylist.getCurrentTrack(), mIsPaused);
+            this, mPlayerPlaylist.getCurrentTrack(), mIsPaused);
     }
 
     /**
@@ -715,9 +722,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             @Override
             public void run() {
                 Picasso
-                        .with(context)
-                        .load(artworkUrl)
-                        .into(mArtworkTarget);
+                    .with(context)
+                    .load(artworkUrl)
+                    .into(mArtworkTarget);
             }
         });
     }
@@ -746,7 +753,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             public void onFinish() {
                 Intent i = new Intent(PlaybackListener.ACTION_ON_PROGRESS_CHANGED);
                 i.putExtra(PlaybackListener.EXTRA_KEY_CURRENT_TIME
-                        , (int) mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
+                    , (int) mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
                 mLocalBroadcastManager.sendBroadcast(i);
             }
         };
@@ -769,7 +776,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     private void resumeTimer() {
         // restart timer for the remaining time amount.
         startTimer(mPlayerPlaylist.getCurrentTrack().getDurationInMilli()
-                - mMediaPlayer.getCurrentPosition());
+            - mMediaPlayer.getCurrentPosition());
     }
 
     /**
@@ -880,7 +887,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             SoundCloudTrack track = mPlayerPlaylist.getCurrentTrack();
             if (track != null) {
                 mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(),
-                        bitmap.copy(bitmap.getConfig(), false));
+                    bitmap.copy(bitmap.getConfig(), false));
             }
 
         }
