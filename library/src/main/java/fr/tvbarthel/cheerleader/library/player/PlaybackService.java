@@ -187,6 +187,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     private static final String THREAD_NAME = TAG + "player_thread";
 
     /**
+     * Thread used to complete work off the main thread.
+     */
+    private HandlerThread mHandlerThread;
+
+    /**
      * Handler used to execute works on an {@link android.os.HandlerThread}
      */
     private Handler mPlayerHandler;
@@ -373,14 +378,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     @Override
     public void onCreate() {
         super.onCreate();
-        HandlerThread thread = new HandlerThread(THREAD_NAME, Process.THREAD_PRIORITY_AUDIO);
-        thread.start();
+        mHandlerThread = new HandlerThread(THREAD_NAME, Process.THREAD_PRIORITY_AUDIO);
+        mHandlerThread.start();
 
-        mPlayerHandler = new PlayerHandler(thread.getLooper());
+        mPlayerHandler = new PlayerHandler(mHandlerThread.getLooper());
         mMediaPlayer = new MediaPlayer();
 
         initializeMediaPlayer();
-        mStopServiceHandler = new StopHandler(thread.getLooper());
+        mStopServiceHandler = new StopHandler(mHandlerThread.getLooper());
 
         // instantiate target used to load track artwork.
         mArtworkTarget = new ArtworkTarget();
@@ -428,6 +433,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
         mMediaPlayer.release();
         mMediaPlayer = null;
+
+        mHandlerThread.quit();
 
         super.onDestroy();
     }
