@@ -512,7 +512,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     public void onCompletion(MediaPlayer mp) {
         // release lock on wifi.
         mWifiLock.release();
-        nextTrack();
+        mPlayerHandler.sendEmptyMessage(WHAT_NEXT_TRACK);
         gotoIdleState();
     }
 
