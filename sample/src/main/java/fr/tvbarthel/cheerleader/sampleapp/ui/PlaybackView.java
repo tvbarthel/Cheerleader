@@ -23,7 +23,7 @@ import fr.tvbarthel.cheerleader.sampleapp.R;
  * Simple view used to display basic player button : play/pause, next and previous.
  */
 public class PlaybackView extends FrameLayout implements View.OnClickListener,
-    CheerleaderPlayerListener, SeekBar.OnSeekBarChangeListener {
+        CheerleaderPlayerListener, SeekBar.OnSeekBarChangeListener {
 
     private ImageView mArtwork;
     private TextView mTitle;
@@ -31,6 +31,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
     private TextView mDuration;
     private ImageView mPlayPause;
     private SeekBar mSeekBar;
+    private boolean mSeeking;
 
     /**
      * Dummy listener.
@@ -166,10 +167,12 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
 
     @Override
     public void onProgressChanged(int milli) {
-        mSeekBar.setProgress(milli);
-        int[] secondMinute = getSecondMinutes(milli);
-        String duration = String.format(getResources().getString(R.string.playback_view_time), secondMinute[0], secondMinute[1]);
-        mCurrentTime.setText(duration);
+        if(!mSeeking){
+            mSeekBar.setProgress(milli);
+            int[] secondMinute = getSecondMinutes(milli);
+            String duration = String.format(getResources().getString(R.string.playback_view_time), secondMinute[0], secondMinute[1]);
+            mCurrentTime.setText(duration);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,16 +182,21 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+        int[] secondMinute = getSecondMinutes(progress);
+        mCurrentTime.setText(
+                String.format(getResources().getString(R.string.playback_view_time),
+                        secondMinute[0], secondMinute[1])
+        );
     }
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-
+        mSeeking = true;
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+        mSeeking = false;
         mListener.onSeekToRequested(seekBar.getProgress());
     }
 
@@ -220,13 +228,13 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
             mDuration.setText(none);
         } else {
             Picasso.with(getContext())
-                .load(SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XLARGE))
-                .fit()
-                .centerCrop()
-                .placeholder(R.color.grey)
-                .into(mArtwork);
+                    .load(SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XLARGE))
+                    .fit()
+                    .centerCrop()
+                    .placeholder(R.color.grey)
+                    .into(mArtwork);
             mTitle.setText(Html.fromHtml(String.format(getResources().getString(R.string.playback_view_title),
-                track.getArtist(), track.getTitle())));
+                    track.getArtist(), track.getTitle())));
             mPlayPause.setImageResource(R.drawable.ic_pause_white);
             if (getTranslationY() != 0) {
                 this.animate().translationY(0);
@@ -235,7 +243,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
             String none = String.format(getResources().getString(R.string.playback_view_time), 0, 0);
             int[] secondMinute = getSecondMinutes(track.getDurationInMilli());
             String duration = String.format(getResources().getString(R.string.playback_view_time),
-                secondMinute[0], secondMinute[1]);
+                    secondMinute[0], secondMinute[1]);
             mCurrentTime.setText(none);
             mDuration.setText(duration);
         }
@@ -269,12 +277,14 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
 
         mArtwork = ((ImageView) findViewById(R.id.playback_view_artwork));
         mArtwork.setColorFilter(
-            getResources().getColor(R.color.playback_view_track_artwork_filter),
-            PorterDuff.Mode.SRC_ATOP
+                getResources().getColor(R.color.playback_view_track_artwork_filter),
+                PorterDuff.Mode.SRC_ATOP
         );
         mTitle = ((TextView) findViewById(R.id.playback_view_track));
         mSeekBar = ((SeekBar) findViewById(R.id.playback_view_seekbar));
         mSeekBar.setOnSeekBarChangeListener(this);
+
+        mSeeking = false;
     }
 
     private int[] getSecondMinutes(long milli) {

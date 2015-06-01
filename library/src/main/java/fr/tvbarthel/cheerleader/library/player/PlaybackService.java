@@ -169,7 +169,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     /**
      * Max idle period after which the service will be stopped.
      */
-    private static final int IDLE_PERIOD_MILLI = 10000;
+    private static final int IDLE_PERIOD_MILLI = 60000;
 
     /**
      * Path param used to access streaming url.
@@ -514,7 +514,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         if (mWifiLock.isHeld()) {
             mWifiLock.release();
         }
-        mWifiLock.release();
         gotoIdleState();
         mPlayerHandler.sendEmptyMessage(WHAT_NEXT_TRACK);
     }
