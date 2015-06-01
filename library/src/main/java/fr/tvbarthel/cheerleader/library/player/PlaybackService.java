@@ -34,8 +34,8 @@ import fr.tvbarthel.cheerleader.library.media.MediaSessionWrapper;
  * Service used as SoundCloudPlayer.
  */
 public class PlaybackService extends Service implements MediaPlayer.OnErrorListener,
-    MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener,
-    AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnInfoListener {
+        MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener,
+        AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnInfoListener {
 
     /**
      * Action used for toggle playback event
@@ -185,6 +185,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      * Name for the internal handler thread.
      */
     private static final String THREAD_NAME = TAG + "player_thread";
+
+    /**
+     * Thread used to complete work off the main thread.
+     */
+    private HandlerThread mHandlerThread;
 
     /**
      * Handler used to execute works on an {@link android.os.HandlerThread}
@@ -355,7 +360,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         filter.addAction(PlaybackListener.ACTION_ON_PROGRESS_CHANGED);
 
         LocalBroadcastManager.getInstance(context.getApplicationContext())
-            .registerReceiver(listener, filter);
+                .registerReceiver(listener, filter);
     }
 
     /**
@@ -366,21 +371,21 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      */
     public static void unregisterListener(Context context, PlaybackListener listener) {
         LocalBroadcastManager.getInstance(context.getApplicationContext())
-            .unregisterReceiver(listener);
+                .unregisterReceiver(listener);
     }
 
 
     @Override
     public void onCreate() {
         super.onCreate();
-        HandlerThread thread = new HandlerThread(THREAD_NAME, Process.THREAD_PRIORITY_AUDIO);
-        thread.start();
+        mHandlerThread = new HandlerThread(THREAD_NAME, Process.THREAD_PRIORITY_AUDIO);
+        mHandlerThread.start();
 
-        mPlayerHandler = new PlayerHandler(thread.getLooper());
+        mPlayerHandler = new PlayerHandler(mHandlerThread.getLooper());
         mMediaPlayer = new MediaPlayer();
 
         initializeMediaPlayer();
-        mStopServiceHandler = new StopHandler(thread.getLooper());
+        mStopServiceHandler = new StopHandler(mHandlerThread.getLooper());
 
         // instantiate target used to load track artwork.
         mArtworkTarget = new ArtworkTarget();
@@ -390,7 +395,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mMainThreadHandler = new Handler(getApplicationContext().getMainLooper());
 
         mWifiLock = ((WifiManager) getBaseContext().getSystemService(Context.WIFI_SERVICE))
-            .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
+                .createWifiLock(WifiManager.WIFI_MODE_FULL, WIFI_LOCK_TAG);
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
 
@@ -428,6 +433,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
         mMediaPlayer.release();
         mMediaPlayer = null;
+
+        mHandlerThread.quit();
 
         super.onDestroy();
     }
@@ -507,8 +514,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         if (mWifiLock.isHeld()) {
             mWifiLock.release();
         }
-        nextTrack();
+        mWifiLock.release();
         gotoIdleState();
+        mPlayerHandler.sendEmptyMessage(WHAT_NEXT_TRACK);
     }
 
     @Override
@@ -600,7 +608,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
             Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK,
-                mPlayerPlaylist.getCurrentTrack());
+                    mPlayerPlaylist.getCurrentTrack());
             mLocalBroadcastManager.sendBroadcast(intent);
 
             updateNotification();
@@ -656,7 +664,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
             // set new data source
             mMediaPlayer.setDataSource(track.getStreamUrl() + SOUND_CLOUD_CLIENT_ID_PARAM
-                + mSoundCloundClientId);
+                    + mSoundCloundClientId);
 
             mIsPaused = false;
             mHasAlreadyPlayed = true;
@@ -668,7 +676,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
             // start loading of the artwork.
             loadArtwork(this,
-                SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XXXLARGE));
+                    SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XXXLARGE));
             // broadcast event
             Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK, track);
@@ -697,7 +705,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      */
     private void updateNotification() {
         mNotificationManager.notify(
-            this, mPlayerPlaylist.getCurrentTrack(), mIsPaused);
+                this, mPlayerPlaylist.getCurrentTrack(), mIsPaused);
     }
 
     /**
@@ -722,9 +730,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             @Override
             public void run() {
                 Picasso
-                    .with(context)
-                    .load(artworkUrl)
-                    .into(mArtworkTarget);
+                        .with(context)
+                        .load(artworkUrl)
+                        .into(mArtworkTarget);
             }
         });
     }
@@ -753,7 +761,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             public void onFinish() {
                 Intent i = new Intent(PlaybackListener.ACTION_ON_PROGRESS_CHANGED);
                 i.putExtra(PlaybackListener.EXTRA_KEY_CURRENT_TIME
-                    , (int) mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
+                        , (int) mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
                 mLocalBroadcastManager.sendBroadcast(i);
             }
         };
@@ -776,7 +784,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     private void resumeTimer() {
         // restart timer for the remaining time amount.
         startTimer(mPlayerPlaylist.getCurrentTrack().getDurationInMilli()
-            - mMediaPlayer.getCurrentPosition());
+                - mMediaPlayer.getCurrentPosition());
     }
 
     /**
@@ -887,7 +895,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             SoundCloudTrack track = mPlayerPlaylist.getCurrentTrack();
             if (track != null) {
                 mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(),
-                    bitmap.copy(bitmap.getConfig(), false));
+                        bitmap.copy(bitmap.getConfig(), false));
             }
 
         }
