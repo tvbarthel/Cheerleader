@@ -54,7 +54,17 @@
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/default_padding"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_play_white" />
+        android:src="@drawable/ic_play_white"
+        android:visibility="invisible" />
+
+    <fr.tvbarthel.cheerleader.sampleapp.ui.ProgressBarCompat
+        android:id="@+id/playback_view_loader"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:layout_gravity="end"
+        android:layout_marginRight="48dp"
+        android:layout_marginTop="5dp"
+        android:indeterminate="true" />
 
     <ImageView
         android:id="@+id/playback_view_next"

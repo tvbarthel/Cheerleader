@@ -31,6 +31,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
     private TextView mDuration;
     private ImageView mPlayPause;
     private SeekBar mSeekBar;
+    private ProgressBarCompat mLoader;
     private boolean mSeeking;
 
     /**
@@ -157,17 +158,19 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
 
     @Override
     public void onBufferingStarted() {
-        mPlayPause.setImageResource(R.drawable.ic_play_white);
+        mLoader.setVisibility(VISIBLE);
+        mPlayPause.setVisibility(INVISIBLE);
     }
 
     @Override
     public void onBufferingEnded() {
-        mPlayPause.setImageResource(R.drawable.ic_pause_white);
+        mLoader.setVisibility(INVISIBLE);
+        mPlayPause.setVisibility(VISIBLE);
     }
 
     @Override
     public void onProgressChanged(int milli) {
-        if(!mSeeking){
+        if (!mSeeking) {
             mSeekBar.setProgress(milli);
             int[] secondMinute = getSecondMinutes(milli);
             String duration = String.format(getResources().getString(R.string.playback_view_time), secondMinute[0], secondMinute[1]);
@@ -272,6 +275,7 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
         mCurrentTime = ((TextView) findViewById(R.id.playback_view_current_time));
         mDuration = ((TextView) findViewById(R.id.playback_view_duration));
         mPlayPause = ((ImageView) findViewById(R.id.playback_view_toggle_play));
+        mLoader = ((ProgressBarCompat) findViewById(R.id.playback_view_loader));
         mPlayPause.setOnClickListener(this);
 
 
