@@ -676,10 +676,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             // start loading of the artwork.
             loadArtwork(this,
                     SoundCloudArtworkHelper.getArtworkUrl(track, SoundCloudArtworkHelper.XXXLARGE));
-            // broadcast event
+            // broadcast events
             Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
             intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK, track);
             mLocalBroadcastManager.sendBroadcast(intent);
+            Intent bufferingStart = new Intent(PlaybackListener.ACTION_ON_BUFFERING_STARTED);
+            mLocalBroadcastManager.sendBroadcast(bufferingStart);
 
             // 2 - THEN PREPARE THE TRACK STREAMING
 
@@ -693,6 +695,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             } else {
                 startTimer(currentTrack.getDurationInMilli());
             }
+
+            Intent bufferingEnds = new Intent(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
+            mLocalBroadcastManager.sendBroadcast(bufferingEnds);
 
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
