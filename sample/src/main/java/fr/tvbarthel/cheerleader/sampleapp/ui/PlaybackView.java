@@ -212,6 +212,8 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
      */
     public void synchronize(CheerleaderPlayer player) {
         setTrack(player.getCurrentTrack());
+        mLoader.setVisibility(INVISIBLE);
+        mPlayPause.setVisibility(VISIBLE);
         setPlaying(player.isPlaying());
     }
 

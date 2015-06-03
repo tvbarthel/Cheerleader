@@ -64,7 +64,8 @@
         android:layout_gravity="end"
         android:layout_marginRight="48dp"
         android:layout_marginTop="5dp"
-        android:indeterminate="true" />
+        android:indeterminate="true"
+        android:indeterminateTint="@color/progress_color" />
 
     <ImageView
         android:id="@+id/playback_view_next"
