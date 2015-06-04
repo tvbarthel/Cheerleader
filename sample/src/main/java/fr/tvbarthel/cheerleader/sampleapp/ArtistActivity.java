@@ -35,7 +35,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class ArtistActivity extends ActionBarActivity implements
-    PlaybackView.Listener, CheerleaderPlaylistListener, TracksAdapter.Listener {
+        PlaybackView.Listener, CheerleaderPlaylistListener, TracksAdapter.Listener {
 
     // bundle keys
     private static final String BUNDLE_KEY_ARTIST_NAME = "artist_activity_bundle_key_artist_name";
@@ -90,17 +90,17 @@ public class ArtistActivity extends ActionBarActivity implements
         String artistName = getExtraArtistName();
 
         mCheerleaderClient = new CheerleaderClient.Builder()
-            .from(this)
-            .with(R.string.sound_cloud_client_id)
-            .supports(artistName)
-            .build();
+                .from(this)
+                .with(R.string.sound_cloud_client_id)
+                .supports(artistName)
+                .build();
 
         mCheerleaderPlayer = new CheerleaderPlayer.Builder()
-            .from(this)
-            .with(R.string.sound_cloud_client_id)
-            .notificationActivity(ArtistActivity.class)
-            .notificationIcon(R.drawable.ic_notification)
-            .build();
+                .from(this)
+                .with(R.string.sound_cloud_client_id)
+                .notificationActivity(ArtistActivity.class)
+                .notificationIcon(R.drawable.ic_notification)
+                .build();
 
 
         mProgress = ((ProgressBar) findViewById(R.id.activity_artist_progress));
@@ -217,10 +217,10 @@ public class ArtistActivity extends ActionBarActivity implements
 
                 // attach the dismiss gesture.
                 new SwipeToDismissGesture.Builder(SwipeToDismissDirection.HORIZONTAL)
-                    .on(mPlaylistRecyclerView)
-                    .apply(new DismissStrategy())
-                    .backgroundColor(getResources().getColor(R.color.grey))
-                    .build();
+                        .on(mPlaylistRecyclerView)
+                        .apply(new DismissStrategy())
+                        .backgroundColor(getResources().getColor(R.color.grey))
+                        .build();
 
                 // hide if current play playlist is empty.
                 if (mPlaylistTracks.isEmpty()) {
@@ -239,16 +239,16 @@ public class ArtistActivity extends ActionBarActivity implements
         mAdapter.notifyDataSetChanged();
 
         AndroidObservable.bindActivity(this,
-            mCheerleaderClient.getArtistTracks()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()))
-            .subscribe(displayTracks());
+                mCheerleaderClient.getArtistTracks()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()))
+                .subscribe(displayTracks());
 
         AndroidObservable.bindActivity(this,
-            mCheerleaderClient.getArtistProfile()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io()))
-            .subscribe(displayArtist());
+                mCheerleaderClient.getArtistProfile()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io()))
+                .subscribe(displayArtist());
     }
 
     /**
@@ -311,13 +311,17 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrieveTracksListener = new TrackView.Listener() {
             @Override
             public void onTrackClicked(SoundCloudTrack track) {
-                boolean playNow = !mCheerleaderPlayer.isPlaying();
+                if (mCheerleaderPlayer.getTracks().contains(track)) {
+                    mCheerleaderPlayer.play(track);
+                } else {
+                    boolean playNow = !mCheerleaderPlayer.isPlaying();
 
-                mCheerleaderPlayer.addTrack(track, playNow);
-                mPlaylistAdapter.notifyDataSetChanged();
+                    mCheerleaderPlayer.addTrack(track, playNow);
+                    mPlaylistAdapter.notifyDataSetChanged();
 
-                if (!playNow) {
-                    toast(R.string.toast_track_added);
+                    if (!playNow) {
+                        toast(R.string.toast_track_added);
+                    }
                 }
             }
         };

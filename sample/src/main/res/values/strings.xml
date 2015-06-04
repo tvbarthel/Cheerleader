@@ -31,7 +31,7 @@
     <string name="sound_cloud_credits">Powered by soundcloud</string>
 
     <!-- toast !-->
-    <string name="toast_track_added">Track added to the playlist.</string>
+    <string name="toast_track_added">Added to the playlist. Touch again to play now.</string>
 
     <!-- playback view !-->
     <string name="playback_view_time">%1$02d:%2$02d</string>
