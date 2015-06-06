@@ -32,7 +32,7 @@ public final class Offliner {
     public static final Observable.Transformer<Response, String> PREPARE_FOR_OFFLINE
             = new Observable.Transformer<Response, String>() {
         @Override
-        public Observable<? extends String> call(Observable<? extends Response> observable) {
+        public Observable<String> call(Observable<Response> observable) {
             return observable.map(getInstance().save)
                     .onErrorReturn(getInstance().retrieve);
         }
