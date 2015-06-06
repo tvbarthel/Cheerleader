@@ -30,7 +30,7 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.CroutonView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.PlaybackView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
 import rx.Subscriber;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -238,13 +238,13 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrievedTracks.clear();
         mAdapter.notifyDataSetChanged();
 
-        AndroidObservable.bindActivity(this,
+        AppObservable.bindActivity(this,
                 mCheerleaderClient.getArtistTracks()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()))
                 .subscribe(displayTracks());
 
-        AndroidObservable.bindActivity(this,
+        AppObservable.bindActivity(this,
                 mCheerleaderClient.getArtistProfile()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io()))
