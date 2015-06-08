@@ -30,6 +30,7 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.CroutonView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.PlaybackView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -68,6 +69,10 @@ public class ArtistActivity extends ActionBarActivity implements
     //Crouton, contextual toast.
     private Crouton mCrouton;
     private CroutonView mCroutonView;
+
+    // Subscription
+    private Subscription mTracksSubscription;
+    private Subscription mProfileSubscription;
 
     /**
      * Start an ArtistActivity for a given artist name.
@@ -147,6 +152,8 @@ public class ArtistActivity extends ActionBarActivity implements
         super.onDestroy();
         mCheerleaderClient.close();
         mCheerleaderPlayer.destroy();
+        releaseSubscription(mProfileSubscription);
+        releaseSubscription(mTracksSubscription);
     }
 
     @Override
@@ -238,13 +245,13 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrievedTracks.clear();
         mAdapter.notifyDataSetChanged();
 
-        AppObservable.bindActivity(this,
+        mTracksSubscription = AppObservable.bindActivity(this,
                 mCheerleaderClient.getArtistTracks()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()))
                 .subscribe(displayTracks());
 
-        AppObservable.bindActivity(this,
+        mProfileSubscription = AppObservable.bindActivity(this,
                 mCheerleaderClient.getArtistProfile()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io()))
@@ -268,12 +275,12 @@ public class ArtistActivity extends ActionBarActivity implements
         return new Subscriber<SoundCloudUser>() {
             @Override
             public void onCompleted() {
-
+                releaseSubscription(mProfileSubscription);
             }
 
             @Override
             public void onError(Throwable e) {
-
+                releaseSubscription(mProfileSubscription);
             }
 
             @Override
@@ -287,11 +294,12 @@ public class ArtistActivity extends ActionBarActivity implements
         return new Subscriber<ArrayList<SoundCloudTrack>>() {
             @Override
             public void onCompleted() {
-
+                releaseSubscription(mTracksSubscription);
             }
 
             @Override
             public void onError(Throwable e) {
+                releaseSubscription(mTracksSubscription);
                 mProgress.setVisibility(View.INVISIBLE);
                 mCallback.setVisibility(View.VISIBLE);
             }
@@ -392,6 +400,17 @@ public class ArtistActivity extends ActionBarActivity implements
             } else {
                 return SwipeToDismissDirection.HORIZONTAL;
             }
+        }
+    }
+
+    /**
+     * Release a subcription.
+     *
+     * @param subscription subcription to release.
+     */
+    private void releaseSubscription(Subscription subscription) {
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
         }
     }
 }
