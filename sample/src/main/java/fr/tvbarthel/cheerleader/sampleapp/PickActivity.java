@@ -1,5 +1,7 @@
 package fr.tvbarthel.cheerleader.sampleapp;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -19,7 +21,7 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.ExtraHintEditText;
  * Simple activity used to pick an artist in order to load it into the sample activity.
  */
 public class PickActivity extends ActionBarActivity implements
-    TextView.OnEditorActionListener, View.OnClickListener, ViewTreeObserver.OnScrollChangedListener {
+        TextView.OnEditorActionListener, View.OnClickListener, ViewTreeObserver.OnScrollChangedListener {
 
     private ExtraHintEditText mArtistName;
     private Animation mWiggle;
@@ -43,6 +45,8 @@ public class PickActivity extends ActionBarActivity implements
         mWiggle = AnimationUtils.loadAnimation(this, R.anim.wiggle);
 
         findViewById(R.id.activity_pick_search_btn).setOnClickListener(this);
+        findViewById(R.id.activity_pick_section_links_git).setOnClickListener(this);
+        findViewById(R.id.activity_pick_section_links_web).setOnClickListener(this);
     }
 
     @Override
@@ -80,6 +84,11 @@ public class PickActivity extends ActionBarActivity implements
                 if (checkField(mArtistName)) {
                     ArtistActivity.startActivity(this, mArtistName.getText().toString());
                 }
+                break;
+            case R.id.activity_pick_section_links_git:
+            case R.id.activity_pick_section_links_web:
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.link_git)));
+                startActivity(i);
                 break;
             default:
                 throw new IllegalStateException("Click not handled on " + v);
