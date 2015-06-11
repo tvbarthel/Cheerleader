@@ -1,6 +1,6 @@
 Cheerleader is an Android open source library implemented during our free time and designed to easily support an artist in an Android application thanks to a SoundCloud account.
 
-# Why Cheerleader ?
+# Why Cheerleader?
 
 ## We are dreamers.
 And like many dreamers we love dreaming of a world where every single person could live a descent life by doing what they love to do even if they are not good at it. Since the world is frenetically led by money and efficiency, it's clearly not possible at this time but we hope that some day it will change...
@@ -27,6 +27,7 @@ The library is composed of two main classes :
 
 # Summary
 * [Disclaimer](#disclaimer)
+* [Methods Count](#methods-count)
 * [Gradle Dependency](#gradle-dependency)
 * [CheerleaderClient](#cheerleaderclient)
 * [CheerleaderPlayer](#cheerleaderplayer)
@@ -43,6 +44,16 @@ Don't forget to read the [SoundCloud terms of use](https://developers.soundcloud
 
 Please keep in mind that the main goal of this project is to help independent artists reach more fans and bring more visibility through an Android application. If you plans to monetize your app (please don't use Ads), check the [Commercial Use](https://developers.soundcloud.com/docs/api/terms-of-use#commercial) section and be sure to pays the artist and SoundCloud for bringing diversified musics for free.
 
+# Methods Count
+```java
+    |cheerleader 569
+    |    |client 252
+    |    |player 199
+    |    |offline 51
+    |    |media 28
+    |    |remote 22
+    |    |helpers 2
+```
 # Gradle Dependency
 Waiting for upload on jcenter repositories.
 
