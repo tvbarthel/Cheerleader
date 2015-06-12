@@ -26,7 +26,7 @@
     <string name="cheerleader_banner_title">@string/app_name</string>
     <string name="cheerleader_banner_subtitle">Support your favorite artist</string>
     <string name="activity_pick_project_section">Project</string>
-    <string name="activity_pick_project">Cheerleader is an open-source Android library based on RxJava which allow to  easily  integrate the support of an artist through it\'s SoundCloud account.</string>
+    <string name="activity_pick_project">Cheerleader is an Android open source library based on RxJava and designed to easily support an artist in an Android application thanks to a SoundCloud account.</string>
     <string name="activity_pick_try_it_section">Sample</string>
     <string name="activity_pick_links_section">Links</string>
     <string name="activity_pick_links_git">Fork us\non GitHub</string>
