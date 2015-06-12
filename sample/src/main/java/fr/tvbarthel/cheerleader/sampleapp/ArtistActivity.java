@@ -55,21 +55,23 @@ public class ArtistActivity extends ActionBarActivity implements
     private ArtistView mArtistView;
     private RecyclerView.OnScrollListener mRetrieveTracksScrollListener;
     private int mScrollY;
+    private int mRetrieveTrackListPaddingBottom;
+    private int mRetrieveTrackListPaddingTop;
 
     // player widget
     private RecyclerView mPlaylistRecyclerView;
     private PlaybackView mPlaybackView;
     private TracksAdapter mPlaylistAdapter;
     private ArrayList<SoundCloudTrack> mPlaylistTracks;
+
     private TrackView.Listener mPlaylistTracksListener;
 
     // banner
     private View mBanner;
-
     //Crouton, contextual toast.
     private Crouton mCrouton;
-    private CroutonView mCroutonView;
 
+    private CroutonView mCroutonView;
     // Subscription
     private Subscription mTracksSubscription;
     private Subscription mProfileSubscription;
@@ -189,6 +191,8 @@ public class ArtistActivity extends ActionBarActivity implements
     public void onTrackAdded(SoundCloudTrack track) {
         if (mPlaylistTracks.isEmpty()) {
             mPlaylistRecyclerView.animate().translationY(0);
+            mRetrieveTracksRecyclerView.setPadding(0,
+                    mRetrieveTrackListPaddingTop, 0, mRetrieveTrackListPaddingBottom);
         }
         mPlaylistTracks.add(track);
         mPlaylistAdapter.notifyDataSetChanged();
@@ -201,6 +205,7 @@ public class ArtistActivity extends ActionBarActivity implements
         }
         if (isEmpty) {
             mPlaylistRecyclerView.animate().translationY(mPlaybackView.getHeight());
+            mRetrieveTracksRecyclerView.setPadding(0, mRetrieveTrackListPaddingTop, 0, 0);
         }
     }
 
@@ -350,6 +355,10 @@ public class ArtistActivity extends ActionBarActivity implements
             }
         };
         mRetrieveTracksRecyclerView.setOnScrollListener(mRetrieveTracksScrollListener);
+
+        mRetrieveTrackListPaddingTop = getResources().getDimensionPixelSize(R.dimen.track_list_padding_top);
+        mRetrieveTrackListPaddingBottom = getResources().getDimensionPixelSize(R.dimen.playback_view_height);
+        mRetrieveTracksRecyclerView.setPadding(0, mRetrieveTrackListPaddingTop, 0, 0);
     }
 
     private void initPlaylistTracksRecyclerView() {
