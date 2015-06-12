@@ -85,11 +85,17 @@ public class PickActivity extends ActionBarActivity implements
                     ArtistActivity.startActivity(this, mArtistName.getText().toString());
                 }
                 break;
+
             case R.id.activity_pick_section_links_git:
-            case R.id.activity_pick_section_links_web:
-                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.link_git)));
-                startActivity(i);
+                final Intent gitLinkIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.link_git)));
+                startActivity(gitLinkIntent);
                 break;
+
+            case R.id.activity_pick_section_links_web:
+                final Intent websiteLinkIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.link_website)));
+                startActivity(websiteLinkIntent);
+                break;
+
             default:
                 throw new IllegalStateException("Click not handled on " + v);
         }
