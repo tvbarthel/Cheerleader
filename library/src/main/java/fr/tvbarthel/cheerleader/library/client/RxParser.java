@@ -1,5 +1,6 @@
 package fr.tvbarthel.cheerleader.library.client;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -36,6 +37,9 @@ final class RxParser {
                     simpleSoundCloudUser.setAvatarUrl(jsonObject.optString(AVATAR_URL));
                     simpleSoundCloudUser.setCountry(jsonObject.optString(COUNTRY));
                     simpleSoundCloudUser.setFullName(jsonObject.optString(FULL_NAME));
+                    if (TextUtils.isEmpty(simpleSoundCloudUser.getFullName())) {
+                        simpleSoundCloudUser.setFullName(simpleSoundCloudUser.getUserName());
+                    }
                     simpleSoundCloudUser.setFirstName(jsonObject.optString(FIRST_NAME));
                     simpleSoundCloudUser.setLastName(jsonObject.optString(LAST_NAME));
                     simpleSoundCloudUser.setCity(jsonObject.optString(CITY));
@@ -65,7 +69,7 @@ final class RxParser {
      * of a user.
      */
     public static final Func1<String, ArrayList<SoundCloudTrack>> PARSE_USER_TRACKS
-        = new Func1<String, ArrayList<SoundCloudTrack>>() {
+            = new Func1<String, ArrayList<SoundCloudTrack>>() {
         @Override
         public ArrayList<SoundCloudTrack> call(String s) {
             ArrayList<SoundCloudTrack> tracks = new ArrayList<>();
@@ -118,6 +122,8 @@ final class RxParser {
                 int dashIndex = title.indexOf('-');
                 if (dashIndex == -1) {
                     track.setTitle(title);
+                    JSONObject user = jsonObject.optJSONObject(USER);
+                    track.setArtist(user.optString(USERNAME));
                 } else {
                     track.setTitle(title.substring(dashIndex + 1, title.length()).trim());
                     track.setArtist(title.substring(0, dashIndex).trim());
@@ -163,7 +169,7 @@ final class RxParser {
      * retrieved from SoundCloud API.
      */
     public static final Func1<String, ArrayList<SoundCloudComment>> PARSE_COMMENTS
-        = new Func1<String, ArrayList<SoundCloudComment>>() {
+            = new Func1<String, ArrayList<SoundCloudComment>>() {
         @Override
         public ArrayList<SoundCloudComment> call(String s) {
             ArrayList<SoundCloudComment> comments = new ArrayList<>();
