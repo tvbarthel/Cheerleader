@@ -164,6 +164,14 @@ By default, no pending intent is attached to the notification.  In order to link
 ```
 Note that small icon as well as small icon background (Lollipop only) can also be customized through the Builder.
 
+**Overview**
+
+| Pre-Lollipop | Post-Lollipop |
+|:-:|:-:|
+| [![nexus 4 collapsed](./static/notifications/nexus4_collapsed_thumbnail.png)](./static/notifications/nexus4_collapsed.png) | [![nexus 5 collapsed](./static/notifications/nexus5_collapsed_thumbnail.png)](./static/notifications/nexus5_collapsed.png)
+| [![nexus 4 expanded](./static/notifications/nexus4_expanded_thumbnail.png)](./static/notifications/nexus4_expanded.png) | [![nexus 5 expanded](./static/notifications/nexus5_expanded_thumbnail.png)](./static/notifications/nexus5_expanded.png)
+
+
 ## Player interface
 The public interface of the Player should allow to perform all actions expected from a player. 
 
