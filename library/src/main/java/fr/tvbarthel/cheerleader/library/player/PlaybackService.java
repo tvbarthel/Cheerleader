@@ -406,11 +406,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mHasAlreadyPlayed = false;
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         mMediaSession = new MediaSessionWrapper(this, new MediaSessionCallback(), mAudioManager);
-
-
     }
 
     @Override
@@ -420,7 +417,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
     @Override
     public void onDestroy() {
-
         stopTimer();
         mAudioManager.abandonAudioFocus(this);
         mMediaSession.onDestroy();
@@ -603,16 +599,20 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     private void resume() {
         if (mIsPaused) {
             mIsPaused = false;
-            mMediaPlayer.start();
+            // Try to gain the audio focus before preparing and starting the media player.
+            if (mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+                    == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                mMediaPlayer.start();
 
-            Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
-            intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK,
-                    mPlayerPlaylist.getCurrentTrack());
-            mLocalBroadcastManager.sendBroadcast(intent);
+                Intent intent = new Intent(PlaybackListener.ACTION_ON_TRACK_PLAYED);
+                intent.putExtra(PlaybackListener.EXTRA_KEY_TRACK,
+                        mPlayerPlaylist.getCurrentTrack());
+                mLocalBroadcastManager.sendBroadcast(intent);
 
-            updateNotification();
-            mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
-            resumeTimer();
+                updateNotification();
+                mMediaSession.setPlaybackState(MediaSessionWrapper.PLAYBACK_STATE_PLAYING);
+                resumeTimer();
+            }
         }
     }
 
@@ -685,19 +685,23 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
             // 2 - THEN PREPARE THE TRACK STREAMING
 
-            // prepare synchronously as the service run on it's own handler thread.
-            mMediaPlayer.prepare();
-            // start the playback.
-            mMediaPlayer.start();
-            SoundCloudTrack currentTrack = mPlayerPlaylist.getCurrentTrack();
-            if (currentTrack == null) {
-                mMediaPlayer.stop();
-            } else {
-                startTimer(currentTrack.getDurationInMilli());
-            }
+            // Try to gain the audio focus before preparing and starting the media player.
+            if (mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+                    == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                // prepare synchronously as the service run on it's own handler thread.
+                mMediaPlayer.prepare();
+                // start the playback.
+                mMediaPlayer.start();
+                SoundCloudTrack currentTrack = mPlayerPlaylist.getCurrentTrack();
+                if (currentTrack == null) {
+                    mMediaPlayer.stop();
+                } else {
+                    startTimer(currentTrack.getDurationInMilli());
+                }
 
-            Intent bufferingEnds = new Intent(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
-            mLocalBroadcastManager.sendBroadcast(bufferingEnds);
+                Intent bufferingEnds = new Intent(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
+                mLocalBroadcastManager.sendBroadcast(bufferingEnds);
+            }
 
         } catch (IOException e) {
             Log.e(TAG, "File referencing not exist : " + track);
