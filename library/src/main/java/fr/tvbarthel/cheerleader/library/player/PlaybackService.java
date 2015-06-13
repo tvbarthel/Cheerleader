@@ -169,7 +169,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     /**
      * Max idle period after which the service will be stopped.
      */
-    private static final int IDLE_PERIOD_MILLI = 10000;
+    private static final int IDLE_PERIOD_MILLI = 60000;
 
     /**
      * Path param used to access streaming url.
@@ -511,9 +511,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     @Override
     public void onCompletion(MediaPlayer mp) {
         // release lock on wifi.
-        mWifiLock.release();
-        mPlayerHandler.sendEmptyMessage(WHAT_NEXT_TRACK);
+        if (mWifiLock.isHeld()) {
+            mWifiLock.release();
+        }
         gotoIdleState();
+        mPlayerHandler.sendEmptyMessage(WHAT_NEXT_TRACK);
     }
 
     @Override
@@ -687,7 +689,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             mMediaPlayer.prepare();
             // start the playback.
             mMediaPlayer.start();
-            startTimer(mPlayerPlaylist.getCurrentTrack().getDurationInMilli());
+            SoundCloudTrack currentTrack = mPlayerPlaylist.getCurrentTrack();
+            if (currentTrack == null) {
+                mMediaPlayer.stop();
+            } else {
+                startTimer(currentTrack.getDurationInMilli());
+            }
 
             Intent bufferingEnds = new Intent(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
             mLocalBroadcastManager.sendBroadcast(bufferingEnds);

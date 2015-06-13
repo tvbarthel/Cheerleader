@@ -31,5 +31,6 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:21.0.+'
     compile 'de.hdodenhof:circleimageview:1.2.2'
     compile 'de.keyboardsurfer.android.widget:crouton:1.8.5@aar'
+    compile 'com.netcosports.recyclergesture:library:0.2.0@aar'
     compile project(':library')
 }

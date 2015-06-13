@@ -54,7 +54,18 @@
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/default_padding"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_play_white" />
+        android:src="@drawable/ic_play_white"
+        android:visibility="invisible" />
+
+    <fr.tvbarthel.cheerleader.sampleapp.ui.ProgressBarCompat
+        android:id="@+id/playback_view_loader"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:layout_gravity="end"
+        android:layout_marginRight="48dp"
+        android:layout_marginTop="5dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/progress_color" />
 
     <ImageView
         android:id="@+id/playback_view_next"
@@ -72,7 +83,29 @@
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_gravity="bottom"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
         android:max="100"
         android:progress="50" />
+
+    <TextView
+        android:id="@+id/playback_view_current_time"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:textColor="@color/playback_view_track_time"
+        android:textStyle="italic"
+        tools:text="01:20" />
+
+    <TextView
+        android:id="@+id/playback_view_duration"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom|end"
+        android:gravity="center"
+        android:textColor="@color/playback_view_track_time"
+        android:textStyle="italic"
+        tools:text="03:48" />
 
 </FrameLayout>

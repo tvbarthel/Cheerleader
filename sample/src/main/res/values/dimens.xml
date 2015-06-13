@@ -20,4 +20,5 @@
     <dimen name="puce_size">25dp</dimen>
     <dimen name="puce_radius">8dp</dimen>
     <dimen name="puce_thickness">2dp</dimen>
+    <dimen name="track_list_padding_top">130dp</dimen>
 </resources>

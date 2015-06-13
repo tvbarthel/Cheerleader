@@ -16,15 +16,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:divider="@null"
-        android:paddingBottom="@dimen/playback_view_height"
-        android:paddingTop="130dp" />
+        android:divider="@null" />
 
     <fr.tvbarthel.cheerleader.sampleapp.ui.ProgressBarCompat
         android:id="@+id/activity_artist_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|bottom"
+        android:layout_gravity="center"
         android:indeterminate="true"
         android:indeterminateTint="@color/progress_color"
         android:visibility="visible" />
@@ -33,8 +31,8 @@
         android:id="@+id/activity_artist_callback"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="@dimen/playback_view_height"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/playback_view_height"
         android:text="@string/search_results_not_found"
         android:textColor="@color/artist_activity_callback_text"
         android:visibility="invisible" />

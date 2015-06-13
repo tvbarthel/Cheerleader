@@ -17,5 +17,8 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven {
+            url 'https://github.com/netcosports/maven/raw/master/'
+        }
     }
 }

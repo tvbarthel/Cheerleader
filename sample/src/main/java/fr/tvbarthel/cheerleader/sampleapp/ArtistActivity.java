@@ -12,12 +12,16 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.netcosports.recyclergesture.library.swipe.SwipeToDismissDirection;
+import com.netcosports.recyclergesture.library.swipe.SwipeToDismissGesture;
+import com.netcosports.recyclergesture.library.swipe.SwipeToDismissStrategy;
+
 import java.util.ArrayList;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
+import fr.tvbarthel.cheerleader.library.client.CheerleaderClient;
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
 import fr.tvbarthel.cheerleader.library.client.SoundCloudUser;
-import fr.tvbarthel.cheerleader.library.client.CheerleaderClient;
 import fr.tvbarthel.cheerleader.library.player.CheerleaderPlayer;
 import fr.tvbarthel.cheerleader.library.player.CheerleaderPlaylistListener;
 import fr.tvbarthel.cheerleader.sampleapp.adapter.TracksAdapter;
@@ -26,13 +30,13 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.CroutonView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.PlaybackView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
 import rx.Subscriber;
-import rx.android.observables.AndroidObservable;
+import rx.Subscription;
+import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class ArtistActivity extends ActionBarActivity implements
-    PlaybackView.Listener, CheerleaderPlaylistListener {
+        PlaybackView.Listener, CheerleaderPlaylistListener, TracksAdapter.Listener {
 
     // bundle keys
     private static final String BUNDLE_KEY_ARTIST_NAME = "artist_activity_bundle_key_artist_name";
@@ -51,20 +55,26 @@ public class ArtistActivity extends ActionBarActivity implements
     private ArtistView mArtistView;
     private RecyclerView.OnScrollListener mRetrieveTracksScrollListener;
     private int mScrollY;
+    private int mRetrieveTrackListPaddingBottom;
+    private int mRetrieveTrackListPaddingTop;
 
     // player widget
     private RecyclerView mPlaylistRecyclerView;
     private PlaybackView mPlaybackView;
     private TracksAdapter mPlaylistAdapter;
     private ArrayList<SoundCloudTrack> mPlaylistTracks;
+
     private TrackView.Listener mPlaylistTracksListener;
 
     // banner
     private View mBanner;
-
     //Crouton, contextual toast.
     private Crouton mCrouton;
+
     private CroutonView mCroutonView;
+    // Subscription
+    private Subscription mTracksSubscription;
+    private Subscription mProfileSubscription;
 
     /**
      * Start an ArtistActivity for a given artist name.
@@ -87,17 +97,17 @@ public class ArtistActivity extends ActionBarActivity implements
         String artistName = getExtraArtistName();
 
         mCheerleaderClient = new CheerleaderClient.Builder()
-            .from(this)
-            .with(R.string.sound_cloud_client_id)
-            .supports(artistName)
-            .build();
+                .from(this)
+                .with(R.string.sound_cloud_client_id)
+                .supports(artistName)
+                .build();
 
         mCheerleaderPlayer = new CheerleaderPlayer.Builder()
-            .from(this)
-            .with(R.string.sound_cloud_client_id)
-            .notificationActivity(ArtistActivity.class)
-            .notificationIcon(R.drawable.ic_notification)
-            .build();
+                .from(this)
+                .with(R.string.sound_cloud_client_id)
+                .notificationActivity(ArtistActivity.class)
+                .notificationIcon(R.drawable.ic_notification)
+                .build();
 
 
         mProgress = ((ProgressBar) findViewById(R.id.activity_artist_progress));
@@ -144,6 +154,8 @@ public class ArtistActivity extends ActionBarActivity implements
         super.onDestroy();
         mCheerleaderClient.close();
         mCheerleaderPlayer.destroy();
+        releaseSubscription(mProfileSubscription);
+        releaseSubscription(mTracksSubscription);
     }
 
     @Override
@@ -177,17 +189,30 @@ public class ArtistActivity extends ActionBarActivity implements
 
     @Override
     public void onTrackAdded(SoundCloudTrack track) {
+        if (mPlaylistTracks.isEmpty()) {
+            mPlaylistRecyclerView.animate().translationY(0);
+            mRetrieveTracksRecyclerView.setPadding(0,
+                    mRetrieveTrackListPaddingTop, 0, mRetrieveTrackListPaddingBottom);
+        }
         mPlaylistTracks.add(track);
         mPlaylistAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onTrackRemoved(SoundCloudTrack track, boolean isEmpty) {
-        mPlaylistTracks.remove(track);
-        mPlaylistAdapter.notifyDataSetChanged();
-        if (isEmpty) {
-            mPlaybackView.animate().translationY(mPlaybackView.getHeight());
+        if (mPlaylistTracks.remove(track)) {
+            mPlaylistAdapter.notifyDataSetChanged();
         }
+        if (isEmpty) {
+            mPlaylistRecyclerView.animate().translationY(mPlaybackView.getHeight());
+            mRetrieveTracksRecyclerView.setPadding(0, mRetrieveTrackListPaddingTop, 0, 0);
+        }
+    }
+
+    // Adapter callbacks.
+    @Override
+    public void onTrackDismissed(int i) {
+        mCheerleaderPlayer.removeTrack(i);
     }
 
     /**
@@ -201,6 +226,15 @@ public class ArtistActivity extends ActionBarActivity implements
                 int headerListHeight = getResources().getDimensionPixelOffset(R.dimen.playback_view_height);
                 mPlaylistRecyclerView.setPadding(0, mPlaylistRecyclerView.getHeight() - headerListHeight, 0, 0);
                 mPlaylistRecyclerView.setAdapter(mPlaylistAdapter);
+
+                // attach the dismiss gesture.
+                new SwipeToDismissGesture.Builder(SwipeToDismissDirection.HORIZONTAL)
+                        .on(mPlaylistRecyclerView)
+                        .apply(new DismissStrategy())
+                        .backgroundColor(getResources().getColor(R.color.grey))
+                        .build();
+
+                // hide if current play playlist is empty.
                 if (mPlaylistTracks.isEmpty()) {
                     mPlaybackView.setTranslationY(headerListHeight);
                 }
@@ -216,17 +250,17 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrievedTracks.clear();
         mAdapter.notifyDataSetChanged();
 
-        AndroidObservable.bindActivity(this,
-            mCheerleaderClient.getArtistTracks()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()))
-            .subscribe(displayTracks());
+        mTracksSubscription = AppObservable.bindActivity(this,
+                mCheerleaderClient.getArtistTracks()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()))
+                .subscribe(displayTracks());
 
-        AndroidObservable.bindActivity(this,
-            mCheerleaderClient.getArtistProfile()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io()))
-            .subscribe(displayArtist());
+        mProfileSubscription = AppObservable.bindActivity(this,
+                mCheerleaderClient.getArtistProfile()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io()))
+                .subscribe(displayArtist());
     }
 
     /**
@@ -246,12 +280,12 @@ public class ArtistActivity extends ActionBarActivity implements
         return new Subscriber<SoundCloudUser>() {
             @Override
             public void onCompleted() {
-
+                releaseSubscription(mProfileSubscription);
             }
 
             @Override
             public void onError(Throwable e) {
-
+                releaseSubscription(mProfileSubscription);
             }
 
             @Override
@@ -265,11 +299,12 @@ public class ArtistActivity extends ActionBarActivity implements
         return new Subscriber<ArrayList<SoundCloudTrack>>() {
             @Override
             public void onCompleted() {
-
+                releaseSubscription(mTracksSubscription);
             }
 
             @Override
             public void onError(Throwable e) {
+                releaseSubscription(mTracksSubscription);
                 mProgress.setVisibility(View.INVISIBLE);
                 mCallback.setVisibility(View.VISIBLE);
             }
@@ -289,13 +324,17 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrieveTracksListener = new TrackView.Listener() {
             @Override
             public void onTrackClicked(SoundCloudTrack track) {
-                boolean playNow = !mCheerleaderPlayer.isPlaying();
+                if (mCheerleaderPlayer.getTracks().contains(track)) {
+                    mCheerleaderPlayer.play(track);
+                } else {
+                    boolean playNow = !mCheerleaderPlayer.isPlaying();
 
-                mCheerleaderPlayer.addTrack(track, playNow);
-                mPlaylistAdapter.notifyDataSetChanged();
+                    mCheerleaderPlayer.addTrack(track, playNow);
+                    mPlaylistAdapter.notifyDataSetChanged();
 
-                if (!playNow) {
-                    toast(R.string.toast_track_added);
+                    if (!playNow) {
+                        toast(R.string.toast_track_added);
+                    }
                 }
             }
         };
@@ -316,6 +355,10 @@ public class ArtistActivity extends ActionBarActivity implements
             }
         };
         mRetrieveTracksRecyclerView.setOnScrollListener(mRetrieveTracksScrollListener);
+
+        mRetrieveTrackListPaddingTop = getResources().getDimensionPixelSize(R.dimen.track_list_padding_top);
+        mRetrieveTrackListPaddingBottom = getResources().getDimensionPixelSize(R.dimen.playback_view_height);
+        mRetrieveTracksRecyclerView.setPadding(0, mRetrieveTrackListPaddingTop, 0, 0);
     }
 
     private void initPlaylistTracksRecyclerView() {
@@ -335,6 +378,8 @@ public class ArtistActivity extends ActionBarActivity implements
         mPlaylistAdapter.setHeaderView(mPlaybackView);
 
         mPlaylistRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mPlaylistAdapter.setAdapterListener(this);
+
     }
 
     /**
@@ -351,5 +396,30 @@ public class ArtistActivity extends ActionBarActivity implements
 
         mCrouton = Crouton.make(this, mCroutonView, R.id.activity_artist_main_container);
         mCrouton.show();
+    }
+
+    /**
+     * Swipe to dismiss strategy used to disable swipe to dismiss on the header.
+     */
+    private static class DismissStrategy extends SwipeToDismissStrategy {
+        @Override
+        public SwipeToDismissDirection getDismissDirection(int position) {
+            if (position == 0) {
+                return SwipeToDismissDirection.NONE;
+            } else {
+                return SwipeToDismissDirection.HORIZONTAL;
+            }
+        }
+    }
+
+    /**
+     * Release a subcription.
+     *
+     * @param subscription subcription to release.
+     */
+    private void releaseSubscription(Subscription subscription) {
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+        }
     }
 }

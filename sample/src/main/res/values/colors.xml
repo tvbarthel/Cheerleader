@@ -7,6 +7,7 @@
     <color name="red_light">#fff17f86</color>
     <color name="red_translucent">#aaf61825</color>
     <color name="red_dark">#c31119</color>
+    <color name="red_darker">#ff951018</color>
     <color name="grey_light">#eeeeee</color>
 
     <color name="notification_title">#202020</color>
@@ -43,6 +44,7 @@
     <!-- playback view !-->
     <color name="playback_view_track_name">@android:color/white</color>
     <color name="playback_view_track_artwork_filter">@color/red_translucent</color>
+    <color name="playback_view_track_time">@color/grey_light</color>
 
     <!-- toolbar !-->
     <color name="toolbar_background">@color/primary</color>
