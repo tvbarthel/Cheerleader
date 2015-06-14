@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- notification dimens !-->
+    <dimen name="simple_sound_cloud_notification_title">17sp</dimen>
+    <dimen name="simple_sound_cloud_notification_subtitle">14sp</dimen>
+    <dimen name="simple_sound_cloud_notification_icon">64dp</dimen>
+    <dimen name="simple_sound_cloud_notification_padding">8dp</dimen>
+    <dimen name="simple_sound_cloud_notification_thumbnail_padding">4dp</dimen>
+    <dimen name="simple_sound_cloud_notification_small_icon">16dp</dimen>
+    <dimen name="simple_sound_cloud_notification_small_icon_padding">3dp</dimen>
+</resources>

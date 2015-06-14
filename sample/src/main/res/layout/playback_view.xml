@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/playback_view_height"
+    android:orientation="horizontal">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/shadow_top" />
+
+    <ImageView
+        android:id="@+id/playback_view_artwork"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="5dp"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/playback_view_track"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_marginRight="144dp"
+        android:layout_marginTop="5dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:padding="@dimen/activity_vertical_margin"
+        android:singleLine="true"
+        android:textColor="@color/playback_view_track_name"
+        android:textSize="16sp"
+        tools:text="Story writing" />
+
+    <ImageView
+        android:id="@+id/playback_view_previous"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:layout_gravity="end"
+        android:layout_marginRight="96dp"
+        android:layout_marginTop="5dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/default_padding"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_previous_white" />
+
+    <ImageView
+        android:id="@+id/playback_view_toggle_play"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:layout_gravity="end"
+        android:layout_marginRight="48dp"
+        android:layout_marginTop="5dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/default_padding"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_play_white"
+        android:visibility="invisible" />
+
+    <fr.tvbarthel.cheerleader.sampleapp.ui.ProgressBarCompat
+        android:id="@+id/playback_view_loader"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:layout_gravity="end"
+        android:layout_marginRight="48dp"
+        android:layout_marginTop="5dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/progress_color" />
+
+    <ImageView
+        android:id="@+id/playback_view_next"
+        android:layout_width="48dp"
+        android:layout_height="65dp"
+        android:layout_gravity="end"
+        android:layout_marginTop="5dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/default_padding"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_next_white" />
+
+    <SeekBar
+        android:id="@+id/playback_view_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:max="100"
+        android:progress="50" />
+
+    <TextView
+        android:id="@+id/playback_view_current_time"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:textColor="@color/playback_view_track_time"
+        android:textStyle="italic"
+        tools:text="01:20" />
+
+    <TextView
+        android:id="@+id/playback_view_duration"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom|end"
+        android:gravity="center"
+        android:textColor="@color/playback_view_track_time"
+        android:textStyle="italic"
+        tools:text="03:48" />
+
+</FrameLayout>

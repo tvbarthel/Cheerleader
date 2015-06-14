@@ -1,14 +1,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fr.tvbarthel.simplesoundcloud.library">
+    package="fr.tvbarthel.cheerleader.library">
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
         android:label="@string/app_name">
 
+        <!-- Content Provider used to access offline storage !-->
         <provider
             android:name=".offline.OfflinerProvider"
-            android:authorities="fr.tvbarthel.simplesoundcloud.library.SoundCloud.OfflineProvider"
+            android:authorities="fr.tvbarthel.cheerleader.library.Cheerleader.OfflineProvider"
             android:exported="false" />
+
+        <!-- Service used for music playback !-->
+        <service
+            android:name=".player.PlaybackService"
+            android:exported="false" />
+
+        <!-- receiver used to stop player when audio become noisy !-->
+        <!-- http://developer.android.com/reference/android/media/AudioManager.html#ACTION_AUDIO_BECOMING_NOISY !-->
+        <receiver android:name=".player.PlayerReceiver">
+            <intent-filter>
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Catch lock screen event !-->
+        <receiver android:name=".media.MediaSessionReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

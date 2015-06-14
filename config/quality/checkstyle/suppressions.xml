@@ -9,6 +9,17 @@
     <suppress files="BuildConfig.java" checks="[a-zA-Z0-9]*" />
     <suppress files="FastBlurHelper"
         checks="InnerAssignmentCheck|MultipleVariableDeclarationsCheck|MethodLengthCheck" />
+
     <!-- comment line @link more than 120 caract !-->
-    <suppress files="SimpleSoundCloudOffliner" checks="LineLength"/>
+    <suppress files="SimpleSoundCloudOffliner" checks="LineLength" />
+
+    <!-- model class with lot of getter and setter + comment !-->
+    <suppress files="SoundCloudTrack" checks="FileLength" />
+
+    <!-- Player service well commented !-->
+    <suppress files="PlaybackService" checks="FileLength" />
+
+    <!-- Google code !-->
+    <suppress files="RemoteControlHelper.java" checks="[a-zA-Z0-9]*" />
+    <suppress files="RemoteControlClientCompat.java" checks="[a-zA-Z0-9]*" />
 </suppressions>

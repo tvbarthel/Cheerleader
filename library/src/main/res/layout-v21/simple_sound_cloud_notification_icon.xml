@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:layout_width="@dimen/simple_sound_cloud_notification_icon"
+    android:layout_height="@dimen/simple_sound_cloud_notification_icon"
+    android:padding="@dimen/simple_sound_cloud_notification_padding"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/simple_sound_cloud_notification_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/simple_sound_cloud_notification_thumbnail_padding"
+        tools:src="@drawable/ic_album_black" />
+
+    <ImageView
+        android:id="@+id/simple_sound_cloud_notification_icon"
+        android:layout_width="@dimen/simple_sound_cloud_notification_small_icon"
+        android:layout_height="@dimen/simple_sound_cloud_notification_small_icon"
+        android:padding="@dimen/simple_sound_cloud_notification_small_icon_padding"
+        android:layout_gravity="bottom|end"
+        tools:src="@drawable/ic_album_black" />
+
+</FrameLayout>

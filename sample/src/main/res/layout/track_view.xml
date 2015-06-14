@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/track_view_artwork"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="start|top"
+        android:scaleType="centerCrop"
+        app:border_color="@color/track_view_artwork_border"
+        app:border_width="2dp" />
+
+    <TextView
+        android:id="@+id/track_view_artist"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginLeft="64dp"
+        android:ellipsize="end"
+        android:gravity="bottom"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:singleLine="true"
+        android:textColor="@color/track_view_artist"
+        tools:text="IvanB" />
+
+    <TextView
+        android:id="@+id/track_view_title"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginLeft="64dp"
+        android:layout_marginTop="32dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:gravity="top"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:singleLine="true"
+        android:textColor="@color/track_view_track"
+        tools:text="Start Again (prod. Tido Vegas)" />
+
+    <TextView
+        android:id="@+id/track_view_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:gravity="end"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:singleLine="true"
+        android:textStyle="italic"
+        android:textColor="@color/track_view_duration"
+        tools:text="3:20" />
+
+</merge>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/notification_button_pressed">
+    <item>
+        <selector>
+            <item android:state_pressed="true">
+                <shape>
+                    <solid android:color="@android:color/white" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

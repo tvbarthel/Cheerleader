@@ -1,0 +1,48 @@
+<FrameLayout
+    android:id="@+id/activity_artist_main_container"
+    style="@style/AppTheme.MainContainer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <include
+        android:id="@+id/activity_artist_banner"
+        layout="@layout/cheerleader_banner" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/activity_artist_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:divider="@null" />
+
+    <fr.tvbarthel.cheerleader.sampleapp.ui.ProgressBarCompat
+        android:id="@+id/activity_artist_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/progress_color"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/activity_artist_callback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/playback_view_height"
+        android:text="@string/search_results_not_found"
+        android:textColor="@color/artist_activity_callback_text"
+        android:visibility="invisible" />
+
+    <fr.tvbarthel.cheerleader.sampleapp.ui.BottomRecyclerListView
+        android:id="@+id/activity_artist_playlist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:divider="@null"
+        android:overScrollMode="never"
+        android:scrollbars="none" />
+</FrameLayout>

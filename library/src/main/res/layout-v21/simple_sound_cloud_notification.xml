@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:ignore="ContentDescription">
+
+    <include layout="@layout/simple_sound_cloud_notification_icon" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="3"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/simple_sound_cloud_notification_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/simple_sound_cloud_notification_title"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="@dimen/simple_sound_cloud_notification_title"
+            tools:text="IvanB" />
+
+        <TextView
+            android:id="@+id/simple_sound_cloud_notification_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/simple_sound_cloud_notification_subtitle"
+            android:textSize="@dimen/simple_sound_cloud_notification_subtitle"
+            android:singleLine="true"
+            android:ellipsize="end"
+            tools:text="Story writing" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/simple_sound_cloud_notification_previous"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:background="@drawable/notification_button"
+        android:padding="@dimen/simple_sound_cloud_notification_padding"
+        android:src="@drawable/simple_sound_cloud_notification_previous" />
+
+    <ImageButton
+        android:id="@+id/simple_sound_cloud_notification_play"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:background="@drawable/notification_button"
+        android:padding="@dimen/simple_sound_cloud_notification_padding"
+        android:src="@drawable/simple_sound_cloud_notification_play" />
+
+    <ImageButton
+        android:id="@+id/simple_sound_cloud_notification_next"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:background="@drawable/notification_button"
+        android:padding="@dimen/simple_sound_cloud_notification_padding"
+        android:src="@drawable/simple_sound_cloud_notification_next" />
+
+    <ImageView
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/notification_button_pressed"
+        android:layout_marginTop="@dimen/simple_sound_cloud_notification_padding"
+        android:layout_marginBottom="@dimen/simple_sound_cloud_notification_padding" />
+
+    <ImageButton
+        android:id="@+id/simple_sound_cloud_notification_clear"
+        android:layout_width="36dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/notification_button"
+        android:padding="@dimen/simple_sound_cloud_notification_padding"
+        android:scaleType="fitCenter"
+        android:src="@drawable/simple_sound_cloud_notification_clear" />
+
+</LinearLayout>

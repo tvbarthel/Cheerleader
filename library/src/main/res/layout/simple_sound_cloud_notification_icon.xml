@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/simple_sound_cloud_notification_thumbnail"
+    android:layout_width="@dimen/simple_sound_cloud_notification_icon"
+    android:layout_height="@dimen/simple_sound_cloud_notification_icon"
+    android:background="@color/material_blue_grey_800"
+    android:layout_marginRight="@dimen/simple_sound_cloud_notification_padding" />
