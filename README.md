@@ -39,7 +39,11 @@ Don't forget to read the [SoundCloud terms of use](https://developers.soundcloud
 Please keep in mind that the main goal of this project is to help independent artists reach more fans and bring more visibility through an Android application. If you plans to monetize your app (please don't use Ads), check the [Commercial Use](https://developers.soundcloud.com/docs/api/terms-of-use#commercial) section and be sure to pays the artist and SoundCloud for bringing diversified musics for free.
 
 # Gradle Dependency
-Waiting for upload on jcenter repositories.
+Promoted on Maven Central : 
+
+```java
+compile 'fr.tvbarthel.cheerleader:library:0.1.1'
+```
 
 # CheerleaderClient 
 As any client, the CheerleaderClient will provide a bridge between your app and the data stored on the SoundCloud servers.
