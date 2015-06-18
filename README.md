@@ -5,6 +5,7 @@ Cheerleader is an Android open source library designed to easily support an arti
 
 [![Maven Central](http://img.shields.io/maven-central/v/fr.tvbarthel.cheerleader/library.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fr.tvbarthel.cheerleader%22)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Cheerleader-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1982)
+[![Sample app](./static/google_play.png)](https://play.google.com/store/apps/details?id=fr.tvbarthel.cheerleader.sampleapp)
 
 The library is based on RxJava, if you aren't familiar with it, the following links are strongly recommended :
 * [Official wiki](https://github.com/ReactiveX/RxJava/wiki)
