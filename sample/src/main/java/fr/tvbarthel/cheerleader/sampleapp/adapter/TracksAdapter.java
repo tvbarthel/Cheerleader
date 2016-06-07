@@ -17,7 +17,7 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
  * Simple adapter used to display artist tracks in a list with an optional header.
  */
 public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder>
-    implements CheerleaderPlayerListener, SwipeToDismissGesture.Dismisser {
+        implements CheerleaderPlayerListener, SwipeToDismissGesture.Dismisser {
 
     /**
      * View types.
@@ -71,9 +71,10 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder>
                 TrackView v = new TrackView(viewGroup.getContext());
                 v.setListener(mListener);
                 v.setLayoutParams(
-                    new RecyclerView.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT)
+                        new RecyclerView.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
                 );
                 holder = new TrackHolder(v);
                 break;
@@ -94,11 +95,11 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.Holder>
                 ((TrackHolder) holder).trackView.setModel(mTracks.get(i - offset));
                 if (i == mPlayedTrackPosition) {
                     ((TrackHolder) holder).trackView
-                        .setBackgroundResource(R.drawable.selectable_background_red_light);
+                            .setBackgroundResource(R.drawable.selectable_background_red_light);
                     ((TrackHolder) holder).trackView.setSelected(true);
                 } else {
                     ((TrackHolder) holder).trackView
-                        .setBackgroundResource(R.drawable.selectable_background_white);
+                            .setBackgroundResource(R.drawable.selectable_background_white);
                     ((TrackHolder) holder).trackView.setSelected(false);
                 }
                 break;

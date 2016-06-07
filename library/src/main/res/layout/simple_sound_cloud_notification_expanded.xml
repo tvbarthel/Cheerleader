@@ -9,9 +9,7 @@ Based one notification_template_material_big_picture.xml
     android:layout_height="256dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    tools:ignore="ContentDescription"
-    internal:layout_minHeight="65dp"
-    internal:layout_maxHeight="unbounded">
+    tools:ignore="ContentDescription">
 
     <include layout="@layout/simple_sound_cloud_notification_icon" />
 
