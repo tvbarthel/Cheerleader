@@ -10,15 +10,15 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import fr.tvbarthel.cheerleader.library.R;
-import fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper;
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
+import fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper;
 
 /**
  * Handle player notification behaviour.
@@ -194,6 +194,7 @@ final class NotificationManager {
                     R.id.simple_sound_cloud_notification_play,
                     R.drawable.simple_sound_cloud_notification_play
             );
+            mNotificationBuilder.setOngoing(false);
         } else {
             mNotificationView.setImageViewResource(
                     R.id.simple_sound_cloud_notification_play,
@@ -203,6 +204,7 @@ final class NotificationManager {
                     R.id.simple_sound_cloud_notification_play,
                     R.drawable.simple_sound_cloud_notification_pause
             );
+            mNotificationBuilder.setOngoing(true);
         }
 
         service.startForeground(NOTIFICATION_ID, buildNotification());

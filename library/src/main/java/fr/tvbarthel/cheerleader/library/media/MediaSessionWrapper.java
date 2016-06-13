@@ -112,6 +112,11 @@ public class MediaSessionWrapper {
      */
     private LocalBroadcastManager mLocalBroadcastManager;
 
+    /**
+     * Builder used to set the playback state to the Media session compat.
+     */
+    private PlaybackStateCompat.Builder mStateBuilder;
+
     private Context mContext;
 
     /**
@@ -130,6 +135,7 @@ public class MediaSessionWrapper {
         mRuntimePackageName = context.getPackageName();
 
         initLockScreenRemoteControlClient(context);
+        initPlaybackStateBuilder();
 
         mMediaSession = new MediaSessionCompat(context, TAG);
         mMediaSession.setCallback(new MediaSessionCallback());
@@ -166,11 +172,12 @@ public class MediaSessionWrapper {
             case PLAYBACK_STATE_STOPPED:
                 setRemoteControlClientPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
                 setMediaSessionCompatPlaybackState(PlaybackStateCompat.STATE_STOPPED);
+                mMediaSession.setActive(false);
                 break;
             case PLAYBACK_STATE_PLAYING:
-                mMediaSession.setActive(true);
                 setRemoteControlClientPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
                 setMediaSessionCompatPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+                mMediaSession.setActive(true);
                 break;
             case PLAYBACK_STATE_PAUSED:
                 setRemoteControlClientPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
@@ -243,9 +250,22 @@ public class MediaSessionWrapper {
      * @param state playback state.
      */
     private void setMediaSessionCompatPlaybackState(int state) {
-        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
-        stateBuilder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f);
-        mMediaSession.setPlaybackState(stateBuilder.build());
+        mStateBuilder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f);
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+    }
+
+    /**
+     * Initialize the playback state builder with supported actions.
+     */
+    private void initPlaybackStateBuilder() {
+        mStateBuilder = new PlaybackStateCompat.Builder();
+        mStateBuilder.setActions(
+                PlaybackStateCompat.ACTION_PLAY
+                        | PlaybackStateCompat.ACTION_PAUSE
+                        | PlaybackStateCompat.ACTION_PLAY_PAUSE
+                        | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                        | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+        );
     }
 
     /**
@@ -359,26 +379,26 @@ public class MediaSessionWrapper {
         /**
          * Called when play is requested.
          */
-        public void onPlay();
+        void onPlay();
 
         /**
          * Called when pause is requested.
          */
-        public void onPause();
+        void onPause();
 
         /**
          * Called when next track should be played.
          */
-        public void onSkipToNext();
+        void onSkipToNext();
 
         /**
          * Called when previous track should be played.
          */
-        public void onSkipToPrevious();
+        void onSkipToPrevious();
 
         /**
          * Called when play/pause button is toggled.
          */
-        public void onPlayPauseToggle();
+        void onPlayPauseToggle();
     }
 }
