@@ -857,6 +857,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     /**
      * Callback implementation to catch media session events.
      */
+    @SuppressWarnings("PMD.CallSuperLast") // due to onPause pmd think of an Activity callback.
     private final class MediaSessionCallback implements MediaSessionWrapper.MediaSessionWrapperCallback {
 
         @Override
