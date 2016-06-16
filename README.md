@@ -300,4 +300,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 # Special Thanks to ...
-(Ivan B)[https://twitter.com/ivanbnw) , for his daily support and motivation through his lyrics.
+[Ivan B](https://twitter.com/ivanbnw) , for his daily support and motivation through his lyrics.
