@@ -212,6 +212,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     private boolean mIsPaused;
 
     /**
+     * Used to know if the player is paused due to audio focus loss.
+     */
+    private boolean mIsPausedAfterAudioFocusChanged;
+
+    /**
      * Used to know if the player has leary played a track.
      */
     private boolean mHasAlreadyPlayed;
@@ -529,18 +534,20 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     public void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                if (mIsPaused) {
+                if (mIsPausedAfterAudioFocusChanged) {
                     resume();
                 }
                 mMediaPlayer.setVolume(1.0f, 1.0f);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 if (!mIsPaused) {
+                    mIsPausedAfterAudioFocusChanged = true;
                     pause();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 if (!mIsPaused) {
+                    mIsPausedAfterAudioFocusChanged = true;
                     pause();
                 }
                 break;
@@ -599,6 +606,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     private void resume() {
         if (mIsPaused) {
             mIsPaused = false;
+            mIsPausedAfterAudioFocusChanged = false;
             // Try to gain the audio focus before preparing and starting the media player.
             if (mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
                     == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -666,6 +674,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
                     + mSoundCloundClientId);
 
             mIsPaused = false;
+            mIsPausedAfterAudioFocusChanged = false;
             mHasAlreadyPlayed = true;
 
             // 1 - UPDATE ALL VISUAL CALLBACK FIRST TO IMPROVE USER EXPERIENCE
