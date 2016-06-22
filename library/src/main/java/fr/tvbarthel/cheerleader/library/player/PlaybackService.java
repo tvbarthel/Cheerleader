@@ -35,7 +35,7 @@ import fr.tvbarthel.cheerleader.library.media.MediaSessionWrapper;
  */
 public class PlaybackService extends Service implements MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener,
-        AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnInfoListener {
+        AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnInfoListener, MediaPlayer.OnPreparedListener {
 
     /**
      * Action used for toggle playback event
@@ -266,6 +266,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
      * Progress used to update current track progress.
      */
     private CountDownTimer mCountDown;
+
+    /**
+     * Boolean used to if the media player is preparing.
+     */
+    private boolean mIsPreparing;
 
 
     /**
@@ -498,6 +503,24 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     }
 
     @Override
+    public void onPrepared(MediaPlayer mp) {
+        // start the playback.
+        mIsPreparing = false;
+        if (!mIsPaused) {
+            mMediaPlayer.start();
+            SoundCloudTrack currentTrack = mPlayerPlaylist.getCurrentTrack();
+            if (currentTrack == null) {
+                mMediaPlayer.stop();
+            } else {
+                startTimer(currentTrack.getDurationInMilli());
+            }
+
+            Intent bufferingEnds = new Intent(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
+            mLocalBroadcastManager.sendBroadcast(bufferingEnds);
+        }
+    }
+
+    @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
         Log.e(TAG, "MediaPlayer error occurred : " + what + " => reset mediaPlayer");
         initializeMediaPlayer();
@@ -580,7 +603,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     private void pause() {
         if (mHasAlreadyPlayed && !mIsPaused) {
             mIsPaused = true;
-            mMediaPlayer.pause();
+            if (!mIsPreparing) {
+                mMediaPlayer.pause();
+            }
 
             // broadcast event
             Intent intent = new Intent(PlaybackListener.ACTION_ON_PLAYER_PAUSED);
@@ -642,6 +667,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mMediaPlayer.setOnCompletionListener(this);
         mMediaPlayer.setOnSeekCompleteListener(this);
         mMediaPlayer.setOnInfoListener(this);
+        mMediaPlayer.setOnPreparedListener(this);
+        mIsPreparing = false;
     }
 
     /**
@@ -688,19 +715,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             // Try to gain the audio focus before preparing and starting the media player.
             if (mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
                     == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                // prepare synchronously as the service run on it's own handler thread.
-                mMediaPlayer.prepare();
-                // start the playback.
-                mMediaPlayer.start();
-                SoundCloudTrack currentTrack = mPlayerPlaylist.getCurrentTrack();
-                if (currentTrack == null) {
-                    mMediaPlayer.stop();
-                } else {
-                    startTimer(currentTrack.getDurationInMilli());
-                }
-
-                Intent bufferingEnds = new Intent(PlaybackListener.ACTION_ON_BUFFERING_ENDED);
-                mLocalBroadcastManager.sendBroadcast(bufferingEnds);
+                // prepare asynchronously the stream to be able to handle new action on the
+                // service thread such as a pause command.
+                mIsPreparing = true;
+                mMediaPlayer.prepareAsync();
             }
 
         } catch (IOException e) {
