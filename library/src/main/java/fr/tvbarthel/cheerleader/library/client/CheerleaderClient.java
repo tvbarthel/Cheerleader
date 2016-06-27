@@ -9,7 +9,11 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import fr.tvbarthel.cheerleader.library.offline.Offliner;
-import retrofit.RestAdapter;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -52,9 +56,9 @@ public final class CheerleaderClient implements Closeable {
     private static CheerleaderClient sInstance;
 
     /**
-     * Rest adapter used to create {@link RetrofitService}
+     * Retrofit instance used to create {@link RetrofitService}
      */
-    private RestAdapter mRestAdapter;
+    private Retrofit mRetrofit;
 
     /**
      * "Retrofit service" which encapsulate communication with sound cloud api.
@@ -62,9 +66,14 @@ public final class CheerleaderClient implements Closeable {
     private RetrofitService mRetrofitService;
 
     /**
-     * {@link retrofit.RequestInterceptor} used to sign each request with sound cloud client id.
+     * Interceptor used to sign every request with the sound cloud client id.
      */
-    private RequestSignator mRequestSignator;
+    private RequestSignatorInterceptor mRequestSignatorInterceptor;
+
+    /**
+     * Logger used to log http request and response when enabled.
+     */
+    private HttpLoggingInterceptor mHttpLoggingInterceptor;
 
     /**
      * WeakReference on the application context.
@@ -93,6 +102,11 @@ public final class CheerleaderClient implements Closeable {
     private CacheRam mCacheRam;
 
     /**
+     * Tools used to handle the offline layer.
+     */
+    private Offliner mOffliner;
+
+    /**
      * Private default constructor.
      */
     private CheerleaderClient() {
@@ -113,23 +127,33 @@ public final class CheerleaderClient implements Closeable {
         mClientKey = clientId;
         mIsClosed = false;
 
-        mRequestSignator = new RequestSignator(mClientKey);
+        mRequestSignatorInterceptor = new RequestSignatorInterceptor(mClientKey);
+
+        mHttpLoggingInterceptor = new HttpLoggingInterceptor();
+        mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+
 
         mApplicationContext = new WeakReference<>(applicationContext);
+
+        mOffliner = new Offliner(getContext(), false);
 
         /**
          * Initialize the Retrofit adapter for network communication.
          */
-        mRestAdapter = new RestAdapter.Builder()
-            .setEndpoint(SOUND_CLOUD_API)
-            .setRequestInterceptor(mRequestSignator)
-            .build();
-        mRetrofitService = mRestAdapter.create(RetrofitService.class);
-
-        /**
-         * Initialize the Offliner component for offline storage.
-         */
-        Offliner.initInstance(getContext(), false);
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(SOUND_CLOUD_API)
+                .addConverterFactory(StringConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(
+                        new OkHttpClient.Builder()
+                                .addInterceptor(mRequestSignatorInterceptor)
+                                .addInterceptor(mOffliner.getInterceptor())
+                                .addInterceptor(mHttpLoggingInterceptor)
+                                .build()
+                )
+                .build();
+        mRetrofitService = mRetrofit.create(RetrofitService.class);
 
         mCacheRam = new CacheRam();
     }
@@ -152,7 +176,7 @@ public final class CheerleaderClient implements Closeable {
         if (sInstance == null || sInstance.mIsClosed) {
             sInstance = new CheerleaderClient(context.getApplicationContext(), clientId, artistName);
         } else {
-            sInstance.mRequestSignator.setClientId(clientId);
+            sInstance.mRequestSignatorInterceptor.setClientId(clientId);
             sInstance.mClientKey = clientId;
             sInstance.mArtistName = artistName;
         }
@@ -171,9 +195,10 @@ public final class CheerleaderClient implements Closeable {
         }
         mIsClosed = true;
 
-        mRestAdapter = null;
+        mRetrofit = null;
         mRetrofitService = null;
-        mRequestSignator = null;
+        mRequestSignatorInterceptor = null;
+        mHttpLoggingInterceptor = null;
 
         mApplicationContext.clear();
         mApplicationContext = null;
@@ -198,9 +223,8 @@ public final class CheerleaderClient implements Closeable {
             });
         } else {
             return mRetrofitService.getUserTracks(mArtistName)
-                .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_USER_TRACKS)
-                .map(cacheTracks());
+                    .map(RxParser.PARSE_USER_TRACKS)
+                    .map(cacheTracks());
         }
     }
 
@@ -221,9 +245,8 @@ public final class CheerleaderClient implements Closeable {
             });
         } else {
             return mRetrofitService.getUser(mArtistName)
-                .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_USER)
-                .map(cacheArtistProfile());
+                    .map(RxParser.PARSE_USER)
+                    .map(cacheArtistProfile());
         }
     }
 
@@ -246,9 +269,8 @@ public final class CheerleaderClient implements Closeable {
             });
         } else {
             return mRetrofitService.getTrackComments(track.getId())
-                .compose(Offliner.PREPARE_FOR_OFFLINE)
-                .map(RxParser.PARSE_COMMENTS)
-                .map(cacheTrackComments());
+                    .map(RxParser.PARSE_COMMENTS)
+                    .map(cacheTrackComments());
         }
     }
 
@@ -272,11 +294,11 @@ public final class CheerleaderClient implements Closeable {
     private void setLog(int logLevel) {
         checkState();
         if ((logLevel & LOG_RETROFIT) != 0) {
-            mRestAdapter.setLogLevel(RestAdapter.LogLevel.FULL);
+            mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         } else {
-            mRestAdapter.setLogLevel(RestAdapter.LogLevel.NONE);
+            mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
         }
-        Offliner.debug((logLevel & LOG_OFFLINER) != 0);
+        mOffliner.debug((logLevel & LOG_OFFLINER) != 0);
 
     }
 
@@ -437,7 +459,7 @@ public final class CheerleaderClient implements Closeable {
          * <p/>
          * Different log policies can be combine :
          * <pre>
-         * simpleSoundCloud.setLog(SimpleSoundCloud.LOG_OFFLINER | SimpleSoundCloud.LOG_RETROFIT);
+         * setLog(CheerleaderClient.LOG_OFFLINER | CheerleaderClient.LOG_RETROFIT);
          * </pre>
          *
          * @param logLevel log policy.
@@ -456,21 +478,21 @@ public final class CheerleaderClient implements Closeable {
         public CheerleaderClient build() {
             if (this.context == null) {
                 throw new IllegalStateException("Context should be passed using "
-                    + "'Builder.from' to build the client.");
+                        + "'Builder.from' to build the client.");
             }
 
             if (this.apiKey == null) {
                 throw new IllegalStateException("Api key should be passed using "
-                    + "'Builder.with' to build the client.");
+                        + "'Builder.with' to build the client.");
             }
 
             if (this.artistName == null) {
                 throw new IllegalStateException("Artist name should be passed using "
-                    + "'Builder.supports' to build the client.");
+                        + "'Builder.supports' to build the client.");
             }
 
             CheerleaderClient instance
-                = getInstance(this.context, this.apiKey, this.artistName);
+                    = getInstance(this.context, this.apiKey, this.artistName);
             if (!this.apiKey.equals(instance.mClientKey)) {
                 throw new IllegalStateException("Only one api key can be used at the same time.");
             }

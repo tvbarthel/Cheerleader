@@ -97,10 +97,11 @@ public class TrackView extends FrameLayout implements View.OnClickListener {
         mModel = track;
         if (mModel != null) {
             Picasso.with(getContext())
-                .load(SoundCloudArtworkHelper.getArtworkUrl(mModel, SoundCloudArtworkHelper.XLARGE))
-                .placeholder(R.color.grey_light)
-                .fit()
-                .into(mArtwork);
+                    .load(SoundCloudArtworkHelper.getArtworkUrl(mModel, SoundCloudArtworkHelper.XLARGE))
+                    .placeholder(R.color.grey_light)
+                    .fit()
+                    .centerInside()
+                    .into(mArtwork);
             mArtist.setText(mModel.getArtist());
             mTitle.setText(mModel.getTitle());
             long min = mModel.getDurationInMilli() / 60000;
