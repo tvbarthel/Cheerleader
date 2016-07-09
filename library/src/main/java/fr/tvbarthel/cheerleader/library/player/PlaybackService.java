@@ -528,8 +528,16 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        Log.e(TAG, "MediaPlayer error occurred : " + what + " => reset mediaPlayer");
-        initializeMediaPlayer();
+        // Most of the time when the media player fires an error, it can recover from it.
+        // We simply return true to mark the error as handled.
+        Log.e(TAG, "MediaPlayer error occurred : " + what + " - " + extra + " => reset mediaPlayer");
+
+        // If the media server died
+        // Re-initialize the media player.
+        if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
+            initializeMediaPlayer();
+        }
+
         return true;
     }
 
@@ -674,6 +682,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mMediaPlayer.setOnSeekCompleteListener(this);
         mMediaPlayer.setOnInfoListener(this);
         mMediaPlayer.setOnPreparedListener(this);
+        mMediaPlayer.setOnErrorListener(this);
         mIsPreparing = false;
     }
 
@@ -690,13 +699,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         try {
             // acquire lock on wifi.
             mWifiLock.acquire();
-
-            // set media player to stop state in order to be able to call prepare.
-            mMediaPlayer.reset();
-
-            // set new data source
-            mMediaPlayer.setDataSource(track.getStreamUrl() + SOUND_CLOUD_CLIENT_ID_PARAM
-                    + mSoundCloundClientId);
 
             mIsPaused = false;
             mHasAlreadyPlayed = true;
@@ -717,6 +719,13 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             mLocalBroadcastManager.sendBroadcast(bufferingStart);
 
             // 2 - THEN PREPARE THE TRACK STREAMING
+
+            // set media player to stop state in order to be able to call prepare.
+            mMediaPlayer.reset();
+
+            // set new data source
+            mMediaPlayer.setDataSource(track.getStreamUrl() + SOUND_CLOUD_CLIENT_ID_PARAM
+                    + mSoundCloundClientId);
 
             // Try to gain the audio focus before preparing and starting the media player.
             if (mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
@@ -926,13 +935,15 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
             // update meta data with artwork.
             SoundCloudTrack track = mPlayerPlaylist.getCurrentTrack();
             if (track != null) {
-                // On KitKat and bellow, copy bitmap to avoid IllegalStateException "Can't parcel a recycled bitmap"
+                // On KitKat and bellow, copy bitmap to avoid IllegalStateException
                 // from the remove control client on KitKat (IRemoteControlDisplay.java:340)
+                // The MediaSession seems to recycle the bitmap, so be sure to pass a copy.
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-                    bitmap = bitmap.copy(bitmap.getConfig(), false);
+                    mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(),
+                            bitmap.copy(bitmap.getConfig(), false));
+                } else {
+                    mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(), bitmap);
                 }
-
-                mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(), bitmap);
             }
 
         }

@@ -129,7 +129,14 @@ final class NotificationManager {
     /**
      * A {@link Runnable} to load the artwork with some delay.
      */
-    private Runnable loadArtworkRunnable;
+    private Runnable mLoadArtworkRunnable;
+
+    /**
+     * The size of the bitmap artwork. (in pixels).
+     * <p/>
+     * Should be used to resize the artwork bitmap.
+     */
+    private int mArtworkBitmapSize;
 
     /**
      * Encapsulate player notification behaviour.
@@ -144,6 +151,9 @@ final class NotificationManager {
 
         mNotificationManager = ((android.app.NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE));
+
+        mArtworkBitmapSize = context.getResources()
+                .getDimensionPixelOffset(R.dimen.simple_sound_cloud_notification_icon);
 
         // initialize actions' PendingIntents.
         initializePendingIntent(context);
@@ -384,25 +394,22 @@ final class NotificationManager {
      * @param artworkUrl artwork url of the track.
      */
     private void loadArtwork(final Context context, final String artworkUrl) {
-        if (loadArtworkRunnable != null) {
-            mMainThreadHandler.removeCallbacks(loadArtworkRunnable);
+        if (mLoadArtworkRunnable != null) {
+            mMainThreadHandler.removeCallbacks(mLoadArtworkRunnable);
         }
 
-        loadArtworkRunnable = new Runnable() {
+        mLoadArtworkRunnable = new Runnable() {
             @Override
             public void run() {
                 final Picasso picasso = Picasso.with(context);
                 picasso.cancelRequest(mThumbnailArtworkTarget);
 
-                final int iconSize = context.getResources()
-                        .getDimensionPixelOffset(R.dimen.simple_sound_cloud_notification_icon);
-
                 picasso.load(artworkUrl)
                         .centerCrop()
-                        .resize(iconSize, iconSize)
+                        .resize(mArtworkBitmapSize, mArtworkBitmapSize)
                         .into(mThumbnailArtworkTarget);
             }
         };
-        mMainThreadHandler.postDelayed(loadArtworkRunnable, LOAD_ARTWORK_DELAY);
+        mMainThreadHandler.postDelayed(mLoadArtworkRunnable, LOAD_ARTWORK_DELAY);
     }
 }
