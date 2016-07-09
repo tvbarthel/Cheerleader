@@ -57,6 +57,11 @@ final class NotificationManager {
     private static final int REQUEST_CODE_CLEAR = 0x00000040;
 
     /**
+     * Delay before effectively loading the artwork. (in milliseconds).
+     */
+    private static final int LOAD_ARTWORK_DELAY = 1000;
+
+    /**
      * Singleton pattern.
      */
     private static NotificationManager sInstance;
@@ -69,7 +74,7 @@ final class NotificationManager {
     /**
      * Target used to load asynchronously track artwork into the notification.
      */
-    private Target mArtworkTarget;
+    private Target mThumbnailArtworkTarget;
 
     /**
      * Id of the track displayed in the notification.
@@ -122,6 +127,18 @@ final class NotificationManager {
     private NotificationConfig mNotificationConfig;
 
     /**
+     * A {@link Runnable} to load the artwork with some delay.
+     */
+    private Runnable mLoadArtworkRunnable;
+
+    /**
+     * The size of the bitmap artwork. (in pixels).
+     * <p/>
+     * Should be used to resize the artwork bitmap.
+     */
+    private int mArtworkBitmapSize;
+
+    /**
      * Encapsulate player notification behaviour.
      *
      * @param context context used to instantiate internal component.
@@ -135,10 +152,13 @@ final class NotificationManager {
         mNotificationManager = ((android.app.NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE));
 
+        mArtworkBitmapSize = context.getResources()
+                .getDimensionPixelOffset(R.dimen.simple_sound_cloud_notification_icon);
+
         // initialize actions' PendingIntents.
         initializePendingIntent(context);
 
-        // initialize traget used to load artwork asynchronously.
+        // initialize target used to load artwork asynchronously.
         initializeArtworkTarget();
     }
 
@@ -264,14 +284,13 @@ final class NotificationManager {
      * Initialize target used to load artwork asynchronously.
      */
     private void initializeArtworkTarget() {
-        mArtworkTarget = new Target() {
+        mThumbnailArtworkTarget = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                mNotificationView.setImageViewBitmap(R.id.simple_sound_cloud_notification_thumbnail, bitmap);
-                mNotificationExpandedView.setImageViewBitmap(
+                mNotificationView.setImageViewBitmap(
                         R.id.simple_sound_cloud_notification_thumbnail, bitmap);
                 mNotificationExpandedView.setImageViewBitmap(
-                        R.id.simple_sound_cloud_notification_expanded_thumbnail, bitmap);
+                        R.id.simple_sound_cloud_notification_thumbnail, bitmap);
                 mNotificationManager.notify(NOTIFICATION_ID, buildNotification());
             }
 
@@ -375,14 +394,22 @@ final class NotificationManager {
      * @param artworkUrl artwork url of the track.
      */
     private void loadArtwork(final Context context, final String artworkUrl) {
-        mMainThreadHandler.post(new Runnable() {
+        if (mLoadArtworkRunnable != null) {
+            mMainThreadHandler.removeCallbacks(mLoadArtworkRunnable);
+        }
+
+        mLoadArtworkRunnable = new Runnable() {
             @Override
             public void run() {
-                Picasso
-                        .with(context)
-                        .load(artworkUrl)
-                        .into(mArtworkTarget);
+                final Picasso picasso = Picasso.with(context);
+                picasso.cancelRequest(mThumbnailArtworkTarget);
+
+                picasso.load(artworkUrl)
+                        .centerCrop()
+                        .resize(mArtworkBitmapSize, mArtworkBitmapSize)
+                        .into(mThumbnailArtworkTarget);
             }
-        });
+        };
+        mMainThreadHandler.postDelayed(mLoadArtworkRunnable, LOAD_ARTWORK_DELAY);
     }
 }

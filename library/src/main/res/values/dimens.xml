@@ -5,6 +5,9 @@
     <dimen name="simple_sound_cloud_notification_title">18sp</dimen>
     <dimen name="simple_sound_cloud_notification_subtitle">14sp</dimen>
     <dimen name="simple_sound_cloud_notification_icon">64dp</dimen>
+    <dimen name="simple_sound_cloud_notification_icon_expanded">128dp</dimen>
     <dimen name="simple_sound_cloud_notification_padding">8dp</dimen>
+    <dimen name="simple_sound_cloud_notification_icon_padding">5dp</dimen>
+    <dimen name="simple_sound_cloud_notification_icon_padding_big">7dp</dimen>
 
 </resources>
