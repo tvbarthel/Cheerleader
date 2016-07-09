@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -187,6 +188,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     private static final String THREAD_NAME = TAG + "player_thread";
 
     /**
+     * The size of the bitmap to load for the media session artwork. (in pixels).
+     */
+    private static final int MEDIA_SESSION_ARTWORK_SIZE = 300;
+
+    /**
      * Thread used to complete work off the main thread.
      */
     private HandlerThread mHandlerThread;
@@ -255,7 +261,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     /**
      * Picasso target used to retrieve the track artwork.
      */
-    private Target mArtworkTarget;
+    private Target mMediaSessionArtworkTarget;
 
     /**
      * Handler running on main thread to perform change on notification ui.
@@ -393,7 +399,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mStopServiceHandler = new StopHandler(mHandlerThread.getLooper());
 
         // instantiate target used to load track artwork.
-        mArtworkTarget = new ArtworkTarget();
+        mMediaSessionArtworkTarget = new MediaSessionArtworkTarget();
 
         // create handler on the main thread to avoid throwing error
         // with picasso when bitmap is retrieved and loaded in notification.
@@ -755,10 +761,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
         mMainThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                Picasso
-                        .with(context)
-                        .load(artworkUrl)
-                        .into(mArtworkTarget);
+                final Picasso picasso = Picasso.with(context);
+                picasso.cancelRequest(mMediaSessionArtworkTarget);
+                picasso.load(artworkUrl)
+                        .centerCrop()
+                        .resize(MEDIA_SESSION_ARTWORK_SIZE, MEDIA_SESSION_ARTWORK_SIZE)
+                        .into(mMediaSessionArtworkTarget);
             }
         });
     }
@@ -911,18 +919,20 @@ public class PlaybackService extends Service implements MediaPlayer.OnErrorListe
     /**
      * Custom target used to load track artwork asynchronously.
      */
-    private class ArtworkTarget implements Target {
+    private class MediaSessionArtworkTarget implements Target {
 
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-
             // update meta data with artwork.
-            // copy bitmap to avoid IllegalStateException "Can't parcel a recycled bitmap"
-            // from the remove control client on KitKat (IRemoteControlDisplay.java:340)
             SoundCloudTrack track = mPlayerPlaylist.getCurrentTrack();
             if (track != null) {
-                mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(),
-                        bitmap.copy(bitmap.getConfig(), false));
+                // On KitKat and bellow, copy bitmap to avoid IllegalStateException "Can't parcel a recycled bitmap"
+                // from the remove control client on KitKat (IRemoteControlDisplay.java:340)
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                    bitmap = bitmap.copy(bitmap.getConfig(), false);
+                }
+
+                mMediaSession.setMetaData(mPlayerPlaylist.getCurrentTrack(), bitmap);
             }
 
         }
