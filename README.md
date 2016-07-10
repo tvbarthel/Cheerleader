@@ -157,8 +157,18 @@ Note that small icon as well as small icon background (Lollipop only) can also b
 
 | Pre-Lollipop | Post-Lollipop |
 |:-:|:-:|
-| [![nexus 4 collapsed](./static/notifications/nexus4_collapsed_thumbnail.png)](./static/notifications/nexus4_collapsed.png) | [![nexus 5 collapsed](./static/notifications/nexus5_collapsed_thumbnail.png)](./static/notifications/nexus5_collapsed.png)
-| [![nexus 4 expanded](./static/notifications/nexus4_expanded_thumbnail.png)](./static/notifications/nexus4_expanded.png) | [![nexus 5 expanded](./static/notifications/nexus5_expanded_thumbnail.png)](./static/notifications/nexus5_expanded.png)
+| [![KitKat collapsed](./static/notifications/notif_kitkat_collapsed_thumbnail.png)](./static/notifications/notif_kitkat_collapsed.png) | [![lollipop collapsed](./static/notifications/notif_lollipop_collapsed_thumbnail.png)](./static/notifications/notif_lollipop_collapsed.png)
+| [![KitKat expanded](./static/notifications/notif_kitkat_expanded_thumbnail.png)](./static/notifications/notif_kitkat_expanded.png) | [![lollipop expanded](./static/notifications/notif_lollipop_expanded_thumbnail.png)](./static/notifications/notif_lollipop_expanded.png)
+
+**Android Wear**
+
+Cheerleader now fully supports Android Wear ♥
+
+| Player | Controls |
+|:-:|:-:|
+| [![Android wear player](./static/notifications/notif_wear_1_thumbnail.png)](./static/notifications/notif_wear_1.png) | [![Android wear control](./static/notifications/notif_wear_2_thumbnail.png)](./static/notifications/notif_wear_2.png) |
+
+*Note:* the color of the control background is extracted by Android from the artwork.
 
 
 ## Player interface
@@ -259,7 +269,6 @@ See also ```java mCheerleaderPlayer.registerPlaylistListener(listener) ``` and `
 
 # TODO
 * Add the possibility to download the tracks localy.
-* Support Android Wear notification.
 * Support Android Auto.
 * Support Chromecast.
 
