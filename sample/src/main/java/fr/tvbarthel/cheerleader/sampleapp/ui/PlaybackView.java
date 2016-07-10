@@ -144,6 +144,10 @@ public class PlaybackView extends FrameLayout implements View.OnClickListener,
     @Override
     public void onPlayerPause() {
         mPlayPause.setImageResource(R.drawable.ic_play_white);
+        if (mPlayPause.getVisibility() == INVISIBLE) {
+            mLoader.setVisibility(INVISIBLE);
+            mPlayPause.setVisibility(VISIBLE);
+        }
     }
 
     @Override

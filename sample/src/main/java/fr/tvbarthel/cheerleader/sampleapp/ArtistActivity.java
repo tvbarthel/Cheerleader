@@ -31,7 +31,6 @@ import fr.tvbarthel.cheerleader.sampleapp.ui.PlaybackView;
 import fr.tvbarthel.cheerleader.sampleapp.ui.TrackView;
 import rx.Subscriber;
 import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -250,17 +249,17 @@ public class ArtistActivity extends ActionBarActivity implements
         mRetrievedTracks.clear();
         mAdapter.notifyDataSetChanged();
 
-        mTracksSubscription = AppObservable.bindActivity(this,
+        mTracksSubscription =
                 mCheerleaderClient.getArtistTracks()
                         .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread()))
-                .subscribe(displayTracks());
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(displayTracks());
 
-        mProfileSubscription = AppObservable.bindActivity(this,
+        mProfileSubscription =
                 mCheerleaderClient.getArtistProfile()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io()))
-                .subscribe(displayArtist());
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(displayArtist());
     }
 
     /**
@@ -413,9 +412,9 @@ public class ArtistActivity extends ActionBarActivity implements
     }
 
     /**
-     * Release a subcription.
+     * Release a subscription.
      *
-     * @param subscription subcription to release.
+     * @param subscription subscription to release.
      */
     private void releaseSubscription(Subscription subscription) {
         if (subscription != null && !subscription.isUnsubscribed()) {

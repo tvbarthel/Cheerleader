@@ -71,13 +71,13 @@ public class ArtistView extends FrameLayout {
     public void setModel(SoundCloudUser artist) {
         mModel = artist;
         if (mModel != null) {
-            Picasso.with(getContext()).load(mModel.getAvatarUrl()).into(mAvatar);
+            Picasso.with(getContext()).load(mModel.getAvatarUrl()).fit().centerInside().into(mAvatar);
             mArtistName.setText(mModel.getFullName());
             mTracks.setText(
-                String.format(
-                    getResources().getString(R.string.artist_view_track_count),
-                    mModel.getTrackCount()
-                )
+                    String.format(
+                            getResources().getString(R.string.artist_view_track_count),
+                            mModel.getTrackCount()
+                    )
             );
             mDescription.setText(Html.fromHtml(mModel.getDescription()));
             this.setVisibility(VISIBLE);

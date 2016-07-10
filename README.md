@@ -21,6 +21,7 @@ The library is composed of two main classes :
 * [Gradle Dependency](#gradle-dependency)
 * [CheerleaderClient](#cheerleaderclient)
 * [CheerleaderPlayer](#cheerleaderplayer)
+* [Release Notes](#release-notes)
 * [TODO](#todo)
 * [Methods Count](#methods-count)
 * [Contributing](#contributing)
@@ -43,7 +44,7 @@ Please keep in mind that the main goal of this project is to help independent ar
 Promoted on Maven Central : 
 
 ```java
-compile 'fr.tvbarthel.cheerleader:library:0.1.1'
+compile 'fr.tvbarthel.cheerleader:library:1.0.0'
 ```
 
 # CheerleaderClient 
@@ -127,7 +128,8 @@ Note that a pipe can be used to chain log levels.
 # CheerleaderPlayer
 The player encapsulate the whole playback logic including :
 - An internal playlist;
-- Notification, small and expanded (Artist name, track title, track artwork, actions -play, pause, previous, next-);
+- Phone Notification, small and expanded (Artist name, track title, track artwork, actions -play, pause, previous, next-);
+- Wear Notification (Artist name, track title, track artwork, actions -play, pause, previous, next, volume up, volume down-);
 - Lock screen enhancement while playing (track artwork);
 - Audio focus compliant (pause when headset is unplugged, pause/resume while hanging up the phone, etc.);
 - Support of third app equalizer. 
@@ -151,14 +153,24 @@ By default, no pending intent is attached to the notification.  In order to link
             .with(R.string.sound_cloud_client_id)
             .build();
 ```
-Note that small icon as well as small icon background (Lollipop only) can also be customized through the Builder.
+Note that small icon as well as small icon background (Lollipop+ only) can also be customized through the Builder.
 
 **Overview**
 
 | Pre-Lollipop | Post-Lollipop |
 |:-:|:-:|
-| [![nexus 4 collapsed](./static/notifications/nexus4_collapsed_thumbnail.png)](./static/notifications/nexus4_collapsed.png) | [![nexus 5 collapsed](./static/notifications/nexus5_collapsed_thumbnail.png)](./static/notifications/nexus5_collapsed.png)
-| [![nexus 4 expanded](./static/notifications/nexus4_expanded_thumbnail.png)](./static/notifications/nexus4_expanded.png) | [![nexus 5 expanded](./static/notifications/nexus5_expanded_thumbnail.png)](./static/notifications/nexus5_expanded.png)
+| [![KitKat collapsed](./static/notifications/notif_kitkat_collapsed_thumbnail.png)](./static/notifications/notif_kitkat_collapsed.png) | [![lollipop collapsed](./static/notifications/notif_lollipop_collapsed_thumbnail.png)](./static/notifications/notif_lollipop_collapsed.png)
+| [![KitKat expanded](./static/notifications/notif_kitkat_expanded_thumbnail.png)](./static/notifications/notif_kitkat_expanded.png) | [![lollipop expanded](./static/notifications/notif_lollipop_expanded_thumbnail.png)](./static/notifications/notif_lollipop_expanded.png)
+
+**Android Wear**
+
+Cheerleader now fully supports Android Wear ♥
+
+| Player | Controls |
+|:-:|:-:|
+| [![Android wear player](./static/notifications/notif_wear_1_thumbnail.png)](./static/notifications/notif_wear_1.png) | [![Android wear control](./static/notifications/notif_wear_2_thumbnail.png)](./static/notifications/notif_wear_2.png) |
+
+*Note:* the color of the control background is extracted by Android from the artwork.
 
 
 ## Player interface
@@ -257,19 +269,25 @@ A second listener used to catch any events performed on the internal playlist.
 ```
 See also ```java mCheerleaderPlayer.registerPlaylistListener(listener) ``` and ```java mCheerleaderPlayer.unregisterPlaylistListener(listener) ```
 
+# Release Notes
+* 1.0.0 :
+    * No API break to mention.
+    * Add the support of Android Wear notification.
+    * Improve stability of the playback service.
+    * Use last version of RxJava and Retrofit.
+
 # TODO
 * Add the possibility to download the tracks localy.
-* Support Android Wear notification.
 * Support Android Auto.
 * Support Chromecast.
 
 # Methods Count
 ```java
-    |cheerleader 569
-    |    |client 252
-    |    |player 199
-    |    |offline 51
-    |    |media 28
+    |cheerleader 577
+    |    |client 264
+    |    |player 201
+    |    |offline 43
+    |    |media 29
     |    |remote 22
     |    |helpers 2
 ```
@@ -300,4 +318,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 # Special Thanks to ...
-(Ivan B)[https://twitter.com/ivanbnw) , for his daily support and motivation through his lyrics.
+[Ivan B](https://twitter.com/ivanbnw) , for his daily support and motivation through his lyrics.
