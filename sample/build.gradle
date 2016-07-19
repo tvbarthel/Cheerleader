@@ -22,6 +22,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    // fake product flavor used to ensure that multiple app using cheerleader
+    // can be installed on the same device.
+    productFlavors {
+        blue {
+            applicationIdSuffix ".blue"
+        }
+
+        red {
+            applicationIdSuffix ".red"
+        }
+    }
 }
 
 dependencies {
