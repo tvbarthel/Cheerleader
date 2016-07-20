@@ -1,6 +1,7 @@
 package fr.tvbarthel.cheerleader.library.helpers;
 
 import fr.tvbarthel.cheerleader.library.client.SoundCloudTrack;
+import fr.tvbarthel.cheerleader.library.client.SoundCloudUser;
 
 /**
  * Used to encapsulate artwork url format.
@@ -76,6 +77,46 @@ public final class SoundCloudArtworkHelper {
      */
     public static String getArtworkUrl(SoundCloudTrack track, String size) {
         String defaultUrl = track.getArtworkUrl();
+        if (defaultUrl == null) {
+            return null;
+        }
+        switch (size) {
+            case MINI:
+            case TINY:
+            case SMALL:
+            case BADGE:
+            case LARGE:
+            case XLARGE:
+            case XXLARGE:
+            case XXXLARGE:
+                return defaultUrl.replace(LARGE, size);
+            default:
+                return defaultUrl;
+        }
+    }
+
+    /**
+     * Retrieve the cover url of a user pointing to the requested size.
+     * <p/>
+     * By default, {@link SoundCloudUser#getAvatarUrl()}
+     * points to the {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#LARGE}
+     * <p/>
+     * Available size are :
+     * {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#MINI}
+     * {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#TINY}
+     * {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#SMALL}
+     * {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#BADGE}
+     * {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#LARGE}
+     * {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#XLARGE}
+     * {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#XXLARGE}
+     * {@link fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper#XXXLARGE}
+     *
+     * @param user user for which cover url should be returned.
+     * @param size wished size.
+     * @return artwork url or null if no artwork are available.
+     */
+    public static String getCoverUrl(SoundCloudUser user, String size) {
+        String defaultUrl = user.getAvatarUrl();
         if (defaultUrl == null) {
             return null;
         }
