@@ -1,7 +1,6 @@
 package fr.tvbarthel.cheerleader.library.offline;
 
 import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -43,6 +42,11 @@ final class OfflinerQueryHandler extends AsyncQueryHandler {
     private static final int TOKEN_SAVE_NEW_REQUEST = 2;
 
     /**
+     * package name of the application currently using cheerleader.
+     */
+    private final String mPackageName;
+
+    /**
      * Used to know if log are enable or not.
      */
     private boolean mDebug;
@@ -51,11 +55,12 @@ final class OfflinerQueryHandler extends AsyncQueryHandler {
     /**
      * Handle accessing and retrieving for offline storage.
      *
-     * @param cr ContentResolver
+     * @param context holding context used to initialize internal component.
      */
-    public OfflinerQueryHandler(ContentResolver cr) {
-        super(cr);
-        mDebug = false;
+    public OfflinerQueryHandler(Context context) {
+        super(context.getContentResolver());
+        this.mDebug = false;
+        this.mPackageName = context.getPackageName();
     }
 
     /**
@@ -190,7 +195,7 @@ final class OfflinerQueryHandler extends AsyncQueryHandler {
      * @return full build URI.
      */
     private Uri getUri(String string) {
-        return Uri.parse(OfflinerProvider.CONTENT + OfflinerProvider.getAuthority()
+        return Uri.parse(OfflinerProvider.CONTENT + OfflinerProvider.getAuthority(mPackageName)
                 + OfflinerProvider.SLASH + string);
     }
 }
