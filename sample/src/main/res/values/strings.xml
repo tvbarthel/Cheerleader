@@ -2,7 +2,6 @@
 <resources>
 
     <!-- general -->
-    <string name="app_name">Cheerleader</string>
     <string name="id">id : %1$d</string>
     <string name="action_settings">Settings</string>
     <string name="duration">%1$d:%2$02d</string>

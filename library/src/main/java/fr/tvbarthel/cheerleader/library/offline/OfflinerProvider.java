@@ -27,7 +27,7 @@ public class OfflinerProvider extends ContentProvider {
     public static final String SLASH = "/";
 
     private static final String UNKNOWN_URI = "Unknown URI ";
-    private static final String AUTHORITY = "fr.tvbarthel.cheerleader.library.Cheerleader.OfflineProvider";
+    private static final String AUTHORITY = ".Cheerleader.OfflineProvider";
     private static final int CACHE = 1;
     private static final String TAG = OfflinerProvider.class.getSimpleName();
     private static UriMatcher sUriMatcher;
@@ -40,10 +40,11 @@ public class OfflinerProvider extends ContentProvider {
     /**
      * Retrieve the authority of the provider.
      *
+     * @param packageName package name.
      * @return authority.
      */
-    public static String getAuthority() {
-        return AUTHORITY;
+    public static String getAuthority(String packageName) {
+        return packageName + AUTHORITY;
     }
 
     @Override
@@ -120,7 +121,7 @@ public class OfflinerProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         mDbHelper = new OfflinerDBHelper(getContext());
-        mAuthority = getAuthority();
+        mAuthority = getAuthority(getContext().getPackageName());
         if (sUriMatcher == null) {
             sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
             sUriMatcher.addURI(mAuthority, OfflinerDBHelper.TABLE_CACHE, CACHE);

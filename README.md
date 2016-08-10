@@ -44,7 +44,7 @@ Please keep in mind that the main goal of this project is to help independent ar
 Promoted on Maven Central : 
 
 ```java
-compile 'fr.tvbarthel.cheerleader:library:1.0.0'
+compile 'fr.tvbarthel.cheerleader:library:1.0.1'
 ```
 
 # CheerleaderClient 
@@ -270,6 +270,10 @@ A second listener used to catch any events performed on the internal playlist.
 See also ```java mCheerleaderPlayer.registerPlaylistListener(listener) ``` and ```java mCheerleaderPlayer.unregisterPlaylistListener(listener) ```
 
 # Release Notes
+* 1.0.1 :
+    * Allow multiple app using Cheerleader to be installed at the same time (x
+    * add SoundCloudArtworkHelper#getCoverUrl(SoundCloudUser user, String size) method
+      to retrieve user artwork url for different size.
 * 1.0.0 :
     * No API break to mention.
     * Add the support of Android Wear notification.
@@ -283,13 +287,13 @@ See also ```java mCheerleaderPlayer.registerPlaylistListener(listener) ``` and `
 
 # Methods Count
 ```java
-    |cheerleader 577
+    |cheerleader 578
     |    |client 264
     |    |player 201
     |    |offline 43
     |    |media 29
     |    |remote 22
-    |    |helpers 2
+    |    |helpers 3
 ```
 
 # Contributing

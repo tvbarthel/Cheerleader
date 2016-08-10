@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import fr.tvbarthel.cheerleader.library.client.SoundCloudUser;
+import fr.tvbarthel.cheerleader.library.helpers.SoundCloudArtworkHelper;
 import fr.tvbarthel.cheerleader.sampleapp.R;
 
 /**
@@ -71,7 +72,16 @@ public class ArtistView extends FrameLayout {
     public void setModel(SoundCloudUser artist) {
         mModel = artist;
         if (mModel != null) {
-            Picasso.with(getContext()).load(mModel.getAvatarUrl()).fit().centerInside().into(mAvatar);
+            Picasso.with(getContext())
+                    .load(
+                            SoundCloudArtworkHelper.getCoverUrl(
+                                    mModel,
+                                    SoundCloudArtworkHelper.XLARGE
+                            )
+                    )
+                    .fit()
+                    .centerInside()
+                    .into(mAvatar);
             mArtistName.setText(mModel.getFullName());
             mTracks.setText(
                     String.format(

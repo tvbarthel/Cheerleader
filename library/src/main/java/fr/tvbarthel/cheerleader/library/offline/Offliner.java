@@ -60,7 +60,7 @@ public final class Offliner {
     public Offliner(Context context, boolean debug) {
         super();
         mDebug = debug;
-        mCacheQueryHandler = new OfflinerQueryHandler(context.getContentResolver());
+        mCacheQueryHandler = new OfflinerQueryHandler(context.getApplicationContext());
         mContext = new WeakReference<>(context.getApplicationContext());
         mCacheQueryHandler.debug(debug);
         mInternalInterceptor = new Interceptor() {
