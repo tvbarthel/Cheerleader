@@ -157,10 +157,10 @@ Note that small icon as well as small icon background (Lollipop+ only) can also 
 
 **Overview**
 
-| Pre-Lollipop | Post-Lollipop |
-|:-:|:-:|
-| [![KitKat collapsed](./static/notifications/notif_kitkat_collapsed_thumbnail.png)](./static/notifications/notif_kitkat_collapsed.png) | [![lollipop collapsed](./static/notifications/notif_lollipop_collapsed_thumbnail.png)](./static/notifications/notif_lollipop_collapsed.png)
-| [![KitKat expanded](./static/notifications/notif_kitkat_expanded_thumbnail.png)](./static/notifications/notif_kitkat_expanded.png) | [![lollipop expanded](./static/notifications/notif_lollipop_expanded_thumbnail.png)](./static/notifications/notif_lollipop_expanded.png)
+| Pre-Lollipop | Post-Lollipop | Nougat |
+|:-:|:-:|:-:|
+| [![KitKat collapsed](./static/notifications/notif_kitkat_collapsed_thumbnail.png)](./static/notifications/notif_kitkat_collapsed.png) | [![lollipop collapsed](./static/notifications/notif_lollipop_collapsed_thumbnail.png)](./static/notifications/notif_lollipop_collapsed.png) | [![Nougat collapsed](./static/notifications/notif_nougat_collapsed_thumbnail.png)](./static/notifications/notif_nougat_collapsed.png)
+| [![KitKat expanded](./static/notifications/notif_kitkat_expanded_thumbnail.png)](./static/notifications/notif_kitkat_expanded.png) | [![lollipop expanded](./static/notifications/notif_lollipop_expanded_thumbnail.png)](./static/notifications/notif_lollipop_expanded.png) | [![Nougat expanded](./static/notifications/notif_nougat_expanded_thumbnail.png)](./static/notifications/notif_nougat_expanded.png)
 
 **Android Wear**
 

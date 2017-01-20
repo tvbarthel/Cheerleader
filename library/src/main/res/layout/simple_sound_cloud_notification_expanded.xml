@@ -3,19 +3,19 @@ Based one notification_template_material_big_picture.xml
     http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/5.0.1_r1/frameworks/base/core/res/res/layout/notification_template_material_big_picture.xml
 !-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="128dp"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    tools:ignore="ContentDescription">
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="128dp"
+             android:gravity="center_vertical"
+             android:orientation="horizontal"
+             tools:ignore="ContentDescription">
 
     <ImageView
         android:id="@+id/simple_sound_cloud_notification_thumbnail"
         android:layout_width="@dimen/simple_sound_cloud_notification_icon_expanded"
         android:layout_height="@dimen/simple_sound_cloud_notification_icon_expanded"
         android:layout_marginRight="@dimen/simple_sound_cloud_notification_padding"
-        android:background="#ff37474f" />
+        android:background="#ff37474f"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,17 +35,18 @@ Based one notification_template_material_big_picture.xml
             android:singleLine="true"
             android:textColor="@color/simple_sound_cloud_notification_title"
             android:textSize="@dimen/simple_sound_cloud_notification_title"
-            tools:text="Ivan B" />
+            tools:text="Ivan B"/>
 
         <TextView
             android:id="@+id/simple_sound_cloud_notification_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:fontFamily="sans-serif-condensed"
             android:maxLines="2"
             android:textColor="@color/simple_sound_cloud_notification_subtitle"
             android:textSize="@dimen/simple_sound_cloud_notification_subtitle"
-            tools:text="Story writing" />
+            tools:text="Story writing"/>
 
     </LinearLayout>
 
@@ -63,7 +64,7 @@ Based one notification_template_material_big_picture.xml
             android:background="@drawable/notification_button"
             android:padding="@dimen/simple_sound_cloud_notification_icon_padding_big"
             android:scaleType="centerInside"
-            android:src="@drawable/simple_sound_cloud_notification_previous" />
+            android:src="@drawable/simple_sound_cloud_notification_previous"/>
 
         <ImageButton
             android:id="@+id/simple_sound_cloud_notification_play"
@@ -73,7 +74,7 @@ Based one notification_template_material_big_picture.xml
             android:background="@drawable/notification_button"
             android:padding="@dimen/simple_sound_cloud_notification_icon_padding_big"
             android:scaleType="centerInside"
-            android:src="@drawable/simple_sound_cloud_notification_play" />
+            android:src="@drawable/simple_sound_cloud_notification_play"/>
 
         <ImageButton
             android:id="@+id/simple_sound_cloud_notification_next"
@@ -83,7 +84,7 @@ Based one notification_template_material_big_picture.xml
             android:background="@drawable/notification_button"
             android:padding="@dimen/simple_sound_cloud_notification_icon_padding_big"
             android:scaleType="centerInside"
-            android:src="@drawable/simple_sound_cloud_notification_next" />
+            android:src="@drawable/simple_sound_cloud_notification_next"/>
 
     </LinearLayout>
 
@@ -95,6 +96,6 @@ Based one notification_template_material_big_picture.xml
         android:background="@drawable/notification_button"
         android:padding="@dimen/simple_sound_cloud_notification_padding"
         android:scaleType="fitCenter"
-        android:src="@drawable/simple_sound_cloud_notification_clear" />
+        android:src="@drawable/simple_sound_cloud_notification_clear"/>
 
 </FrameLayout>
