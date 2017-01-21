@@ -12,8 +12,8 @@
         android:layout_height="64dp"
         android:layout_gravity="start|top"
         android:scaleType="centerCrop"
-        app:border_color="@color/track_view_artwork_border"
-        app:border_width="2dp" />
+        app:civ_border_color="@color/track_view_artwork_border"
+        app:civ_border_width="2dp" />
 
     <TextView
         android:id="@+id/track_view_artist"
