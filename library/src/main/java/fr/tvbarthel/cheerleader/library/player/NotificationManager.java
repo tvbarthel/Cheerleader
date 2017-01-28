@@ -352,6 +352,8 @@ final class NotificationManager {
         // set the notification priority.
         mNotificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
 
+        mNotificationBuilder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+
         // set the content intent.
         Class<?> playerActivity = mNotificationConfig.getNotificationActivity();
         if (playerActivity != null) {

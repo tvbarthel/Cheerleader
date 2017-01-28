@@ -44,7 +44,7 @@ Please keep in mind that the main goal of this project is to help independent ar
 Promoted on Maven Central : 
 
 ```java
-compile 'fr.tvbarthel.cheerleader:library:1.0.1'
+compile 'fr.tvbarthel.cheerleader:library:1.0.2'
 ```
 
 # CheerleaderClient 
@@ -157,10 +157,10 @@ Note that small icon as well as small icon background (Lollipop+ only) can also 
 
 **Overview**
 
-| Pre-Lollipop | Post-Lollipop |
-|:-:|:-:|
-| [![KitKat collapsed](./static/notifications/notif_kitkat_collapsed_thumbnail.png)](./static/notifications/notif_kitkat_collapsed.png) | [![lollipop collapsed](./static/notifications/notif_lollipop_collapsed_thumbnail.png)](./static/notifications/notif_lollipop_collapsed.png)
-| [![KitKat expanded](./static/notifications/notif_kitkat_expanded_thumbnail.png)](./static/notifications/notif_kitkat_expanded.png) | [![lollipop expanded](./static/notifications/notif_lollipop_expanded_thumbnail.png)](./static/notifications/notif_lollipop_expanded.png)
+| Pre-Lollipop | Post-Lollipop | Nougat |
+|:-:|:-:|:-:|
+| [![KitKat collapsed](./static/notifications/notif_kitkat_collapsed_thumbnail.png)](./static/notifications/notif_kitkat_collapsed.png) | [![lollipop collapsed](./static/notifications/notif_lollipop_collapsed_thumbnail.png)](./static/notifications/notif_lollipop_collapsed.png) | [![Nougat collapsed](./static/notifications/notif_nougat_collapsed_thumbnail.png)](./static/notifications/notif_nougat_collapsed.png)
+| [![KitKat expanded](./static/notifications/notif_kitkat_expanded_thumbnail.png)](./static/notifications/notif_kitkat_expanded.png) | [![lollipop expanded](./static/notifications/notif_lollipop_expanded_thumbnail.png)](./static/notifications/notif_lollipop_expanded.png) | [![Nougat expanded](./static/notifications/notif_nougat_expanded_thumbnail.png)](./static/notifications/notif_nougat_expanded.png)
 
 **Android Wear**
 
@@ -270,11 +270,14 @@ A second listener used to catch any events performed on the internal playlist.
 See also ```java mCheerleaderPlayer.registerPlaylistListener(listener) ``` and ```java mCheerleaderPlayer.unregisterPlaylistListener(listener) ```
 
 # Release Notes
-* 1.0.1 :
+* 1.0.2:
+    * Notification layout for Android N.
+    * Use last build tools / libraries dependencies.
+* 1.0.1:
     * Allow multiple app using Cheerleader to be installed at the same time (x
     * add SoundCloudArtworkHelper#getCoverUrl(SoundCloudUser user, String size) method
       to retrieve user artwork url for different size.
-* 1.0.0 :
+* 1.0.0:
     * No API break to mention.
     * Add the support of Android Wear notification.
     * Improve stability of the playback service.
